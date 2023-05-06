@@ -1,10 +1,11 @@
 // ----------------------------------------------------------------------------
-// Adafruit BME280 Temperature Humidity Pressure Sensor
+// Adafruit BME280 Temperature Humidity Pressure Sensor -- Adressage par défaut pour le BME280 externe Adr = 0x77
+// Pression non-ajouté
 // https://www.adafruit.com/product/2652
 // ----------------------------------------------------------------------------
 void configureBme280()
 {
-  DEBUG_PRINT("Info - Initializing BME280...");
+  DEBUG_PRINT("Info - Initializing BME280 Ext...");
 
   if (bme280.begin())
   {
@@ -30,7 +31,63 @@ void readBme280()
   // Check if sensor initialized successfully
   if (online.bme280)
   {
-    DEBUG_PRINT("Info - Reading BME280...");
+    DEBUG_PRINT("Info - Reading BME280 Ext...");
+
+    myDelay(250);
+
+    // Read sensor data
+    temperatureExt = bme280.readTemperature();
+    humidityExt = bme280.readHumidity();
+    //pressureExt = bme280.readPressure() / 100.0F;
+
+    // Add to statistics object
+    temperatureExtStats.add(temperatureExt);
+    humidityExtStats.add(humidityExt);
+    //pressureExtStats.add(pressureExt);
+
+    DEBUG_PRINTLN("done.");
+  }
+  else
+  {
+    DEBUG_PRINTLN("Warning - BME280 Ext offline!");
+  }
+  // Stop the loop timer
+  timer.readBme280 = millis() - loopStartTime;
+}
+
+// ----------------------------------------------------------------------------
+// Adafruit BME280 Temperature Humidity Pressure Sensor -- Second adressage pour le BME280 interne adr = 0x76
+// https://www.adafruit.com/product/2652
+// ----------------------------------------------------------------------------
+void configureBme280Int()
+{
+  DEBUG_PRINT("Info - Initializing BME280 int...");
+
+  if (bme280.begin(0x76))
+  {
+    online.bme280Int = true;
+    DEBUG_PRINTLN("success!");
+  }
+  else
+  {
+    online.bme280Int = false;
+    DEBUG_PRINTLN("failed!");
+  }
+}
+
+// Read BME280
+void readBme280Int()
+{
+  // Start the loop timer
+  unsigned long loopStartTime = millis();
+
+  // Initialize sensor
+  configureBme280Int();
+
+  // Check if sensor initialized successfully
+  if (online.bme280Int)
+  {
+    DEBUG_PRINT("Info - Reading BME280 Int...");
 
     myDelay(250);
 
@@ -48,12 +105,65 @@ void readBme280()
   }
   else
   {
-    DEBUG_PRINTLN("Warning - BME280 offline!");
+    DEBUG_PRINTLN("Warning - BME280 int offline!");
   }
   // Stop the loop timer
   timer.readBme280 = millis() - loopStartTime;
 }
 
+// ----------------------------------------------------------------------------
+// Adafruit VEML7700 Lux Meter -- Basé sur le BME280
+// ----------------------------------------------------------------------------
+void configureVEML7700()
+{
+  DEBUG_PRINT("Info - Initializing BME280...");
+
+  if (veml.begin())
+  {
+    online.veml7700 = true;
+    DEBUG_PRINTLN("success!");
+  }
+  else
+  {
+    online.veml7700 = false;
+    DEBUG_PRINTLN("failed!");
+  }
+}
+
+// Read BME280
+void readVeml7700()
+{
+  // Start the loop timer
+  unsigned long loopStartTime = millis();
+
+  // Initialize sensor
+  configureVEML7700();
+
+  // Check if sensor initialized successfully
+  if (online.veml7700)
+  {
+    DEBUG_PRINT("Info - Reading VEML7700...");
+
+    myDelay(250);
+
+// Add acquisition
+  solar = 0.0945 * veml.readLux(); // Default = VEML_LUX_NORMAL
+  
+  solarStats.add(solar);
+  
+    DEBUG_PRINTLN("done.");
+  }
+  else
+  {
+    DEBUG_PRINTLN("Warning - VEML7700 offline!");
+  }
+  // Stop the loop timer
+  timer.readVeml7700 = millis() - loopStartTime;
+}
+
+
+
+/*
 // ----------------------------------------------------------------------------
 // Davis Instruments Temperature Humidity Sensor (Sensiron SHT31-LSS)
 // ------------------------------
@@ -95,7 +205,7 @@ void readSht31()
   // Stop the loop timer
   timer.readSht31 = millis() - loopStartTime;
 }
-
+*/
 // ----------------------------------------------------------------------------
 // Adafruit LSM303AGR Accelerometer/Magnetomter
 // https://www.adafruit.com/product/4413
@@ -193,6 +303,7 @@ void readLsm303()
 // Black      A4      CH2: Temperature (0 - 2.5V)
 // Shield     GND     Earth ground
 // ----------------------------------------------------------------------------
+/*
 void readHmp60()
 {
   // Start loop timer
@@ -232,7 +343,7 @@ void readHmp60()
   // Stop loop timer
   timer.readHmp60 = millis() - loopStartTime;
 }
-
+*/
 // ----------------------------------------------------------------------------
 // Apogee SP-212 Pyranometer
 // -----------------------------------------------------
@@ -243,6 +354,7 @@ void readHmp60()
 // Black     GND        Ground (from sensor signal and output power)
 // Clear     GND        Shield/Ground
 // ----------------------------------------------------------------------------
+/*
 void readSp212()
 {
   // Start loop timer
@@ -271,7 +383,8 @@ void readSp212()
   // Stop loop timer
   timer.readSp212 = millis() - loopStartTime;
 }
-
+*/
+/*
 // ----------------------------------------------------------------------------
 // R.M. Young Wind Monitor 5103L (4-20 mA)
 // 150 Ohm 0.1% resistor
@@ -495,3 +608,4 @@ void readMb7354()
 {
 
 }
+*/

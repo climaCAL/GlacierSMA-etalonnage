@@ -74,10 +74,10 @@ void printMoSbd()
   //DEBUG_PRINT("solar:");            printTab(3);  DEBUG_PRINTLN(moSbdMessage.solar);
   DEBUG_PRINT("pitch:");            printTab(3);  DEBUG_PRINTLN(moSbdMessage.pitch);
   DEBUG_PRINT("roll:");             printTab(3);  DEBUG_PRINTLN(moSbdMessage.roll);
-  DEBUG_PRINT("windSpeed:");        printTab(2);  DEBUG_PRINTLN(moSbdMessage.windSpeed);
-  DEBUG_PRINT("windDirection:");    printTab(2);  DEBUG_PRINTLN(moSbdMessage.windDirection);
-  DEBUG_PRINT("windGustSpeed:");    printTab(2);  DEBUG_PRINTLN(moSbdMessage.windGustSpeed);
-  DEBUG_PRINT("windGustDirection:");  printTab(1);  DEBUG_PRINTLN(moSbdMessage.windGustDirection);
+  //DEBUG_PRINT("windSpeed:");        printTab(2);  DEBUG_PRINTLN(moSbdMessage.windSpeed);
+  //DEBUG_PRINT("windDirection:");    printTab(2);  DEBUG_PRINTLN(moSbdMessage.windDirection);
+  //DEBUG_PRINT("windGustSpeed:");    printTab(2);  DEBUG_PRINTLN(moSbdMessage.windGustSpeed);
+  //DEBUG_PRINT("windGustDirection:");  printTab(1);  DEBUG_PRINTLN(moSbdMessage.windGustDirection);
   //DEBUG_PRINT("latitude:");         printTab(2);  DEBUG_PRINTLN(moSbdMessage.latitude);
   //DEBUG_PRINT("longitude:");        printTab(2);  DEBUG_PRINTLN(moSbdMessage.longitude);
   //DEBUG_PRINT("satellites:");       printTab(2);  DEBUG_PRINTLN(moSbdMessage.satellites);

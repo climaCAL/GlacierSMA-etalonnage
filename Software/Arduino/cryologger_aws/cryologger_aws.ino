@@ -46,6 +46,7 @@
 #include <TinyGPS++.h>              // https://github.com/mikalhart/TinyGPSPlus (v1.0.3)
 #include <Wire.h>                   // https://www.arduino.cc/en/Reference/Wire
 #include <wiring_private.h>         // Required for creating new Serial instance
+#include "Adafruit_VEML7700.h"      // Add docs
 
 // ----------------------------------------------------------------------------
 // Define unique identifier
@@ -130,6 +131,7 @@ void SERCOM1_Handler()
 // Object instantiations
 // ----------------------------------------------------------------------------
 Adafruit_BME280                 bme280;
+Adafruit_VEML7700 veml = Adafruit_VEML7700(); //Création de l'objet pour la classe du capteur de luminosité.
 Adafruit_LSM303_Accel_Unified   lsm303 = Adafruit_LSM303_Accel_Unified(54321); // I2C address: 0x1E
 IridiumSBD                      modem(IRIDIUM_PORT, PIN_IRIDIUM_SLEEP);
 RTCZero                         rtc;
@@ -234,24 +236,24 @@ typedef union
     uint16_t  humidityInt;        // Internal humidity (%)          (2 bytes)   * 100
     uint16_t  pressureInt;        // Internal pressure (hPa)        (2 bytes)   - 850 * 100
     int16_t   temperatureExt;     // External temperature (°C)      (2 bytes)   * 100
-    uint16_t  humidityExt;        // External humidity (%)          (2 bytes)   * 10
+    uint16_t  humidityExt;        // External humidity (%)          (2 bytes)   * 100
     int16_t   pitch;              // Pitch (°)                      (2 bytes)   * 100
     int16_t   roll;               // Roll (°)                       (2 bytes)   * 100
-    //uint16_t  solar;              // Solar irradiance (W m-2)       (2 bytes)   * 100
-    uint16_t  windSpeed;          // Mean wind speed (m/s)          (2 bytes)   * 100
-    uint16_t  windDirection;      // Mean wind direction (°)        (2 bytes)
-    uint16_t  windGustSpeed;      // Wind gust speed (m/s)          (2 bytes)   * 100
-    uint16_t  windGustDirection;  // Wind gust direction (°)        (2 bytes)
-    //int32_t   latitude;           // Latitude (DD)                  (4 bytes)   * 1000000
-    //int32_t   longitude;          // Longitude (DD)                 (4 bytes)   * 1000000
+    uint16_t  solar;              // Solar irradiance (W m-2)       (2 bytes)   * 100
+    //uint16_t  windSpeed;          // Mean wind speed (m/s)          (2 bytes)   * 100
+    //uint16_t  windDirection;      // Mean wind direction (°)        (2 bytes)
+    //uint16_t  windGustSpeed;      // Wind gust speed (m/s)          (2 bytes)   * 100
+    //uint16_t  windGustDirection;  // Wind gust direction (°)        (2 bytes)
+    int32_t   latitude;           // Latitude (DD)                  (4 bytes)   * 1000000
+    int32_t   longitude;          // Longitude (DD)                 (4 bytes)   * 1000000
     //uint8_t   satellites;         // # of satellites                (1 byte)
     //uint16_t  hdop;               // HDOP                           (2 bytes)
     uint16_t  voltage;            // Battery voltage (V)            (2 bytes)   * 100
     uint16_t  transmitDuration;   // Previous transmission duration (2 bytes)
     uint8_t   transmitStatus;     // Iridium return code            (1 byte)
     uint16_t  iterationCounter;   // Message counter                (2 bytes)
-  } __attribute__((packed));                                    // Total: (33 bytes)
-  uint8_t bytes[33];
+  } __attribute__((packed));                                    // Total: (35 bytes)
+  uint8_t bytes[35];
 } SBD_MO_MESSAGE;
 
 SBD_MO_MESSAGE moSbdMessage;
@@ -277,6 +279,8 @@ SBD_MT_MESSAGE mtSbdMessage;
 struct struct_online
 {
   bool bme280   = false;
+  bool bme280Int = false;
+  bool veml7700 = false;
   bool lsm303   = false;
   bool gnss     = false;
   bool microSd  = false;
@@ -291,6 +295,7 @@ struct struct_timer
   unsigned long writeMicroSd;
   unsigned long readGnss;
   unsigned long readBme280;
+  unsigned long readVeml7700;
   unsigned long readLsm303;
   unsigned long readHmp60;
   unsigned long readSht31;
@@ -443,12 +448,14 @@ void loop()
       enable5V();       // Enable 5V power
       enable12V();      // Enable 12V power
       readBme280();     // Read sensor
+      readBme280Int();
       readLsm303();     // Read accelerometer
+      readVeml7700();
       //readSp212();      // Read solar radiation
       //readSht31();      // Read temperature/relative humidity sensor
       //read7911();       // Read anemometer
-      readHmp60();      // Read temperature/relative humidity sensor
-      read5103L();      // Read anemometer
+      //readHmp60();      // Read temperature/relative humidity sensor
+      //read5103L();      // Read anemometer
       disable12V();     // Disable 12V power
       disable5V();      // Disable 5V power
 
