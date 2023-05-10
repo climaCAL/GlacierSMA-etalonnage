@@ -51,7 +51,7 @@
 // ----------------------------------------------------------------------------
 // Define unique identifier
 // ----------------------------------------------------------------------------
-#define CRYOLOGGER_ID "OEG"
+#define CRYOLOGGER_ID "AVL"
 
 // ----------------------------------------------------------------------------
 // Data logging
@@ -143,8 +143,8 @@ sensirion                       sht(20, 21);  // (data, clock). Pull-up required
 // Custom TinyGPS objects to store fix and validity information
 // Note: $GPGGA and $GPRMC sentences produced by GPS receivers (PA6H module)
 // $GNGGA and $GNRMC sentences produced by GPS/GLONASS receivers (PA161D module)
-TinyGPSCustom gnssFix(gnss, "GNGGA", 6); // Fix quality
-TinyGPSCustom gnssValidity(gnss, "GNRMC", 2); // Validity
+TinyGPSCustom gnssFix(gnss, "GPGGA", 6); // Fix quality
+TinyGPSCustom gnssValidity(gnss, "GPRMC", 2); // Validity
 
 // ----------------------------------------------------------------------------
 // Statistics objects
@@ -167,7 +167,7 @@ unsigned long sampleInterval    = 5;      // Sampling interval (minutes). Defaul
 unsigned int  averageInterval   = 12;     // Number of samples to be averaged in each message. Default: 12 (hourly)
 unsigned int  transmitInterval  = 1;      // Number of messages in each Iridium transmission (340-byte limit)
 unsigned int  retransmitLimit   = 2;      // Failed data transmission reattempts (340-byte limit)
-unsigned int  gnssTimeout       = 180;    // Timeout for GNSS signal acquisition (seconds)
+unsigned int  gnssTimeout       = 120;    // Timeout for GNSS signal acquisition (seconds)
 unsigned int  iridiumTimeout    = 180;    // Timeout for Iridium transmission (seconds)
 bool          firstTimeFlag     = true;   // Flag to determine if program is running for the first time
 float         batteryCutoff     = 0.0;    // Battery voltage cutoff threshold (V)
@@ -239,7 +239,7 @@ typedef union
     uint16_t  humidityExt;        // External humidity (%)          (2 bytes)   * 100
     int16_t   pitch;              // Pitch (°)                      (2 bytes)   * 100
     int16_t   roll;               // Roll (°)                       (2 bytes)   * 100
-    uint16_t  solar;              // Solar irradiance (W m-2)       (2 bytes)   * 100
+    uint16_t  solar;              // Solar irradiance (W m-2)       (2 bytes)   * 10
     uint16_t  windSpeed;          // Mean wind speed (m/s)          (2 bytes)   * 100
     uint16_t  windDirection;      // Mean wind direction (°)        (2 bytes)
     uint16_t  windGustSpeed;      // Wind gust speed (m/s)          (2 bytes)   * 100
