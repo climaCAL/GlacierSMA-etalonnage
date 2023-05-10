@@ -167,7 +167,7 @@ unsigned long sampleInterval    = 5;      // Sampling interval (minutes). Defaul
 unsigned int  averageInterval   = 12;     // Number of samples to be averaged in each message. Default: 12 (hourly)
 unsigned int  transmitInterval  = 1;      // Number of messages in each Iridium transmission (340-byte limit)
 unsigned int  retransmitLimit   = 2;      // Failed data transmission reattempts (340-byte limit)
-unsigned int  gnssTimeout       = 120;    // Timeout for GNSS signal acquisition (seconds)
+unsigned int  gnssTimeout       = 180;    // Timeout for GNSS signal acquisition (seconds)
 unsigned int  iridiumTimeout    = 180;    // Timeout for Iridium transmission (seconds)
 bool          firstTimeFlag     = true;   // Flag to determine if program is running for the first time
 float         batteryCutoff     = 0.0;    // Battery voltage cutoff threshold (V)
@@ -240,20 +240,20 @@ typedef union
     int16_t   pitch;              // Pitch (°)                      (2 bytes)   * 100
     int16_t   roll;               // Roll (°)                       (2 bytes)   * 100
     uint16_t  solar;              // Solar irradiance (W m-2)       (2 bytes)   * 100
-    //uint16_t  windSpeed;          // Mean wind speed (m/s)          (2 bytes)   * 100
-    //uint16_t  windDirection;      // Mean wind direction (°)        (2 bytes)
-    //uint16_t  windGustSpeed;      // Wind gust speed (m/s)          (2 bytes)   * 100
-    //uint16_t  windGustDirection;  // Wind gust direction (°)        (2 bytes)
+    uint16_t  windSpeed;          // Mean wind speed (m/s)          (2 bytes)   * 100
+    uint16_t  windDirection;      // Mean wind direction (°)        (2 bytes)
+    uint16_t  windGustSpeed;      // Wind gust speed (m/s)          (2 bytes)   * 100
+    uint16_t  windGustDirection;  // Wind gust direction (°)        (2 bytes)
     int32_t   latitude;           // Latitude (DD)                  (4 bytes)   * 1000000
     int32_t   longitude;          // Longitude (DD)                 (4 bytes)   * 1000000
-    //uint8_t   satellites;         // # of satellites                (1 byte)
-    //uint16_t  hdop;               // HDOP                           (2 bytes)
+    uint8_t   satellites;         // # of satellites                (1 byte)
+    uint16_t  hdop;               // HDOP                           (2 bytes)
     uint16_t  voltage;            // Battery voltage (V)            (2 bytes)   * 100
     uint16_t  transmitDuration;   // Previous transmission duration (2 bytes)
     uint8_t   transmitStatus;     // Iridium return code            (1 byte)
     uint16_t  iterationCounter;   // Message counter                (2 bytes)
-  } __attribute__((packed));                                    // Total: (35 bytes)
-  uint8_t bytes[35];
+  } __attribute__((packed));                                    // Total: (46 bytes)
+  uint8_t bytes[46];
 } SBD_MO_MESSAGE;
 
 SBD_MO_MESSAGE moSbdMessage;
