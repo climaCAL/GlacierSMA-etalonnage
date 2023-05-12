@@ -121,6 +121,9 @@ Uart Serial2 (&sercom1, PIN_IRIDIUM_RX, PIN_IRIDIUM_TX, SERCOM_RX_PAD_2, UART_TX
 #define GNSS_PORT     Serial1
 #define IRIDIUM_PORT  Serial2
 
+//WindSensor module I2C address declaration:
+const uint16_t WIND_SENSOR_SLAVE_ADDR = 0x66;
+
 // Attach interrupt handler to SERCOM for new Serial instance
 void SERCOM1_Handler()
 {
@@ -215,6 +218,7 @@ float         windSpeed         = 0.0;    // Wind speed (m/s)
 float         windDirection     = 0.0;    // Wind direction (°)
 float         windGustSpeed     = 0.0;    // Wind gust speed  (m/s)
 float         windGustDirection = 0.0;    // Wind gust direction (°)
+int           windDirectionSector = 0.0;  // Wind direction indicator (ref to DFRWindSpeed() for details)
 float         voltage           = 0.0;    // Battery voltage (V)
 float         latitude          = 0.0;    // GNSS latitude (DD)
 float         longitude         = 0.0;    // GNSS longitude (DD)
@@ -225,6 +229,14 @@ tmElements_t  tm;                         // Variable for converting time elemen
 // ----------------------------------------------------------------------------
 // Unions/structures
 // ----------------------------------------------------------------------------
+
+// DFRWindSensor (CAL) struc to store/retreive data
+typedef struct {
+  uint8_t regMemoryMap[6] = {0,0,0,0,0,0};
+  float angleVentFloat = 0;
+  uint16_t directionVentInt = 0;
+  float vitesseVentFloat = 0;
+}vent;
 
 // Union to store Iridium Short Burst Data (SBD) Mobile Originated (MO) messages
 typedef union
@@ -301,6 +313,7 @@ struct struct_timer
   unsigned long readSht31;
   unsigned long read5103L;
   unsigned long read7911;
+  unsigned long readDFRWS;
   unsigned long readSp212;
   unsigned long iridium;
 } timer;
@@ -451,13 +464,14 @@ void loop()
       readBme280Int();
       readLsm303();     // Read accelerometer
       readVeml7700();
-      //readSp212();      // Read solar radiation
-      //readSht31();      // Read temperature/relative humidity sensor
-      //read7911();       // Read anemometer
-      //readHmp60();      // Read temperature/relative humidity sensor
-      //read5103L();      // Read anemometer
-      disable12V();     // Disable 12V power
-      disable5V();      // Disable 5V power
+      //readSp212();       // Read solar radiation
+      //readSht31();       // Read temperature/relative humidity sensor
+      //read7911();        // Read anemometer
+      //readHmp60();       // Read temperature/relative humidity sensor
+      //read5103L();       // Read anemometer
+      readDFRWindSensor(); // Read anemometer and windDirection
+      disable12V();      // Disable 12V power
+      disable5V();       // Disable 5V power
 
       // Print summary of statistics
       printStats();

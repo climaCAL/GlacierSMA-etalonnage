@@ -11,7 +11,7 @@ void calculateStats()
   moSbdMessage.voltage        = batteryStats.average()          * 100;          // Mean battery voltage (V)
 
   // Calculate mean wind speed and direction vectors
-  //windVectors();
+  windVectors();
 
   // Clear all statistics objects
   clearStats();
@@ -19,6 +19,7 @@ void calculateStats()
   // Clear wind gust speed and direction maximums
   windGustSpeed = 0;
   windGustDirection = 0;
+  windDirectionSector = 0;
 }
 
 // Clear statistics objects
