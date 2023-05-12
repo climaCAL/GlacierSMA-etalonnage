@@ -122,6 +122,10 @@ void configureVEML7700()
   {
     online.veml7700 = true;
     DEBUG_PRINTLN("success!");
+    /*
+    veml.setGain(VEML7700_GAIN_2);
+    veml.setIntegrationTime(VEML7700_IT_200MS);
+    */
   }
   else
   {
@@ -148,7 +152,7 @@ void readVeml7700()
     myDelay(250);
 
 // Add acquisition
-  solar = veml.readLux(); // Default = VEML_LUX_NORMAL
+  solar = 51.172 * veml.readLux() ; // Default = VEML_LUX_NORMAL
   
   solarStats.add(solar);
   
