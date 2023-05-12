@@ -128,6 +128,7 @@ void configureVEML7700()
     online.veml7700 = false;
     DEBUG_PRINTLN("failed!");
   }
+  
 }
 
 // Read BME280
@@ -147,7 +148,7 @@ void readVeml7700()
     myDelay(250);
 
 // Add acquisition
-  solar = 0.0945 * veml.readLux(); // Default = VEML_LUX_NORMAL
+  solar = 10.583 * veml.readLux() - 39.794; // Default = VEML_LUX_NORMAL
   
   solarStats.add(solar);
   
