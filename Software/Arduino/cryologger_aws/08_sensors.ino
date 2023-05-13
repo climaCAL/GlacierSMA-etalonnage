@@ -152,7 +152,7 @@ void readVeml7700()
     myDelay(250);
 
 // Add acquisition
-  solar = veml.readLux() ; // Default = VEML_LUX_NORMAL
+  solar = 15.172 * veml.readLux() ; // Default = VEML_LUX_NORMAL
   
   solarStats.add(solar);
   

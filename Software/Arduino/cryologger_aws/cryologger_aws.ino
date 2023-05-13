@@ -251,7 +251,7 @@ typedef union
     uint16_t  humidityExt;        // External humidity (%)          (2 bytes)   * 100
     int16_t   pitch;              // Pitch (°)                      (2 bytes)   * 100
     int16_t   roll;               // Roll (°)                       (2 bytes)   * 100
-    uint16_t  solar;              // Solar irradiance (W m-2)       (2 bytes)   * 10
+    uint32_t  solar;              // Solar irradiance (W m-2)       (2 bytes)   * 10
     uint16_t  windSpeed;          // Mean wind speed (m/s)          (2 bytes)   * 100
     uint16_t  windDirection;      // Mean wind direction (°)        (2 bytes)
     uint16_t  windGustSpeed;      // Wind gust speed (m/s)          (2 bytes)   * 100
@@ -264,8 +264,8 @@ typedef union
     uint16_t  transmitDuration;   // Previous transmission duration (2 bytes)
     uint8_t   transmitStatus;     // Iridium return code            (1 byte)
     uint16_t  iterationCounter;   // Message counter                (2 bytes)
-  } __attribute__((packed));                                    // Total: (46 bytes)
-  uint8_t bytes[46];
+  } __attribute__((packed));                                    // Total: (48 bytes)
+  uint8_t bytes[48];
 } SBD_MO_MESSAGE;
 
 SBD_MO_MESSAGE moSbdMessage;
