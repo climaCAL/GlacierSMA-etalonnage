@@ -25,8 +25,8 @@ void configureRtc()
   rtc.setAlarmTime(0, sampleInterval, 0); // hours, minutes, seconds
 
   // Enable alarm for hour rollover match
-  rtc.enableAlarm(rtc.MATCH_MMSS);
-  //rtc.enableAlarm(rtc.MATCH_SS);
+  //rtc.enableAlarm(rtc.MATCH_MMSS);
+  rtc.enableAlarm(rtc.MATCH_SS);
 
   // Attach alarm interrupt service routine (ISR)
   rtc.attachInterrupt(alarmIsr);
@@ -35,7 +35,7 @@ void configureRtc()
 
   DEBUG_PRINT("Info - RTC initialized "); printDateTime();
   DEBUG_PRINT("Info - Initial alarm "); printAlarm();
-  DEBUG_PRINT("Info - Alarm match "); DEBUG_PRINTLN(rtc.MATCH_MMSS);
+  DEBUG_PRINT("Info - Alarm match "); DEBUG_PRINTLN(rtc.MATCH_SS);
 }
 
 // Read RTC
@@ -75,8 +75,8 @@ void setRtcAlarm()
     rtc.setAlarmTime(0, sampleInterval, 0); // hours, minutes, seconds
 
     // Enable alarm for hour rollover match
-    rtc.enableAlarm(rtc.MATCH_MMSS);
-    //rtc.enableAlarm(rtc.MATCH_SS);
+    //rtc.enableAlarm(rtc.MATCH_MMSS);
+    rtc.enableAlarm(rtc.MATCH_SS);
 
     // Reset sample counter
     sampleCounter = 0;
@@ -86,7 +86,8 @@ void setRtcAlarm()
 
     DEBUG_PRINT("Info - Current datetime: "); printDateTime();
     DEBUG_PRINT("Info - Next alarm: "); printAlarm();
-    DEBUG_PRINT("Info - Alarm match: "); DEBUG_PRINTLN(rtc.MATCH_MMSS);
+    //DEBUG_PRINT("Info - Alarm match: "); DEBUG_PRINTLN(rtc.MATCH_MMSS);
+    DEBUG_PRINT("Info - Alarm match: "); DEBUG_PRINTLN(rtc.MATCH_SS);
   }
   else
   {
