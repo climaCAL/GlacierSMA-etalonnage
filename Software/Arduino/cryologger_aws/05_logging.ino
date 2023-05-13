@@ -169,7 +169,7 @@ void logData()
       logFile.print(roll);                logFile.print(",");
       logFile.print(windSpeed);           logFile.print(",");
       logFile.print(windDirection);       logFile.print(",");
-      //logFile.print(solar);               logFile.print(",");
+      logFile.print(solar);               logFile.print(",");
       logFile.print(latitude, 6);         logFile.print(",");
       logFile.print(longitude, 6);        logFile.print(",");
       logFile.print(satellites);          logFile.print(",");
@@ -238,7 +238,7 @@ void logData()
       DEBUG_PRINT(roll);                DEBUG_PRINT(",");      
       DEBUG_PRINT(windSpeed);           DEBUG_PRINT(",");
       DEBUG_PRINT(windDirection);       DEBUG_PRINT(",");
-      //DEBUG_PRINT(solar);               DEBUG_PRINT(",");
+      DEBUG_PRINT(solar);               DEBUG_PRINT(",");
       DEBUG_PRINT_DEC(latitude, 6);     DEBUG_PRINT(",");
       DEBUG_PRINT_DEC(longitude, 6);    DEBUG_PRINT(",");
       DEBUG_PRINT(satellites);          DEBUG_PRINT(",");
