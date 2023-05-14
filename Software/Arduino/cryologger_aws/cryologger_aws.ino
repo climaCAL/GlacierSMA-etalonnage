@@ -134,7 +134,7 @@ void SERCOM1_Handler()
 // Object instantiations
 // ----------------------------------------------------------------------------
 Adafruit_BME280                 bme280;
-Adafruit_VEML7700 veml = Adafruit_VEML7700(); //Création de l'objet pour la classe du capteur de luminosité.
+//Adafruit_VEML7700               veml = Adafruit_VEML7700(); //Création de l'objet pour la classe du capteur de luminosité. --> Called in the read function.
 Adafruit_LSM303_Accel_Unified   lsm303 = Adafruit_LSM303_Accel_Unified(54321); // I2C address: 0x1E
 IridiumSBD                      modem(IRIDIUM_PORT, PIN_IRIDIUM_SLEEP);
 RTCZero                         rtc;

@@ -114,10 +114,10 @@ void readBme280Int()
 // ----------------------------------------------------------------------------
 // Adafruit VEML7700 Lux Meter -- Basé sur le BME280
 // ----------------------------------------------------------------------------
-void configureVEML7700()
+void configureVEML7700(Adafruit_VEML7700 &veml)
 {
   DEBUG_PRINT("Info - Initializing BME280...");
-
+  
   if (veml.begin())
   {
     online.veml7700 = true;
@@ -132,7 +132,6 @@ void configureVEML7700()
     online.veml7700 = false;
     DEBUG_PRINTLN("failed!");
   }
-  
 }
 
 // Read BME280
@@ -141,9 +140,11 @@ void readVeml7700()
   // Start the loop timer
   unsigned long loopStartTime = millis();
 
+  Adafruit_VEML7700 veml = Adafruit_VEML7700();
+   
   // Initialize sensor
-  configureVEML7700();
-
+  configureVEML7700(veml);
+  
   // Check if sensor initialized successfully
   if (online.veml7700)
   {
