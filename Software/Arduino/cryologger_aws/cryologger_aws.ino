@@ -152,16 +152,17 @@ TinyGPSCustom gnssValidity(gnss, "GPRMC", 2); // Validity
 // ----------------------------------------------------------------------------
 // Statistics objects
 // ----------------------------------------------------------------------------
-Statistic batteryStats;         // Battery voltage
-Statistic temperatureIntStats;  // Internal temperature
-Statistic humidityIntStats;     // Internal humidity
-Statistic pressureIntStats;     // Internal pressure
-Statistic temperatureExtStats;  // External temperature
-Statistic humidityExtStats;     // External humidity
-Statistic solarStats;           // Solar radiation
-Statistic windSpeedStats;       // Wind speed
-Statistic uStats;               // Wind east-west wind vector component (u)
-Statistic vStats;               // Wind north-south wind vector component (v)
+typedef statistic::Statistic<float,uint32_t,false> StatisticCAL;
+StatisticCAL batteryStats;         // Battery voltage
+StatisticCAL temperatureIntStats;  // Internal temperature
+StatisticCAL humidityIntStats;     // Internal humidity
+StatisticCAL pressureIntStats;     // Internal pressure
+StatisticCAL temperatureExtStats;  // External temperature
+StatisticCAL humidityExtStats;     // External humidity
+StatisticCAL solarStats;           // Solar radiation
+StatisticCAL windSpeedStats;       // Wind speed
+StatisticCAL uStats;               // Wind east-west wind vector component (u)
+StatisticCAL vStats;               // Wind north-south wind vector component (v)
 
 // ----------------------------------------------------------------------------
 // User defined global variable declarations
@@ -173,7 +174,7 @@ unsigned int  retransmitLimit   = 4;      // Failed data transmission reattempts
 unsigned int  gnssTimeout       = 120;    // Timeout for GNSS signal acquisition (seconds)
 unsigned int  iridiumTimeout    = 180;    // Timeout for Iridium transmission (seconds)
 bool          firstTimeFlag     = true;   // Flag to determine if program is running for the first time
-float         batteryCutoff     = 0.0;    // Battery voltage cutoff threshold (V)
+float         batteryCutoff     = 11.0;    // Battery voltage cutoff threshold (V)
 byte          loggingMode       = 2;      // Flag for new log file creation. 1: daily, 2: monthly, 3: yearly
 
 // ----------------------------------------------------------------------------
@@ -275,14 +276,14 @@ typedef union
 {
   struct
   {
-    uint8_t   sampleInterval;     // 2 bytes
+    uint8_t   sampleInterval;     // 1 byte
     uint8_t   averageInterval;    // 1 byte
     uint8_t   transmitInterval;   // 1 byte
     uint8_t   retransmitLimit;    // 1 byte
-    uint8_t   batteryCutoff;      // 1 bytes
+    uint8_t   batteryCutoff;      // 1 byte
     uint8_t   resetFlag;          // 1 byte
   };
-  uint8_t bytes[7]; // Size of message to be received in bytes
+  uint8_t bytes[6]; // Size of message to be received in bytes
 } SBD_MT_MESSAGE;
 
 SBD_MT_MESSAGE mtSbdMessage;
@@ -470,8 +471,10 @@ void loop()
       //readHmp60();       // Read temperature/relative humidity sensor
       //read5103L();       // Read anemometer
       readDFRWindSensor(); // Read anemometer and windDirection
-      disable12V();      // Disable 12V power
-      disable5V();       // Disable 5V power
+
+// Moving those 2 AFTER transmit block.
+//      disable12V();      // Disable 12V power
+//      disable5V();       // Disable 5V power
 
       // Print summary of statistics
       printStats();
@@ -507,6 +510,10 @@ void loop()
 
       // Set the RTC alarm
       setRtcAlarm();
+
+      //Ok, we're done, let's shutdown things
+      disable12V();      // Disable 12V power
+      disable5V();       // Disable 5V power
 
       DEBUG_PRINTLN("Info - Entering deep sleep...");
       DEBUG_PRINTLN();

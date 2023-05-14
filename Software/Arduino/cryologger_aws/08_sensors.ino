@@ -593,12 +593,13 @@ void readDFRWindSensor()
   unsigned long loopStartTime = millis();
 
   DEBUG_PRINT("Info - Reading DFRWindSensor...");
+  myDelay(2000); //Let the DFRWindSensor settle a bit... making sure data is accurate at the sensor and ready for us.
 
   // Requires I2C bus
   Wire.begin();
   myDelay(1000);
 
-  vent lectureVent;
+  vent lectureVent;  //Let's use a structure to read wind sensor.
 
   byte len = Wire.requestFrom(WIND_SENSOR_SLAVE_ADDR,0x06);  //Requesting 6 bytes from slave
   if (len != 0) {
