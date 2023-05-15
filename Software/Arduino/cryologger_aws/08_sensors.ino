@@ -36,8 +36,8 @@ void readBme280()
     myDelay(250);
 
     // Read sensor data
-    temperatureExt = bme280.readTemperature();
-    humidityExt = bme280.readHumidity();
+    temperatureExt = 1.046 * bme280.readTemperature() - 0.805;
+    humidityExt = 1.09 * bme280.readHumidity() + 2,3;
     //pressureExt = bme280.readPressure() / 100.0F;
 
     // Add to statistics object
@@ -92,8 +92,8 @@ void readBme280Int()
     myDelay(250);
 
     // Read sensor data
-    temperatureInt = bme280.readTemperature();
-    humidityInt = bme280.readHumidity();
+    temperatureInt = 1.05 * bme280.readTemperature() - 1,07 ;
+    humidityInt = bme280.readHumidity(); // no need of correction
     pressureInt = bme280.readPressure() / 100.0F;
 
     // Add to statistics object
