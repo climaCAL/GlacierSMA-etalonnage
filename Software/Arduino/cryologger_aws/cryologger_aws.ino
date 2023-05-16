@@ -252,11 +252,11 @@ typedef union
     uint16_t  humidityExt;        // External humidity (%)          (2 bytes)   * 100
     int16_t   pitch;              // Pitch (°)                      (2 bytes)   * 100
     int16_t   roll;               // Roll (°)                       (2 bytes)   * 100
-    uint32_t  solar;              // Solar irradiance (W m-2)       (2 bytes)   * 10
+    uint32_t  solar;              // Solar illuminance (Lux)        (4 bytes)   * 10
     uint16_t  windSpeed;          // Mean wind speed (m/s)          (2 bytes)   * 100
-    uint16_t  windDirection;      // Mean wind direction (°)        (2 bytes)
+    uint16_t  windDirection;      // Mean wind direction (°)        (2 bytes)	* 10
     uint16_t  windGustSpeed;      // Wind gust speed (m/s)          (2 bytes)   * 100
-    uint16_t  windGustDirection;  // Wind gust direction (°)        (2 bytes)
+    uint16_t  windGustDirection;  // Wind gust direction (°)        (2 bytes)	* 10
     int32_t   latitude;           // Latitude (DD)                  (4 bytes)   * 1000000
     int32_t   longitude;          // Longitude (DD)                 (4 bytes)   * 1000000
     uint8_t   satellites;         // # of satellites                (1 byte)
