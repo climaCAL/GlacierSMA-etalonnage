@@ -37,7 +37,14 @@ void readBme280()
 
     // Read sensor data
     temperatureExt = 1.046 * bme280.readTemperature() - 0.805;
-    humidityExt = 1.09 * bme280.readHumidity() + 2.3;
+    uint16_t humExt = 1.09 * bme280.readHumidity() + 2.3;
+
+    if (humExt >= 100){
+      humidityExt = 100;
+    }
+    else{
+      humidityExt = humExt;
+    }
     //pressureExt = bme280.readPressure() / 100.0F;
 
     // Add to statistics object
@@ -93,8 +100,15 @@ void readBme280Int()
 
     // Read sensor data
     temperatureInt = 1.05 * bme280.readTemperature() - 1.07 ;
-    humidityInt = bme280.readHumidity(); // no need of correction
+    uint16_t humInt =  bme280.readHumidity(); // no need of correction
     pressureInt = bme280.readPressure() / 100.0F;
+
+    if (humInt >= 100){
+      humidityInt = 100;
+    }
+    else{
+      humidityInt = humInt;
+    }
 
     // Add to statistics object
     temperatureIntStats.add(temperatureInt);
@@ -153,8 +167,15 @@ void readVeml7700()
     myDelay(250);
 
 // Add acquisition
-  solar = 15.172 * veml.readLux() ; // Default = VEML_LUX_NORMAL
+  int32_t soleil = 15.172 * veml.readLux() - 998; // Default = VEML_LUX_NORMAL
   
+  if(soleil <= 0){
+    solar = 0;
+  }
+  else{
+    solar = soleil;
+  }
+
   solarStats.add(solar);
   
     DEBUG_PRINTLN("done.");
