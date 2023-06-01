@@ -59,6 +59,11 @@
 #define LOGGING         true  // Log data to microSD
 
 // ----------------------------------------------------------------------------
+// Define modifed addresses
+// ----------------------------------------------------------------------------
+#define BME280_ADR2 0x76    // Second addresse for the BME280 - Used for the interiror sensor.
+
+// ----------------------------------------------------------------------------
 // Debugging macros
 // ----------------------------------------------------------------------------
 #define DEBUG           true  // Output debug messages to Serial Monitor
@@ -177,6 +182,24 @@ bool          firstTimeFlag     = true;   // Flag to determine if program is run
 float         batteryCutoff     = 11.0;    // Battery voltage cutoff threshold (V)
 byte          loggingMode       = 2;      // Flag for new log file creation. 1: daily, 2: monthly, 3: yearly
 
+// ----------------------------------------------------------------------------
+// Sensors correction factor and offsets -- to modify -- 
+// ----------------------------------------------------------------------------
+//BME280 -- Exterior sensor
+float tempBmeEXT_CF             = 1.046;    // Correction factor for exterior temperature acquisition.
+float tempBmeEXT_Offset         = -0.805;   // Offset for exterior temperature acquisition.
+float humBmeEXT_CF              = 1.09;     // Correction factor for exterior humidity acquisition.
+float humBmeEXT_Offset          = 2.3;      // Offset for exterior humidity acquisition.
+
+//BME280 -- Interior sensor
+float tempImeINT_CF             = 1.05;     // Correction factor for interior temperature acquisition.
+float tempBmeINT_Offset         = -1.07;    // Offset for interior temperature acquisition.
+float humImeINT_CF              = 1.0;      // Correction factor for interior humidity acquisition.
+float humBmeINT_Offset          = 0.0;      // Offset for interior humidity acquisition.
+
+//VEML7700
+float veml_CF                   = 15.172;   // Correction factor for light intensity acquisition.
+float veml_Offset               = -998;     // Offset for light intensity acquisition.
 // ----------------------------------------------------------------------------
 // Global variable declarations
 // ----------------------------------------------------------------------------

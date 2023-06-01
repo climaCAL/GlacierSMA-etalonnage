@@ -36,8 +36,8 @@ void readBme280()
     myDelay(250);
 
     // Read sensor data
-    temperatureExt = 1.046 * bme280.readTemperature() - 0.805;
-    uint16_t humExt = 1.09 * bme280.readHumidity() + 2.3;
+    temperatureExt = tempBmeEXT_CF * bme280.readTemperature() + tempBmeEXT_Offset;
+    uint16_t humExt = humBmeEXT_CF * bme280.readHumidity() + humBmeEXT_Offset;
 
     if (humExt >= 100){
       humidityExt = 100;
@@ -70,7 +70,7 @@ void configureBme280Int()
 {
   DEBUG_PRINT("Info - Initializing BME280 int...");
 
-  if (bme280.begin(0x76))
+  if (bme280.begin(BME280_ADR2))
   {
     online.bme280Int = true;
     DEBUG_PRINTLN("success!");
@@ -99,8 +99,8 @@ void readBme280Int()
     myDelay(250);
 
     // Read sensor data
-    temperatureInt = 1.05 * bme280.readTemperature() - 1.07 ;
-    uint16_t humInt =  bme280.readHumidity(); // no need of correction
+    temperatureInt = tempImeINT_CF * bme280.readTemperature() + tempBmeINT_Offset ;
+    uint16_t humInt =  humImeINT_CF * bme280.readHumidity() + humBmeINT_Offset; // no need of correction
     pressureInt = bme280.readPressure() / 100.0F;
 
     if (humInt >= 100){
@@ -167,7 +167,7 @@ void readVeml7700()
     myDelay(250);
 
 // Add acquisition
-  int32_t soleil = 15.172 * veml.readLux() - 998; // Default = VEML_LUX_NORMAL
+  int32_t soleil = veml_CF * veml.readLux() + veml_Offset; // Default = VEML_LUX_NORMAL
   
   if(soleil <= 0){
     solar = 0;
