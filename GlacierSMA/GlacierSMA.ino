@@ -67,8 +67,8 @@
 // Debugging macros
 // ----------------------------------------------------------------------------
 #define DEBUG           true  // Output debug messages to Serial Monitor
-#define DEBUG_GNSS      false  // Output GNSS debug information
-#define DEBUG_IRIDIUM   false  // Output Iridium debug messages to Serial Monitor
+#define DEBUG_GNSS      false // Output GNSS debug information
+#define DEBUG_IRIDIUM   false // Output Iridium debug messages to Serial Monitor
 #define CALIBRATE       false // Enable sensor calibration code
 
 #if DEBUG
@@ -172,11 +172,19 @@ StatisticCAL vStats;               // Wind north-south wind vector component (v)
 // ----------------------------------------------------------------------------
 // User defined global variable declarations
 // ----------------------------------------------------------------------------
+#ifdef DEBUG
+unsigned long sampleInterval    = 1;      // Sampling interval (minutes). Default: 5 min (300 seconds)
+#else
 unsigned long sampleInterval    = 5;      // Sampling interval (minutes). Default: 5 min (300 seconds)
+#endif
 unsigned int  averageInterval   = 12;     // Number of samples to be averaged in each message. Default: 12 (hourly)
 unsigned int  transmitInterval  = 1;      // Number of messages in each Iridium transmission (340-byte limit)
 unsigned int  retransmitLimit   = 4;      // Failed data transmission reattempts (340-byte limit)
+#ifdef DEBUG_GNSS
+unsigned int  gnssTimeout       = 30;     // Timeout for GNSS signal acquisition (seconds)
+#else
 unsigned int  gnssTimeout       = 120;    // Timeout for GNSS signal acquisition (seconds)
+#endif
 unsigned int  iridiumTimeout    = 180;    // Timeout for Iridium transmission (seconds)
 bool          firstTimeFlag     = true;   // Flag to determine if program is running for the first time
 float         batteryCutoff     = 11.0;    // Battery voltage cutoff threshold (V)
@@ -312,12 +320,20 @@ typedef union
 SBD_MT_MESSAGE mtSbdMessage;
 
 // Structure to store device online/offline states
+// Note: If initialized to `false` here, sensors will never become enabled;
+//       Also, sensors set to `true` might get reset to `false` if missing.
 struct struct_online
 {
-  bool bme280   = false;
-  bool bme280Int = false;
-  bool veml7700 = false;
-  bool lsm303   = false;
+  bool bme280   = true;
+  bool bme280Int = true;
+  bool dfrWindSensor = true;
+  bool di7911   = false;
+  bool hmp60    = false;
+  bool lsm303   = true;
+  bool sht31    = false;
+  bool sp212    = false;
+  bool veml7700 = true;
+  bool wm5103L  = false;
   bool gnss     = false;
   bool microSd  = false;
 } online;
@@ -481,23 +497,30 @@ void loop()
 
       cutoffCounter = 0;
 
-      // Perform measurements
-      enable5V();       // Enable 5V power
-      enable12V();      // Enable 12V power
-      readBme280();     // Read sensor
-      readBme280Int();
-      readLsm303();     // Read accelerometer
-      readVeml7700();
-      //readSp212();       // Read solar radiation
-      //readSht31();       // Read temperature/relative humidity sensor
-      //read7911();        // Read anemometer
-      //readHmp60();       // Read temperature/relative humidity sensor
-      //read5103L();       // Read anemometer
-      readDFRWindSensor(); // Read anemometer and windDirection
+      enable5V();         // Enable 5V power
+      enable12V();        // Enable 12V power
 
-// Moving those 2 AFTER transmit block.
-//      disable12V();      // Disable 12V power
-//      disable5V();       // Disable 5V power
+      // Perform measurements
+      if (online.bme280)
+        readBme280();     // Read temperature and humidty sensor (external)
+      if (online.bme280Int)
+        readBme280Int();  // Read temperature and humidty sensor (internal)
+      if (online.lsm303)
+        readLsm303();     // Read accelerometer
+      if (online.veml7700)
+        readVeml7700();
+      if (online.sp212)
+        readSp212();       // Read solar radiation
+      if (online.sht31)
+        readSht31();       // Read temperature/relative humidity sensor
+      if (online.hmp60)
+        readHmp60();       // Read temperature/relative humidity sensor
+      if (online.wm5103L)
+        read5103L();       // Read anemometer
+      if (online.di7911)
+        read7911();        // Read anemometer
+      if (online.dfrWindSensor)
+        readDFRWindSensor(); // Read anemometer and windDirection
 
       // Print summary of statistics
       printStats();
