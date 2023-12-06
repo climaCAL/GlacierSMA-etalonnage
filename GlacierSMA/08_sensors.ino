@@ -130,7 +130,7 @@ void readBme280Int()
 // ----------------------------------------------------------------------------
 void configureVEML7700(Adafruit_VEML7700 &veml)
 {
-  DEBUG_PRINT("Info - Initializing BME280...");
+  DEBUG_PRINT("Info - Initializing VEML7700...");
   
   if (veml.begin())
   {
