@@ -25,8 +25,10 @@ void configureRtc()
   rtc.setAlarmTime(0, sampleInterval, 0); // hours, minutes, seconds
 
   // Enable alarm for hour rollover match
-  rtc.enableAlarm(rtc.MATCH_MMSS);
-  //rtc.enableAlarm(rtc.MATCH_SS);
+  if (sampleInterval > 1)
+    rtc.enableAlarm(rtc.MATCH_MMSS);
+  else
+    rtc.enableAlarm(rtc.MATCH_SS);
 
   // Attach alarm interrupt service routine (ISR)
   rtc.attachInterrupt(alarmIsr);
@@ -75,8 +77,10 @@ void setRtcAlarm()
     rtc.setAlarmTime(0, sampleInterval, 0); // hours, minutes, seconds
 
     // Enable alarm for hour rollover match
-    rtc.enableAlarm(rtc.MATCH_MMSS);
-    //rtc.enableAlarm(rtc.MATCH_SS);
+    if (sampleInterval > 1)
+      rtc.enableAlarm(rtc.MATCH_MMSS);
+    else
+      rtc.enableAlarm(rtc.MATCH_SS);
 
     // Reset sample counter
     sampleCounter = 0;
