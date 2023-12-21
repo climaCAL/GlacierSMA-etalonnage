@@ -48,6 +48,7 @@ void readGnss()
       continue;
 
     fixCounter++; // Increment fix counter
+    DEBUG_PRINT(fixCounter); DEBUG_PRINT(' ');
 
     // Call ISDB callback during acquisition of GNSS fix
     ISBDCallback(); //DG 12-05: TODO Check if the polling is frequent enough

@@ -177,8 +177,8 @@ void logData()
 
       // Online information
       logFile.print(online.microSd);      logFile.print(",");
-      logFile.print(online.bme280);       logFile.print(",");
-      logFile.print(online.bme280Int);       logFile.print(",");
+      logFile.print(online.bme280Ext);    logFile.print(",");
+      logFile.print(online.bme280Int);    logFile.print(",");
       logFile.print(online.lsm303);       logFile.print(",");
 
       // Timer information
@@ -246,8 +246,8 @@ void logData()
 
       // Online information
       DEBUG_PRINT(online.microSd);      DEBUG_PRINT(",");
-      DEBUG_PRINT(online.bme280);       DEBUG_PRINT(",");
-      DEBUG_PRINT(online.bme280Int);       DEBUG_PRINT(",");
+      DEBUG_PRINT(online.bme280Ext);    DEBUG_PRINT(",");
+      DEBUG_PRINT(online.bme280Int);    DEBUG_PRINT(",");
       DEBUG_PRINT(online.lsm303);       DEBUG_PRINT(",");
 
       // Timer information

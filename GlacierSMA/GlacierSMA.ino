@@ -51,7 +51,7 @@
 // ----------------------------------------------------------------------------
 // Define unique identifier
 // ----------------------------------------------------------------------------
-#define CRYOLOGGER_ID "AL1"
+#define CRYOLOGGER_ID "AL2"
 
 // ----------------------------------------------------------------------------
 // Data logging
@@ -138,7 +138,8 @@ void SERCOM1_Handler()
 // ----------------------------------------------------------------------------
 // Object instantiations
 // ----------------------------------------------------------------------------
-Adafruit_BME280                 bme280;
+Adafruit_BME280                 bme280Ext;
+Adafruit_BME280                 bme280Int;
 //Adafruit_VEML7700               veml = Adafruit_VEML7700(); //Création de l'objet pour la classe du capteur de luminosité. --> Called in the read function.
 Adafruit_LSM303_Accel_Unified   lsm303 = Adafruit_LSM303_Accel_Unified(54321); // I2C address: 0x1E
 IridiumSBD                      modem(IRIDIUM_PORT, PIN_IRIDIUM_SLEEP);
@@ -172,7 +173,7 @@ StatisticCAL vStats;               // Wind north-south wind vector component (v)
 // ----------------------------------------------------------------------------
 // User defined global variable declarations
 // ----------------------------------------------------------------------------
-#ifdef DEBUG
+#if DEBUG
 unsigned long sampleInterval    = 1;      // Sampling interval (minutes). Default: 5 min (300 seconds)
 #else
 unsigned long sampleInterval    = 5;      // Sampling interval (minutes). Default: 5 min (300 seconds)
@@ -180,14 +181,18 @@ unsigned long sampleInterval    = 5;      // Sampling interval (minutes). Defaul
 unsigned int  averageInterval   = 12;     // Number of samples to be averaged in each message. Default: 12 (hourly)
 unsigned int  transmitInterval  = 1;      // Number of messages in each Iridium transmission (340-byte limit)
 unsigned int  retransmitLimit   = 4;      // Failed data transmission reattempts (340-byte limit)
-#ifdef DEBUG_GNSS
+#if DEBUG_GNSS
 unsigned int  gnssTimeout       = 30;     // Timeout for GNSS signal acquisition (seconds)
 #else
 unsigned int  gnssTimeout       = 120;    // Timeout for GNSS signal acquisition (seconds)
 #endif
 unsigned int  iridiumTimeout    = 180;    // Timeout for Iridium transmission (seconds)
 bool          firstTimeFlag     = true;   // Flag to determine if program is running for the first time
+#if DEBUG
+float         batteryCutoff     = 3.0;    // Battery voltage cutoff threshold (V)
+#else
 float         batteryCutoff     = 11.0;    // Battery voltage cutoff threshold (V)
+#endif
 byte          loggingMode       = 2;      // Flag for new log file creation. 1: daily, 2: monthly, 3: yearly
 
 // ----------------------------------------------------------------------------
@@ -208,6 +213,7 @@ float humBmeINT_Offset          = 0.0;      // Offset for interior humidity acqu
 //VEML7700
 float veml_CF                   = 15.172;   // Correction factor for light intensity acquisition.
 float veml_Offset               = -998;     // Offset for light intensity acquisition.
+
 // ----------------------------------------------------------------------------
 // Global variable declarations
 // ----------------------------------------------------------------------------
@@ -320,22 +326,22 @@ typedef union
 SBD_MT_MESSAGE mtSbdMessage;
 
 // Structure to store device online/offline states
-// Note: If initialized to `false` here, sensors will never become enabled;
-//       Also, sensors set to `true` might get reset to `false` if missing.
+// Note: If initialized to `-1` here, sensors will be disabled (never read);
+//       Sensors set to `0` or higher will be adjusted to online dynamically.
 struct struct_online
 {
-  bool bme280   = true;
-  bool bme280Int = true;
-  bool dfrWindSensor = true;
-  bool di7911   = false;
-  bool hmp60    = false;
-  bool lsm303   = true;
-  bool sht31    = false;
-  bool sp212    = false;
-  bool veml7700 = true;
-  bool wm5103L  = false;
-  bool gnss     = false;
-  bool microSd  = false;
+  int8_t bme280Ext = 0;
+  int8_t bme280Int = 0;
+  int8_t dfrWindSensor = 0;
+  int8_t di7911   = -1; //TODO Retirer
+  int8_t hmp60    = -1; //TODO Retirer
+  int8_t lsm303   =  0;
+  int8_t sht31    = -1; //TODO Retirer
+  int8_t sp212    = -1; //TODO Retirer
+  int8_t veml7700 =  0;
+  int8_t wm5103L  = -1; //TODO Retirer
+  int8_t gnss     =  1;
+  int8_t microSd  =  1;
 } online;
 
 // Structure to store function timers
@@ -501,26 +507,55 @@ void loop()
       enable12V();        // Enable 12V power
 
       // Perform measurements
-      if (online.bme280)
-        readBme280();     // Read temperature and humidty sensor (external)
-      if (online.bme280Int)
+      if (online.bme280Ext >= 0)
+        readBme280Ext();     // Read temperature and humidty sensor (external)
+      else
+        DEBUG_PRINTLN("BME280 Ext disabled");
+
+      if (online.bme280Int >= 0)
         readBme280Int();  // Read temperature and humidty sensor (internal)
-      if (online.lsm303)
+      else
+        DEBUG_PRINTLN("BME280 Int disabled");
+
+      if (online.lsm303 >= 0)
         readLsm303();     // Read accelerometer
-      if (online.veml7700)
+      else
+        DEBUG_PRINTLN("LS303 disabled");
+
+      if (online.veml7700 >= 0)
         readVeml7700();
-      if (online.sp212)
+      else
+        DEBUG_PRINTLN("VEMLM7700 disabled");
+
+      if (online.sp212 >= 0)
         readSp212();       // Read solar radiation
-      if (online.sht31)
+      else
+        DEBUG_PRINTLN("SP212 disabled");
+
+      if (online.sht31 >= 0)
         readSht31();       // Read temperature/relative humidity sensor
-      if (online.hmp60)
+      else
+        DEBUG_PRINTLN("SHT31 disabled");
+
+      if (online.hmp60 >= 0)
         readHmp60();       // Read temperature/relative humidity sensor
-      if (online.wm5103L)
+      else
+        DEBUG_PRINTLN("HMP60 disabled");
+        
+      if (online.wm5103L >= 0)
         read5103L();       // Read anemometer
-      if (online.di7911)
+      else
+        DEBUG_PRINTLN("WM5103L disabled");
+
+      if (online.di7911 >= 0)
         read7911();        // Read anemometer
-      if (online.dfrWindSensor)
+      else
+        DEBUG_PRINTLN("DI7911 disabled");
+
+      if (online.dfrWindSensor >= 0)
         readDFRWindSensor(); // Read anemometer and windDirection
+      else
+        DEBUG_PRINTLN("DFR disabled");
 
       // Print summary of statistics
       printStats();
@@ -543,7 +578,12 @@ void loop()
             Serial.print("currentDate: "); Serial.println(currentDate);
             Serial.print("newDate: "); Serial.println(newDate);
           }
+          #if DEBUG
+          if (currentDate != newDate)
+            transmitData(); // Transmit only once per day
+          #else
           transmitData(); // Transmit data via Iridium transceiver
+          #endif
         }
         sampleCounter = 0; // Reset sample counter
       }

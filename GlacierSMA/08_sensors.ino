@@ -3,41 +3,41 @@
 // Pression non-ajouté
 // https://www.adafruit.com/product/2652
 // ----------------------------------------------------------------------------
-void configureBme280()
+void configureBme280Ext()
 {
   DEBUG_PRINT("Info - Initializing BME280 Ext...");
 
-  if (bme280.begin())
+  if (bme280Ext.begin(BME280_ADDRESS_ALTERNATE)) //FIXME This station's external BME is set to address 0x76
   {
-    online.bme280 = true;
+    online.bme280Ext = true;
     DEBUG_PRINTLN("success!");
   }
   else
   {
-    online.bme280 = false;
+    online.bme280Ext = false;
     DEBUG_PRINTLN("failed!");
   }
 }
 
 // Read BME280
-void readBme280()
+void readBme280Ext()
 {
   // Start the loop timer
   unsigned long loopStartTime = millis();
 
   // Initialize sensor
-  configureBme280();
+  configureBme280Ext();
 
   // Check if sensor initialized successfully
-  if (online.bme280)
+  if (online.bme280Ext)
   {
     DEBUG_PRINT("Info - Reading BME280 Ext...");
 
     myDelay(250);
 
     // Read sensor data
-    temperatureExt = tempBmeEXT_CF * bme280.readTemperature() + tempBmeEXT_Offset;
-    uint16_t humExt = humBmeEXT_CF * bme280.readHumidity() + humBmeEXT_Offset;
+    temperatureExt = tempBmeEXT_CF * bme280Ext.readTemperature() + tempBmeEXT_Offset;
+    uint16_t humExt = humBmeEXT_CF * bme280Ext.readHumidity() + humBmeEXT_Offset;
 
     if (humExt >= 100){
       humidityExt = 100;
@@ -70,7 +70,7 @@ void configureBme280Int()
 {
   DEBUG_PRINT("Info - Initializing BME280 int...");
 
-  if (bme280.begin(BME280_ADR2))
+  if (bme280Int.begin(BME280_ADDRESS))
   {
     online.bme280Int = true;
     DEBUG_PRINTLN("success!");
@@ -99,9 +99,9 @@ void readBme280Int()
     myDelay(250);
 
     // Read sensor data
-    temperatureInt = tempImeINT_CF * bme280.readTemperature() + tempBmeINT_Offset ;
-    uint16_t humInt =  humImeINT_CF * bme280.readHumidity() + humBmeINT_Offset; // no need of correction
-    pressureInt = bme280.readPressure() / 100.0F;
+    temperatureInt = tempImeINT_CF * bme280Int.readTemperature() + tempBmeINT_Offset ;
+    uint16_t humInt =  humImeINT_CF * bme280Int.readHumidity() + humBmeINT_Offset; // no need of correction
+    pressureInt = bme280Int.readPressure() / 100.0F;
 
     if (humInt >= 100){
       humidityInt = 100;
