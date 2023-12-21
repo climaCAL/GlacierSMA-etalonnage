@@ -14,18 +14,8 @@ void configureRtc()
   rtc.begin();
 
   // Set time manually
-  //rtc.setTime(hours, minutes, seconds);
-  //rtc.setDate(day, month, year);
-  //rtc.setEpoch();
-
-  //rtc.setTime(22, 55, 0); // Must be in the form: rtc.setTime(11, 04, 30);
-  //rtc.setDate(27, 1, 23);
-
-  // Set initial RTC alarm time
-  rtc.setAlarmTime(0, sampleInterval, 0); // hours, minutes, seconds
-
-  // Enable alarm for minute and second match
-  rtc.enableAlarm(rtc.MATCH_MMSS);
+  //rtc.setTime(22, 55, 0); // Must be in the form: rtc.setTime(hours, minutes, seconds);
+  //rtc.setDate(27, 1, 23); // Must be in the form: rtc.setDate(day, month, year);
 
   // Attach alarm interrupt service routine (ISR)
   rtc.attachInterrupt(alarmIsr);
@@ -34,7 +24,6 @@ void configureRtc()
 
   DEBUG_PRINT("Info - RTC initialized: "); printDateTime();
   DEBUG_PRINT("Info - Initial alarm: "); printAlarm();
-  DEBUG_PRINT("Info - Alarm mode: "); DEBUG_PRINTLN(rtc.MATCH_MMSS);
 }
 
 // Read RTC
@@ -43,12 +32,10 @@ void readRtc()
   // Start the loop timer
   uint32_t loopStartTime = millis();
 
+  DEBUG_PRINT("Info - Current datetime: "); printDateTime();
+
   // Get Unix Epoch time
   unixtime = rtc.getEpoch();
-
-  sprintf(dateTime, "20%02d-%02d-%02d %02d:%02d:%02d",
-          rtc.getYear(), rtc.getMonth(), rtc.getDay(),
-          rtc.getHours(), rtc.getMinutes(), rtc.getSeconds());
 
   // Write data to union
   moSbdMessage.unixtime = unixtime;
@@ -97,20 +84,21 @@ void setRtcAlarm()
   DEBUG_PRINT("Info - Alarm mode: "); DEBUG_PRINTLN(rtc.MATCH_HHMMSS);
 }
 
-void setCutoffAlarm()
+void setCutoffAlarm() //FIXME Is this function really necessary? Why not use setRtcAlarm()?
 {
-  // Set alarm for hour rollover match
-  rtc.setAlarmTime(0, sampleInterval, 0); // hours, minutes, seconds
+  // Set next alarm at a "round" minute, guaranteed to be in the future
+  alarmTime = rtc.getEpoch() + min(sampleInterval * 60UL, 86400);
+  rtc.setAlarmTime(hour(alarmTime), minute(alarmTime) + 1, 0); // hours, minutes, seconds
 
-  // Enable alarm for hour rollover match
-  rtc.enableAlarm(rtc.MATCH_MMSS);
+  // Enable alarm (matching hours, minutes and seconds)
+  rtc.enableAlarm(rtc.MATCH_HHMMSS);
 
   // Clear flag
   alarmFlag = false;
 
   DEBUG_PRINT("Info - Current datetime: "); printDateTime();
   DEBUG_PRINT("Info - Next alarm: "); printAlarm();
-  DEBUG_PRINT("Info - Alarm mode: "); DEBUG_PRINTLN(rtc.MATCH_MMSS);
+  DEBUG_PRINT("Info - Alarm mode: "); DEBUG_PRINTLN(rtc.MATCH_HHMMSS);
 }
 
 // RTC alarm interrupt service routine (ISR)
