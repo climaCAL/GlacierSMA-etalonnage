@@ -468,6 +468,7 @@ void loop()
     {
       // Wake from deep sleep
       wakeUp();
+      printWakeUp(sampleCounter);
     }
 
     // Read battery voltage
@@ -533,7 +534,7 @@ void loop()
         readSp212();       // Read solar radiation
 
       if (disabled.sht31)
-        DEBUG_PRINTLN("SHT31 disabled");
+        DEBUG_PRINTLN("Info - SHT31 disabled");
       else
         readSht31();       // Read temperature/relative humidity sensor
 

@@ -12,7 +12,7 @@ void readGnss()
 
   // Open serial port at 9600 baud
   GNSS_PORT.begin(9600);
-  DEBUG_PRINTLN("Info - Beginning to listen for GNSS traffic...");
+  DEBUG_PRINT("Info - Beginning to listen for GNSS traffic...");
  
   // Configure GNSS
   // Note: a delay of at least 1 s is required after powering on GNSS module
@@ -48,7 +48,7 @@ void readGnss()
       continue;
 
     fixCounter++; // Increment fix counter
-    DEBUG_PRINT(fixCounter); DEBUG_PRINT(' ');
+    DEBUG_PRINT(' '); DEBUG_PRINT(fixCounter);
 
     // Call ISDB callback during acquisition of GNSS fix
     ISBDCallback(); //DG 12-05: TODO Check if the polling is frequent enough

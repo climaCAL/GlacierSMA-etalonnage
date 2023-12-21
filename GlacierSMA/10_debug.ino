@@ -16,6 +16,14 @@ void printTab(byte _times)
 }
 
 // Print user-defined beacon settings
+void printWakeUp(unsigned int sampleNumber)
+{
+  printLine();
+  DEBUG_PRINT("Station awake, collecting sample #"); DEBUG_PRINTLN(sampleNumber);
+  printLine();
+}
+
+// Print user-defined beacon settings
 void printSettings()
 {
   printLine();
@@ -33,7 +41,6 @@ void printSettings()
   DEBUG_PRINT("resetFlag: ");         printTab(2);  DEBUG_PRINTLN(resetFlag);
   DEBUG_PRINT("freeRam(): ");         printTab(2);  DEBUG_PRINTLN(freeRam());
   printLine();
-
 }
 
 void printTimers()
@@ -89,7 +96,6 @@ void printMoSbd()
   DEBUG_PRINT("iterationCounter:"); printTab(1);  DEBUG_PRINTLN(moSbdMessage.iterationCounter);
 
   printLine();
-
 }
 
 // Print contents of union/structure storing Mobile Originated (MT) SBD message data
