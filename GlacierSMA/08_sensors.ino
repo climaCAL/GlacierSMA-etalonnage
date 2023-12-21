@@ -676,10 +676,12 @@ void readDFRWindSensor()
   uStats.add(u);
   vStats.add(v);
 
+  DEBUG_PRINTLN("done.");
+
   // Print debug info
-  DEBUG_PRINT(F("Wind Speed: ")); DEBUG_PRINTLN(windSpeed);
-  DEBUG_PRINT(F("Wind Direction: ")); DEBUG_PRINTLN(windDirection);
-  DEBUG_PRINT(F("Wind Dir. Sector: ")); DEBUG_PRINTLN(windDirectionSector);
+  //DEBUG_PRINT(F("Wind Speed: ")); DEBUG_PRINTLN(windSpeed);
+  //DEBUG_PRINT(F("Wind Direction: ")); DEBUG_PRINTLN(windDirection);
+  //DEBUG_PRINT(F("Wind Dir. Sector: ")); DEBUG_PRINTLN(windDirectionSector);
 
     // Stop the loop timer
   timer.readDFRWS = millis() - loopStartTime;

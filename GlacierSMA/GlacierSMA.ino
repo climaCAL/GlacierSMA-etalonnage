@@ -325,24 +325,24 @@ typedef union
 
 SBD_MT_MESSAGE mtSbdMessage;
 
-// Structure to store device online/offline states
-// Note: If initialized to `-1` here, sensors will be disabled (never read);
-//       Sensors set to `0` or higher will be adjusted to online dynamically.
+// Structure to store device online/offline states and enabled/disabled flags
+// Note: If initialized to `1` here, sensors will be disabled (never read);
+//       Sensors set to `0` will be initialized automatically when needed.
 struct struct_online
 {
-  int8_t bme280Ext = 0;
-  int8_t bme280Int = 0;
-  int8_t dfrWindSensor = 0;
-  int8_t di7911   = -1; //TODO Retirer
-  int8_t hmp60    = -1; //TODO Retirer
-  int8_t lsm303   =  0;
-  int8_t sht31    = -1; //TODO Retirer
-  int8_t sp212    = -1; //TODO Retirer
-  int8_t veml7700 =  0;
-  int8_t wm5103L  = -1; //TODO Retirer
-  int8_t gnss     =  1;
-  int8_t microSd  =  1;
-} online;
+  bool bme280Ext = 0;
+  bool bme280Int = 0;
+  bool dfrWindSensor = 0;
+  bool di7911   = 1; //TODO Retirer
+  bool hmp60    = 1; //TODO Retirer
+  bool lsm303   = 0;
+  bool sht31    = 1; //TODO Retirer
+  bool sp212    = 1; //TODO Retirer
+  bool veml7700 = 0;
+  bool wm5103L  = 1; //TODO Retirer
+  bool gnss     = 0;
+  bool microSd  = 0; // Set to 0 initially otherwise the SD card will not be initialized
+} disabled, online;
 
 // Structure to store function timers
 struct struct_timer
@@ -507,55 +507,55 @@ void loop()
       enable12V();        // Enable 12V power
 
       // Perform measurements
-      if (online.bme280Ext >= 0)
+      if (disabled.bme280Ext)
+        DEBUG_PRINTLN("Info - BME280 Ext disabled");
+      else
         readBme280Ext();     // Read temperature and humidty sensor (external)
-      else
-        DEBUG_PRINTLN("BME280 Ext disabled");
 
-      if (online.bme280Int >= 0)
+      if (disabled.bme280Int)
+        DEBUG_PRINTLN("Info - BME280 Int disabled");
+      else
         readBme280Int();  // Read temperature and humidty sensor (internal)
-      else
-        DEBUG_PRINTLN("BME280 Int disabled");
 
-      if (online.lsm303 >= 0)
+      if (disabled.lsm303)
+        DEBUG_PRINTLN("Info - LS303 disabled");
+      else
         readLsm303();     // Read accelerometer
-      else
-        DEBUG_PRINTLN("LS303 disabled");
 
-      if (online.veml7700 >= 0)
+      if (disabled.veml7700)
+        DEBUG_PRINTLN("Info - VEMLM7700 disabled");
+      else
         readVeml7700();
-      else
-        DEBUG_PRINTLN("VEMLM7700 disabled");
 
-      if (online.sp212 >= 0)
+      if (disabled.sp212)
+        DEBUG_PRINTLN("Info - SP212 disabled");
+      else
         readSp212();       // Read solar radiation
-      else
-        DEBUG_PRINTLN("SP212 disabled");
 
-      if (online.sht31 >= 0)
-        readSht31();       // Read temperature/relative humidity sensor
-      else
+      if (disabled.sht31)
         DEBUG_PRINTLN("SHT31 disabled");
+      else
+        readSht31();       // Read temperature/relative humidity sensor
 
-      if (online.hmp60 >= 0)
+      if (disabled.hmp60)
+        DEBUG_PRINTLN("Info - HMP60 disabled");
+      else
         readHmp60();       // Read temperature/relative humidity sensor
-      else
-        DEBUG_PRINTLN("HMP60 disabled");
         
-      if (online.wm5103L >= 0)
+      if (disabled.wm5103L)
+        DEBUG_PRINTLN("Info - WM5103L disabled");
+      else
         read5103L();       // Read anemometer
-      else
-        DEBUG_PRINTLN("WM5103L disabled");
 
-      if (online.di7911 >= 0)
+      if (disabled.di7911)
+        DEBUG_PRINTLN("Info - DI7911 disabled");
+      else
         read7911();        // Read anemometer
-      else
-        DEBUG_PRINTLN("DI7911 disabled");
 
-      if (online.dfrWindSensor >= 0)
-        readDFRWindSensor(); // Read anemometer and windDirection
+      if (disabled.dfrWindSensor)
+        DEBUG_PRINTLN("Info - DFR disabled");
       else
-        DEBUG_PRINTLN("DFR disabled");
+        readDFRWindSensor(); // Read anemometer and windDirection
 
       // Print summary of statistics
       printStats();

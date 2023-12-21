@@ -96,7 +96,7 @@ void prepareForSleep()
   disableSerial();
 
   // Clear online union
-  //memset(&online, 0, sizeof(online)); // No longer needed (prevents disabling sensors)
+  memset(&online, 0, sizeof(online));
 
   // Clear timer union
   memset(&timer, 0, sizeof(timer));
