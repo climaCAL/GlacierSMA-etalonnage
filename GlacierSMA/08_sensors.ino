@@ -7,7 +7,7 @@ void configureBme280Ext()
 {
   DEBUG_PRINT("Info - Initializing BME280 Ext...");
 
-  if (bme280Ext.begin(BME280_ADDRESS_ALTERNATE)) //FIXME This station's external BME is set to address 0x76
+  if (bme280Ext.begin(BME280_ADDRESS))
   {
     online.bme280Ext = true;
     DEBUG_PRINTLN("success!");
@@ -70,7 +70,7 @@ void configureBme280Int()
 {
   DEBUG_PRINT("Info - Initializing BME280 int...");
 
-  if (bme280Int.begin(BME280_ADDRESS))
+  if (bme280Int.begin(BME280_ADDRESS_ALTERNATE))
   {
     online.bme280Int = true;
     DEBUG_PRINTLN("success!");
