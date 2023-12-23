@@ -52,6 +52,11 @@ void readBme280Ext()
     humidityExtStats.add(humidityExt);
     //pressureExtStats.add(pressureExt);
 
+    #if CALIBRATE
+      DEBUG_PRINT("\tTemperatureExt: "); DEBUG_PRINT(temperatureExt); DEBUG_PRINTLN(" C");
+      DEBUG_PRINT("\tHumidityExt: "); DEBUG_PRINT(humidityExt); DEBUG_PRINTLN("%");
+    #endif
+
     DEBUG_PRINTLN("done.");
   }
   else
@@ -114,6 +119,12 @@ void readBme280Int()
     temperatureIntStats.add(temperatureInt);
     humidityIntStats.add(humidityInt);
     pressureIntStats.add(pressureInt);
+
+    #if CALIBRATE
+      DEBUG_PRINT("\tTemperatureInt: "); DEBUG_PRINT(temperatureInt); DEBUG_PRINTLN(" C");
+      DEBUG_PRINT("\tHumidityInt: "); DEBUG_PRINT(humidityInt); DEBUG_PRINTLN("%");
+      DEBUG_PRINT("\tPressure(Int): "); DEBUG_PRINT(pressureInt); DEBUG_PRINTLN(" kPa");
+    #endif
 
     DEBUG_PRINTLN("done.");
   }
@@ -623,21 +634,23 @@ void readDFRWindSensor()
 
   vent lectureVent;  //Let's use a structure to read wind sensor.
 
-  byte len = Wire.requestFrom(WIND_SENSOR_SLAVE_ADDR,0x06);  //Requesting 6 bytes from slave
+  byte len = Wire.requestFrom(WIND_SENSOR_SLAVE_ADDR,ventRegMemMapSize);  //Requesting 6 bytes from slave
   if (len != 0) {
     while (Wire.available() > 0) {
-      for(int i = 0; i < 6; i++) {
-        lectureVent.regMemoryMap[i] = Wire.read(); 
+      for (int i = 0; i < len/2; i++) {   //modif par Yh le 18déc2023 pour s'ajuster aux nb de bytes recus, avant était i<3
+        uint8_t LSB = Wire.read();
+        uint8_t MSB = Wire.read();
+        lectureVent.regMemoryMap[i] = (MSB<<8)+LSB;
       }
     }
-    lectureVent.angleVentFloat = ((lectureVent.regMemoryMap[0] << 8) + lectureVent.regMemoryMap[1])/10.0;
-    lectureVent.directionVentInt = (lectureVent.regMemoryMap[2] << 8) + lectureVent.regMemoryMap[3];
-    lectureVent.vitesseVentFloat = ((lectureVent.regMemoryMap[4] << 8) + lectureVent.regMemoryMap[5])/10.0;
+    lectureVent.angleVentFloat = lectureVent.regMemoryMap[0]/10.0;
+    lectureVent.directionVentInt = lectureVent.regMemoryMap[1];
+    lectureVent.vitesseVentFloat = lectureVent.regMemoryMap[2]/10.0;
 
     windDirection = lectureVent.angleVentFloat;
     windDirectionSector = lectureVent.directionVentInt;
     windSpeed = lectureVent.vitesseVentFloat;   
-    
+
   } else {
     windDirection = 0.0;
     windDirectionSector = 0;
@@ -678,10 +691,14 @@ void readDFRWindSensor()
 
   DEBUG_PRINTLN("done.");
 
-  // Print debug info
-  //DEBUG_PRINT(F("Wind Speed: ")); DEBUG_PRINTLN(windSpeed);
-  //DEBUG_PRINT(F("Wind Direction: ")); DEBUG_PRINTLN(windDirection);
-  //DEBUG_PRINT(F("Wind Dir. Sector: ")); DEBUG_PRINTLN(windDirectionSector);
+  // Print debug info:
+  char smallMsg[48]={0};  //Temps buffer
+  sprintf(smallMsg,"%x %x %x",lectureVent.regMemoryMap[0],lectureVent.regMemoryMap[1],lectureVent.regMemoryMap[2]);
+
+  DEBUG_PRINT(F("\t*RAW* readings: ")); DEBUG_PRINTLN(smallMsg);
+  DEBUG_PRINT(F("Wind Speed: ")); DEBUG_PRINTLN(windSpeed);
+  DEBUG_PRINT(F("Wind Direction: ")); DEBUG_PRINTLN(windDirection);
+  DEBUG_PRINT(F("Wind Dir. Sector: ")); DEBUG_PRINTLN(windDirectionSector);
 
     // Stop the loop timer
   timer.readDFRWS = millis() - loopStartTime;

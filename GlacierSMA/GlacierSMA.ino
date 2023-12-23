@@ -69,7 +69,7 @@
 #define DEBUG           true  // Output debug messages to Serial Monitor
 #define DEBUG_GNSS      false // Output GNSS debug information
 #define DEBUG_IRIDIUM   false // Output Iridium debug messages to Serial Monitor
-#define CALIBRATE       false // Enable sensor calibration code
+#define CALIBRATE       true // Enable sensor calibration code
 
 #if DEBUG
 #define DEBUG_PRINT(x)            SERIAL_PORT.print(x)
@@ -269,12 +269,22 @@ tmElements_t  tm;                         // Variable for converting time elemen
 // ----------------------------------------------------------------------------
 
 // DFRWindSensor (CAL) struc to store/retreive data
+// Attention structure prévue pour la hauteur de neige ET PAS UTILISÉE ICI
+// regMemoryMap[0] = direction vent en degrés (0-360)
+// regMemoryMap[1] = direction vent en secteur (0-15)
+// regMemoryMap[2] = vitesse vent en m/s *10
+// regMemoryMap[3] = hauteur de neige en mm
+// regMemoryMap[4] = temperature de reference pour la mesure hauteur de neige, em Celcius resolution de 1C
 typedef struct {
-  uint8_t regMemoryMap[6] = {0,0,0,0,0,0};
+  uint16_t regMemoryMap[5] = {0,0,0,0,0};  //total 5 words = 10 bytes; utile: 3 bytes (2 derniers byte seront pour hauteur de neige, futur)
   float angleVentFloat = 0;
   uint16_t directionVentInt = 0;
   float vitesseVentFloat = 0;
+  float hauteurNeige = 0;  //Futur
+  float temperatureHN = 0; //Futur
 }vent;
+
+const uint8_t ventRegMemMapSize = 0x06;  //6 = 3*2 (instuments de vent seulement)
 
 // Union to store Iridium Short Burst Data (SBD) Mobile Originated (MO) messages
 typedef union
@@ -408,11 +418,34 @@ void setup()
 
   while (true)
   {
-    petDog(); // Reset WDT
-    //calibrateAdc();
-    read5103L();
-    readHmp60();
-    myDelay(500);
+petDog(); // Reset WDT
+    DEBUG_PRINT(">  (A) Fram state: ");  // monitore l'etat de la RAM
+    DEBUG_PRINTLN(freeRam());  
+    calibrateAdc();
+    DEBUG_PRINT(">  (B1) Fram state: ");  // monitore l'etat de la RAM
+    DEBUG_PRINTLN(freeRam());
+    readBme280Int();  // Read temperature and humidty sensor (external)
+    DEBUG_PRINT(">  (B2) Fram state: ");  // monitore l'etat de la RAM
+    DEBUG_PRINTLN(freeRam());  
+    readBme280Ext();     // Read temperature and humidty sensor (external)
+    DEBUG_PRINT(">  (C) Fram state: ");  // monitore l'etat de la RAM
+    DEBUG_PRINTLN(freeRam());  
+    readLsm303();
+    DEBUG_PRINT(">  (D) Fram state: ");  // monitore l'etat de la RAM
+    DEBUG_PRINTLN(freeRam());
+    readVeml7700();    // Read solar radiation - Attention (09/28/23 Yh) si le VEML7700 n'est pas connecté, le code bloque... corrigé. Cause: le destructeur. Donc déclaré global.
+    DEBUG_PRINT(">  (E) Fram state: ");  // monitore l'etat de la RAM
+    DEBUG_PRINTLN(freeRam());
+    readDFRWindSensor();
+    DEBUG_PRINT(">  (F) Fram state: ");  // monitore l'etat de la RAM
+    DEBUG_PRINTLN(freeRam());
+    //readGnss(); // Sync RTC with the GNSS
+    readBattery();        // Read battery voltage
+
+    DEBUG_PRINT(">  Fram final  : ");  // monitore l'etat de la RAM
+    DEBUG_PRINTLN(freeRam());  
+
+    myDelay(5000);
   }
 #endif
 
@@ -527,31 +560,6 @@ void loop()
         DEBUG_PRINTLN("Info - VEMLM7700 disabled");
       else
         readVeml7700();
-
-      if (disabled.sp212)
-        DEBUG_PRINTLN("Info - SP212 disabled");
-      else
-        readSp212();       // Read solar radiation
-
-      if (disabled.sht31)
-        DEBUG_PRINTLN("Info - SHT31 disabled");
-      else
-        readSht31();       // Read temperature/relative humidity sensor
-
-      if (disabled.hmp60)
-        DEBUG_PRINTLN("Info - HMP60 disabled");
-      else
-        readHmp60();       // Read temperature/relative humidity sensor
-        
-      if (disabled.wm5103L)
-        DEBUG_PRINTLN("Info - WM5103L disabled");
-      else
-        read5103L();       // Read anemometer
-
-      if (disabled.di7911)
-        DEBUG_PRINTLN("Info - DI7911 disabled");
-      else
-        read7911();        // Read anemometer
 
       if (disabled.dfrWindSensor)
         DEBUG_PRINTLN("Info - DFR disabled");
