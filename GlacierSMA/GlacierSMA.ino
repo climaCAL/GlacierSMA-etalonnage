@@ -127,7 +127,7 @@ Uart Serial2 (&sercom1, PIN_IRIDIUM_RX, PIN_IRIDIUM_TX, SERCOM_RX_PAD_2, UART_TX
 #define IRIDIUM_PORT  Serial2
 
 //WindSensor module I2C address declaration:
-const uint16_t WIND_SENSOR_SLAVE_ADDR = 0x66;
+const uint8_t WIND_SENSOR_SLAVE_ADDR = 0x66;
 
 // Attach interrupt handler to SERCOM for new Serial instance
 void SERCOM1_Handler()
@@ -282,9 +282,9 @@ typedef struct {
   float vitesseVentFloat = 0;
   float hauteurNeige = 0;  //Futur
   float temperatureHN = 0; //Futur
-}vent;
+} vent;
 
-const uint8_t ventRegMemMapSize = 0x06;  //6 = 3*2 (instuments de vent seulement)
+const uint8_t ventRegMemMapSize = 0x06;  //6 = 3 capteurs * 2 bytes (instruments de vent seulement)
 
 // Union to store Iridium Short Burst Data (SBD) Mobile Originated (MO) messages
 typedef union
