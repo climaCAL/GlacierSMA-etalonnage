@@ -35,10 +35,28 @@
 Adafruit_VEML7700::Adafruit_VEML7700(void) {}
 
 Adafruit_VEML7700::~Adafruit_VEML7700(void) {
-  if (i2c_dev) {
-    delete i2c_dev;
+  if (ALS_Shutdown) {
+    delete ALS_Shutdown;
   }
-  
+  if (ALS_Interrupt_Enable) {
+    delete ALS_Interrupt_Enable;
+  }
+    if (ALS_Persistence) {
+    delete ALS_Persistence;
+  }
+  if (ALS_Integration_Time) {
+    delete ALS_Integration_Time;
+  }
+  if (ALS_Gain) {
+    delete ALS_Gain;
+  }
+  if (PowerSave_Enable) {
+    delete PowerSave_Enable;
+  }
+  if (PowerSave_Mode) {
+    delete PowerSave_Mode;
+  }
+
   if (ALS_Config) {
     delete ALS_Config;
   }
@@ -61,26 +79,8 @@ Adafruit_VEML7700::~Adafruit_VEML7700(void) {
     delete Interrupt_Status;
   }
   
-  if (ALS_Shutdown) {
-    delete ALS_Shutdown;
-  }
-  if (ALS_Interrupt_Enable) {
-    delete ALS_Interrupt_Enable;
-  }
-    if (ALS_Persistence) {
-    delete ALS_Persistence;
-  }
-  if (ALS_Integration_Time) {
-    delete ALS_Integration_Time;
-  }
-  if (ALS_Gain) {
-    delete ALS_Gain;
-  }
-  if (PowerSave_Enable) {
-    delete PowerSave_Enable;
-  }
-  if (PowerSave_Mode) {
-    delete PowerSave_Mode;
+  if (i2c_dev) {
+    delete i2c_dev;
   }
  }
 

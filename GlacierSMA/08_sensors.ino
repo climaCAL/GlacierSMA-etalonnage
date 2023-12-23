@@ -1,4 +1,21 @@
 // ----------------------------------------------------------------------------
+// Utility function to detect I2C sensor lockup 
+// ----------------------------------------------------------------------------
+bool scanI2CbusFor(uint8_t lookForAddress) {
+  Wire.beginTransmission(lookForAddress);
+  uint8_t error = Wire.endTransmission();
+  if (error == 0) {   /*if I2C device found*/
+    // Serial.print("I2C device found at address 0x");/*print this line if I2C device found*/
+    // if (lookForAddress<16) {
+    //   Serial.print("0");
+    // }
+    // Serial.println(lookForAddress,HEX);
+    return true;
+  }
+  return false;
+}
+
+// ----------------------------------------------------------------------------
 // Adafruit BME280 Temperature Humidity Pressure Sensor -- Adressage par défaut pour le BME280 externe Adr = 0x77
 // Pression non-ajouté
 // https://www.adafruit.com/product/2652
@@ -139,24 +156,31 @@ void readBme280Int()
 // ----------------------------------------------------------------------------
 // Adafruit VEML7700 Lux Meter -- Basé sur le BME280
 // ----------------------------------------------------------------------------
-void configureVEML7700(Adafruit_VEML7700 &veml)
-{
-  DEBUG_PRINT("Info - Initializing VEML7700...");
-  
-  if (veml.begin())
-  {
-    online.veml7700 = true;
-    DEBUG_PRINTLN("success!");
-    /*
-    veml.setGain(VEML7700_GAIN_2);
-    veml.setIntegrationTime(VEML7700_IT_200MS);
-    */
+#define vemlI2cAddr 0x10
+
+Adafruit_VEML7700* configureVEML7700() {
+  DEBUG_PRINT("Info - Initializing VEML7700... ");
+
+  if (scanI2CbusFor(vemlI2cAddr)) {
+    // Constructed here because the destructor hangs if the sensor is not connected.
+    Adafruit_VEML7700* veml = new Adafruit_VEML7700();
+
+    if (veml->begin()) {
+      online.veml7700 = true;
+      DEBUG_PRINTLN("success!");
+      /*
+      veml.setGain(VEML7700_GAIN_2);
+      veml.setIntegrationTime(VEML7700_IT_200MS);
+      */
+      return veml;
+    }
+
+    delete veml;
   }
-  else
-  {
-    online.veml7700 = false;
-    DEBUG_PRINTLN("failed!");
-  }
+
+  online.veml7700 = false;
+  DEBUG_PRINTLN("failed!");
+  return NULL;
 }
 
 // Read BME280
@@ -165,36 +189,28 @@ void readVeml7700()
   // Start the loop timer
   unsigned long loopStartTime = millis();
 
-  Adafruit_VEML7700 veml = Adafruit_VEML7700();
-   
   // Initialize sensor
-  configureVEML7700(veml);
+  Adafruit_VEML7700* veml = configureVEML7700();
   
   // Check if sensor initialized successfully
-  if (online.veml7700)
-  {
+  if (veml) {
     DEBUG_PRINT("Info - Reading VEML7700...");
-
     myDelay(250);
 
-// Add acquisition
-  int32_t soleil = veml_CF * veml.readLux() + veml_Offset; // Default = VEML_LUX_NORMAL
+    // Add acquisition
+    int32_t soleil = veml_CF * veml->readLux() + veml_Offset; // Default = VEML_LUX_NORMAL
+    solar = soleil > 0 ? soleil : 0;
+    solarStats.add(solar);
   
-  if(soleil <= 0){
-    solar = 0;
-  }
-  else{
-    solar = soleil;
-  }
+    // Delete sensor object
+    delete veml;
 
-  solarStats.add(solar);
-  
     DEBUG_PRINTLN("done.");
   }
-  else
-  {
+  else {
     DEBUG_PRINTLN("Warning - VEML7700 offline!");
   }
+
   // Stop the loop timer
   timer.readVeml7700 = millis() - loopStartTime;
 }
