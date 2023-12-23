@@ -654,11 +654,17 @@ void readDFRWindSensor()
     return;
   }
   
-  online.dfrWindSensor = true;
   vent lectureVent;  //Let's use a structure to read wind sensor.
 
   byte len = Wire.requestFrom(WIND_SENSOR_SLAVE_ADDR, ventRegMemMapSize);  //Requesting 6 bytes from slave
-  if (len != 0) {
+  if (len == 0) {
+    online.dfrWindSensor = false;
+    DEBUG_PRINTLN("failed!");
+    return;
+  }
+  else {
+    online.dfrWindSensor = true;
+    
     while (Wire.available() > 0) {
       for (int i = 0; i < len/2; i++) {   //modif par Yh le 18déc2023 pour s'ajuster aux nb de bytes recus, avant était i<3
         uint8_t LSB = Wire.read();
@@ -671,24 +677,15 @@ void readDFRWindSensor()
     lectureVent.vitesseVentFloat = lectureVent.regMemoryMap[2]/10.0;
 
     windSpeed = lectureVent.vitesseVentFloat;
-    windDirection = lectureVent.angleVentFloat;
-    windDirectionSector = lectureVent.directionVentInt;
-  }
-  else {
-    windDirection = 0.0;
-    windDirectionSector = 0;
-    windSpeed = 0; 
-  }
-
-  if (windSpeed == 0)
-  {
-    windDirection = 0.0;
-    windDirectionSector = 0;
+    if (windSpeed > 0) {
+      // Update wind direction only if wind was detected.
+      windDirection = lectureVent.angleVentFloat;
+      windDirectionSector = lectureVent.directionVentInt;
+    }
   }
 
   // Check and update wind gust speed and direction
-  if ((windSpeed > 0) && (windSpeed > windGustSpeed))
-  {
+  if (windSpeed > windGustSpeed) {
     windGustSpeed = windSpeed;
     windGustDirection = windDirection;
   }
