@@ -1,14 +1,18 @@
+float nan2zero(float f) {
+  return isnan(f) ? 0.0f : f;
+}
+
 // Calculate statistics
 void calculateStats()
 {
   // Write data to union
-  moSbdMessage.temperatureInt = temperatureIntStats.average()   * 100;          // Mean internal temperature (°C)
-  moSbdMessage.humidityInt    = humidityIntStats.average()      * 100;          // Mean internal humidity (%)
-  moSbdMessage.pressureInt    = (pressureIntStats.average()     - 850) * 100;   // Mean internal pressure (hPa)
-  moSbdMessage.temperatureExt = temperatureExtStats.average()   * 100;          // Mean external temperature (°C)
-  moSbdMessage.humidityExt    = humidityExtStats.average()      * 100;          // Mean external humidity (%)
-  moSbdMessage.solar          = solarStats.average()            * 10;           // Mean solar irradiance (W m-2)
-  moSbdMessage.voltage        = batteryStats.average()          * 100;          // Mean battery voltage (V)
+  moSbdMessage.temperatureInt = nan2zero(temperatureIntStats.average()   * 100);          // Mean internal temperature (°C)
+  moSbdMessage.humidityInt    = nan2zero(humidityIntStats.average()      * 100);          // Mean internal humidity (%)
+  moSbdMessage.pressureInt    = nan2zero((pressureIntStats.average()     - 850) * 100);   // Mean internal pressure (hPa)
+  moSbdMessage.temperatureExt = nan2zero(temperatureExtStats.average()   * 100);          // Mean external temperature (°C)
+  moSbdMessage.humidityExt    = nan2zero(humidityExtStats.average()      * 100);          // Mean external humidity (%)
+  moSbdMessage.solar          = nan2zero(solarStats.average()            * 10);           // Mean solar irradiance (W m-2)
+  moSbdMessage.voltage        = nan2zero(batteryStats.average()          * 100);          // Mean battery voltage (V)
 
   // Calculate mean wind speed and direction vectors
   windVectors();
