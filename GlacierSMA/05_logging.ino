@@ -16,9 +16,11 @@ void configureSd()
   }
 
   // Initialize microSD
-  if (!sd.begin(PIN_MICROSD_CS, SD_SCK_MHZ(4)))
+  if (!sd.begin(PIN_MICROSD_CS, SD_SCK_MHZ(12)))
   {
-    DEBUG_PRINTLN("Warning - microSD failed to initialize. Reattempting...");
+    DEBUG_PRINT("Warning - microSD failed to initialize (error code ");
+    DEBUG_PRINT_HEX(sd.sdErrorCode());
+    DEBUG_PRINTLN("); Reattempting...");
 
     // Delay between initialization attempts
     myDelay(2000);
