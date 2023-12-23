@@ -453,6 +453,7 @@ void readSp212()
 // ----------------------------------------------------------------------------
 void read5103L()
 {
+  // Start loop timer
   unsigned int loopStartTime = millis();
 
   DEBUG_PRINT("Info - Reading 5103L...");
@@ -518,6 +519,7 @@ void read5103L()
 // ----------------------------------------------------------------------------
 void read7911()
 {
+  // Start loop timer
   uint32_t loopStartTime = millis();
 
   DEBUG_PRINTLN("Info - Reading 7911...");
@@ -690,22 +692,14 @@ void readDFRWindSensor()
     windGustDirection = windDirection;
   }
 
-  // Write data to union
-  moSbdMessage.windSpeed = windSpeed * 100;
-  moSbdMessage.windDirection = windDirection;
-
   // Calculate wind speed and direction vectors
   // http://tornado.sfsu.edu/geosciences/classes/m430/Wind/WindDirection.html
   float windDirectionRadians = windDirection * DEG_TO_RAD;  // Convert wind direction from degrees to radians
   float u = -1.0 * windSpeed * sin(windDirectionRadians);   // Magnitude of east-west component (u) of vector winds
   float v = -1.0 * windSpeed * cos(windDirectionRadians);   // Magnitude of north-south component (v) of vector winds
 
-  // Write data to union
-  moSbdMessage.windGustSpeed = windGustSpeed * 100;
-  moSbdMessage.windGustDirection = windGustDirection * 10;
-
   // Add to wind statistics
-  windSpeedStats.add(windSpeed);
+  windSpeedStats.add(windSpeed); //FIXME This is never used, instead we reconstruct wind speed from the stats below...
   uStats.add(u);
   vStats.add(v);
 
@@ -737,11 +731,11 @@ void windSpeedIsr()
 // http://tornado.sfsu.edu/geosciences/classes/m430/Wind/WindDirection.html
 void windVectors()
 {
-  // Calculate resultant mean wind speed
-  float rvWindSpeed = sqrt(sq(uStats.average()) + sq(vStats.average()));
-
   DEBUG_PRINT("uStats.average(): "); printTab(1); DEBUG_PRINTLN(uStats.average());
   DEBUG_PRINT("vStats.average(): "); printTab(1); DEBUG_PRINTLN(vStats.average());
+
+  // Calculate resultant mean wind speed
+  float rvWindSpeed = sqrt(sq(uStats.average()) + sq(vStats.average()));
 
   // Calculate resultant mean wind direction
   float rvWindDirection = atan2(-1.0 * uStats.average(), -1.0 * vStats.average());
@@ -750,18 +744,23 @@ void windVectors()
   DEBUG_PRINT("rvWindSpeed: "); printTab(2); DEBUG_PRINTLN(rvWindSpeed);
   DEBUG_PRINT("rvWindDirection: "); printTab(1); DEBUG_PRINTLN(rvWindDirection);
 
-  // To do: Check if necessary
-  if (rvWindDirection < 0)
-    rvWindDirection += 360;
+  // Zero wind speed if no samples were taken
+  if (isnan(rvWindSpeed))
+    rvWindSpeed = 0.0f;
 
   // Zero wind direction if wind speed is zero
   // Note: atan2 can be undefined if u and v vectors are zero
   if (rvWindSpeed == 0)
     rvWindDirection = 0;
+  else if (rvWindDirection < 0) // Todo: Check if necessary
+    rvWindDirection += 360;
 
   // Write data to union
   moSbdMessage.windSpeed = rvWindSpeed * 100;         // Resultant mean wind speed (m/s)
   moSbdMessage.windDirection = rvWindDirection * 10;  // Resultant mean wind direction (°)
+
+  moSbdMessage.windGustSpeed = windGustSpeed * 100;
+  moSbdMessage.windGustDirection = windGustDirection * 10;
 }
 
 // ----------------------------------------------------------------------------
