@@ -641,16 +641,23 @@ void readDFRWindSensor()
   // Start the loop timer
   unsigned long loopStartTime = millis();
 
-  DEBUG_PRINT("Info - Reading DFRWindSensor...");
+  DEBUG_PRINT("Info - Reading DFRWindSensor... ");
   myDelay(2000); //Let the DFRWindSensor settle a bit... making sure data is accurate at the sensor and ready for us.
 
   // Requires I2C bus
   Wire.begin();
   myDelay(1000);
 
+  if (!scanI2CbusFor(WIND_SENSOR_SLAVE_ADDR)) {
+    online.dfrWindSensor = false;
+    DEBUG_PRINTLN("failed!");
+    return;
+  }
+  
+  online.dfrWindSensor = true;
   vent lectureVent;  //Let's use a structure to read wind sensor.
 
-  byte len = Wire.requestFrom(WIND_SENSOR_SLAVE_ADDR,ventRegMemMapSize);  //Requesting 6 bytes from slave
+  byte len = Wire.requestFrom(WIND_SENSOR_SLAVE_ADDR, ventRegMemMapSize);  //Requesting 6 bytes from slave
   if (len != 0) {
     while (Wire.available() > 0) {
       for (int i = 0; i < len/2; i++) {   //modif par Yh le 18déc2023 pour s'ajuster aux nb de bytes recus, avant était i<3
@@ -663,11 +670,11 @@ void readDFRWindSensor()
     lectureVent.directionVentInt = lectureVent.regMemoryMap[1];
     lectureVent.vitesseVentFloat = lectureVent.regMemoryMap[2]/10.0;
 
+    windSpeed = lectureVent.vitesseVentFloat;
     windDirection = lectureVent.angleVentFloat;
     windDirectionSector = lectureVent.directionVentInt;
-    windSpeed = lectureVent.vitesseVentFloat;   
-
-  } else {
+  }
+  else {
     windDirection = 0.0;
     windDirectionSector = 0;
     windSpeed = 0; 
@@ -712,11 +719,11 @@ void readDFRWindSensor()
   sprintf(smallMsg,"%x %x %x",lectureVent.regMemoryMap[0],lectureVent.regMemoryMap[1],lectureVent.regMemoryMap[2]);
 
   DEBUG_PRINT(F("\t*RAW* readings: ")); DEBUG_PRINTLN(smallMsg);
-  DEBUG_PRINT(F("Wind Speed: ")); DEBUG_PRINTLN(windSpeed);
-  DEBUG_PRINT(F("Wind Direction: ")); DEBUG_PRINTLN(windDirection);
-  DEBUG_PRINT(F("Wind Dir. Sector: ")); DEBUG_PRINTLN(windDirectionSector);
+  DEBUG_PRINT(F("\tWind Speed: ")); DEBUG_PRINTLN(windSpeed);
+  DEBUG_PRINT(F("\tWind Direction: ")); DEBUG_PRINTLN(windDirection);
+  DEBUG_PRINT(F("\tWind Dir. Sector: ")); DEBUG_PRINTLN(windDirectionSector);
 
-    // Stop the loop timer
+  // Stop the loop timer
   timer.readDFRWS = millis() - loopStartTime;
 }
 
