@@ -69,7 +69,7 @@
 #define DEBUG           true  // Output debug messages to Serial Monitor
 #define DEBUG_GNSS      false // Output GNSS debug information
 #define DEBUG_IRIDIUM   false // Output Iridium debug messages to Serial Monitor
-#define CALIBRATE       true // Enable sensor calibration code
+#define CALIBRATE       false // Enable sensor calibration code
 
 #if DEBUG
 #define DEBUG_PRINT(x)            SERIAL_PORT.print(x)
@@ -175,25 +175,25 @@ StatisticCAL vStats;               // Wind north-south wind vector component (v)
 // ----------------------------------------------------------------------------
 #if DEBUG
 unsigned long sampleInterval    = 1;      // Sampling interval (minutes). Default: 5 min (300 seconds)
-#else
-unsigned long sampleInterval    = 5;      // Sampling interval (minutes). Default: 5 min (300 seconds)
-#endif
-unsigned int  averageInterval   = 12;     // Number of samples to be averaged in each message. Default: 12 (hourly)
+unsigned int  averageInterval   = 5;      // Number of samples to be averaged in each message. Default: 12 (hourly)
 unsigned int  transmitInterval  = 1;      // Number of messages in each Iridium transmission (340-byte limit)
 unsigned int  retransmitLimit   = 4;      // Failed data transmission reattempts (340-byte limit)
-#if DEBUG_GNSS
 unsigned int  gnssTimeout       = 30;     // Timeout for GNSS signal acquisition (seconds)
-#else
-unsigned int  gnssTimeout       = 120;    // Timeout for GNSS signal acquisition (seconds)
-#endif
 unsigned int  iridiumTimeout    = 180;    // Timeout for Iridium transmission (seconds)
 bool          firstTimeFlag     = true;   // Flag to determine if program is running for the first time
-#if DEBUG
 float         batteryCutoff     = 3.0;    // Battery voltage cutoff threshold (V)
+byte          loggingMode       = 3;      // Flag for new log file creation. 1: daily, 2: monthly, 3: yearly
 #else
-float         batteryCutoff     = 11.0;    // Battery voltage cutoff threshold (V)
-#endif
+unsigned long sampleInterval    = 5;      // Sampling interval (minutes). Default: 5 min (300 seconds)
+unsigned int  averageInterval   = 12;     // Number of samples to be averaged in each message. Default: 12 (hourly)
+unsigned int  transmitInterval  = 1;      // Number of messages in each Iridium transmission (340-byte limit)
+unsigned int  retransmitLimit   = 4;      // Failed data transmission reattempts (340-byte lim
+unsigned int  iridiumTimeout    = 180;    // Timeout for Iridium transmission (seconds)
+bool          firstTimeFlag     = true;   // Flag to determine if program is running for the first timeit)
+unsigned int  gnssTimeout       = 120;    // Timeout for GNSS signal acquisition (seconds)
+float         batteryCutoff     = 11.0;   // Battery voltage cutoff threshold (V)
 byte          loggingMode       = 2;      // Flag for new log file creation. 1: daily, 2: monthly, 3: yearly
+#endif
 
 // ----------------------------------------------------------------------------
 // Sensors correction factor and offsets -- to modify -- 
