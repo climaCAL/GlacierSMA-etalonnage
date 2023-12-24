@@ -460,7 +460,6 @@ void readSp212()
 // ----------------------------------------------------------------------------
 void read5103L()
 {
-  // Start loop timer
   unsigned int loopStartTime = millis();
 
   DEBUG_PRINT("Info - Reading 5103L...");
