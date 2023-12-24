@@ -4,12 +4,20 @@
 bool scanI2CbusFor(uint8_t lookForAddress) {
   Wire.beginTransmission(lookForAddress);
   uint8_t error = Wire.endTransmission();
+
   if (error == 0) { // I2C device replied
-    DEBUG_PRINT("Sensor found at address 0x");
-    if (lookForAddress < 16)
-      DEBUG_PRINT(0);
-    DEBUG_PRINTLN_HEX(lookForAddress);
-    return true;
+    //FIXME This sometimes returns false positives, so let's check again just in case...
+    myDelay(250);
+    Wire.beginTransmission(lookForAddress);
+    error = Wire.endTransmission();
+
+    if (error == 0) { // I2C device replied again
+      DEBUG_PRINT("Sensor found at address 0x");
+      if (lookForAddress < 16)
+        DEBUG_PRINT(0);
+      DEBUG_PRINTLN_HEX(lookForAddress);
+      return true;
+    }
   }
   return false;
 }

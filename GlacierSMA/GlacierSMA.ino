@@ -418,7 +418,7 @@ void setup()
 
   while (true)
   {
-petDog(); // Reset WDT
+    petDog(); // Reset WDT
     DEBUG_PRINT(">  (A) Fram state: ");  // monitore l'etat de la RAM
     DEBUG_PRINTLN(freeRam());  
     calibrateAdc();

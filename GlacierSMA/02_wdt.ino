@@ -57,6 +57,7 @@ void WDT_Handler()
   }
   else
   {
+    DEBUG_WRITE(0x07); // Send a "bell" character to emit a sound on the receiver
     //WDT->CTRL.bit.ENABLE = 0;         // Debugging only: Disable WDT
     //digitalWrite(PIN_LED_RED, HIGH);  // Debugging only: Turn on LED to indicate WDT trigger
     while (true);                     // Force WDT to reset the system
