@@ -69,8 +69,8 @@
 #define DEBUG           true  // Output debug messages to Serial Monitor
 #define DEBUG_GNSS      false // Output GNSS debug information
 #define DEBUG_IRIDIUM   false // Output Iridium debug messages to Serial Monitor
+#define NO_TRANSMIT     true  // Prevent sending satellite messages
 #define CALIBRATE       true  // Enable sensor calibration code
-#define LOWTRANSMIT     true  // Send satellite messages only once per day
 
 #if DEBUG
 #define DEBUG_PRINT(x)            SERIAL_PORT.print(x)
@@ -80,7 +80,6 @@
 #define DEBUG_PRINT_DEC(x, y)     SERIAL_PORT.print(x, y)
 #define DEBUG_PRINTLN_DEC(x, y)   SERIAL_PORT.println(x, y)
 #define DEBUG_WRITE(x)            SERIAL_PORT.write(x)
-
 #else
 #define DEBUG_PRINT(x)
 #define DEBUG_PRINTLN(x)
@@ -588,12 +587,7 @@ void loop()
             Serial.print("currentDate: "); Serial.println(currentDate);
             Serial.print("newDate: "); Serial.println(newDate);
           }
-          #if LOWTRANSMIT
-            if (currentDate != newDate)
-              transmitData(); // Transmit only once per day
-          #else
-            transmitData(); // Transmit data via Iridium transceiver
-          #endif
+          transmitData(); // Transmit data via Iridium transceiver
         }
         sampleCounter = 0; // Reset sample counter
       }

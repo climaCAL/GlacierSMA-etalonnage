@@ -28,6 +28,11 @@ void writeBuffer()
 // Attempt to transmit data via RockBLOCK 9603
 void transmitData()
 {
+  #if NO_TRANSMIT
+    DEBUG_PRINTLN("Info - Satellite messages inhibited (#NO_TRANSMIT)");
+    return;
+  #endif
+
   // Start loop timer
   unsigned long loopStartTime = millis();
 
