@@ -4,12 +4,11 @@
 bool scanI2CbusFor(uint8_t lookForAddress) {
   Wire.beginTransmission(lookForAddress);
   uint8_t error = Wire.endTransmission();
-  if (error == 0) {   /*if I2C device found*/
-    // Serial.print("I2C device found at address 0x");/*print this line if I2C device found*/
-    // if (lookForAddress<16) {
-    //   Serial.print("0");
-    // }
-    // Serial.println(lookForAddress,HEX);
+  if (error == 0) { // I2C device replied
+    DEBUG_PRINT("Sensor found at address 0x");
+    if (lookForAddress < 16)
+      DEBUG_PRINT(0);
+    DEBUG_PRINTLN_HEX(lookForAddress);
     return true;
   }
   return false;
