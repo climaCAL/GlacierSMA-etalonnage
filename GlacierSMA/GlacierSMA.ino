@@ -409,7 +409,6 @@ void setup()
   DEBUG_PRINTLN();
   printLine();
   DEBUG_PRINT("Cryologger - Automatic Weather Station #"); DEBUG_PRINTLN(CRYOLOGGER_ID);
-
   printLine();
 
 #if CALIBRATE
@@ -419,33 +418,35 @@ void setup()
   while (true)
   {
     petDog(); // Reset WDT
-    DEBUG_PRINT(">  (A) Fram state: ");  // monitore l'etat de la RAM
-    DEBUG_PRINTLN(freeRam());  
+    int fram = freeRam();
+    DEBUG_PRINT(">  Fram initial: "); DEBUG_PRINTLN(fram);
+
     calibrateAdc();
-    DEBUG_PRINT(">  (B1) Fram state: ");  // monitore l'etat de la RAM
-    DEBUG_PRINTLN(freeRam());
-    readBme280Int();  // Read temperature and humidty sensor (external)
-    DEBUG_PRINT(">  (B2) Fram state: ");  // monitore l'etat de la RAM
-    DEBUG_PRINTLN(freeRam());  
-    readBme280Ext();     // Read temperature and humidty sensor (external)
-    DEBUG_PRINT(">  (C) Fram state: ");  // monitore l'etat de la RAM
-    DEBUG_PRINTLN(freeRam());  
-    readLsm303();
-    DEBUG_PRINT(">  (D) Fram state: ");  // monitore l'etat de la RAM
-    DEBUG_PRINTLN(freeRam());
-    readVeml7700();    // Read solar radiation - Attention (09/28/23 Yh) si le VEML7700 n'est pas connecté, le code bloque... corrigé. Cause: le destructeur. Donc déclaré global.
-    DEBUG_PRINT(">  (E) Fram state: ");  // monitore l'etat de la RAM
-    DEBUG_PRINTLN(freeRam());
-    readDFRWindSensor();
-    DEBUG_PRINT(">  (F) Fram state: ");  // monitore l'etat de la RAM
-    DEBUG_PRINTLN(freeRam());
-    //readGnss(); // Sync RTC with the GNSS
+    DEBUG_PRINT(">  (ADC) Fram state: "); DEBUG_PRINTLN(freeRam());
+
     readBattery();        // Read battery voltage
+    DEBUG_PRINT(">  (Bat) Fram state: "); DEBUG_PRINTLN(freeRam());
 
-    DEBUG_PRINT(">  Fram final  : ");  // monitore l'etat de la RAM
-    DEBUG_PRINTLN(freeRam());  
+    readBme280Int();  // Read temperature and humidty sensor (external)
+    DEBUG_PRINT(">  (BME280Int) Fram state: "); DEBUG_PRINTLN(freeRam());
 
+    readBme280Ext();     // Read temperature and humidty sensor (external)
+    DEBUG_PRINT(">  (BME280Ext) Fram state: "); DEBUG_PRINTLN(freeRam());
+
+    readLsm303();
+    DEBUG_PRINT(">  (LSM303) Fram state: "); DEBUG_PRINTLN(freeRam());
+
+    readVeml7700();    // Read solar radiation
+    DEBUG_PRINT(">  (VEML7700) Fram state: "); DEBUG_PRINTLN(freeRam());
+
+    readDFRWindSensor();
+    DEBUG_PRINT(">  (DFRWS) Fram state: "); DEBUG_PRINTLN(freeRam());
+
+    //readGnss(); // Sync RTC with the GNSS
+
+    DEBUG_PRINT(">  Fram final change: "); DEBUG_PRINTLN(freeRam() - fram);
     myDelay(5000);
+    printWakeUp(++sampleCounter);
   }
 #endif
 
