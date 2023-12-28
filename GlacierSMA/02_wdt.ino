@@ -50,7 +50,7 @@ void WDT_Handler()
   REG_WDT_INTFLAG = WDT_INTFLAG_EW;   // Clear the Early Warning interrupt flag //WDT->INTFLAG.bit.EW = 1;
 
   // Perform system reset after 10 WDT interrupts (should not occur)
-  if (wdtCounter < 10)
+  if (wdtCounter < systemRstWDTCountLimit)
   {
     REG_WDT_CLEAR = WDT_CLEAR_CLEAR_KEY;  // Clear the WDT and restart time-out period //WDT->CLEAR.bit.CLEAR = 0xA5;
     while (WDT->STATUS.bit.SYNCBUSY);     // Await synchronization of registers between clock domains
