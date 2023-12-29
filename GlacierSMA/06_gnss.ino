@@ -93,12 +93,6 @@ void readGnss()
     satellites = gnss.satellites.value();
     hdop = gnss.hdop.value();
 
-    // Write data to buffer
-    moSbdMessage.latitude = gnss.location.lat() * 1000000;
-    moSbdMessage.longitude = gnss.location.lng() * 1000000;
-    moSbdMessage.satellites = gnss.satellites.value();
-    moSbdMessage.hdop = gnss.hdop.value();
-
     DEBUG_PRINT(F("Info - RTC drift ")); DEBUG_PRINT(rtcDrift); DEBUG_PRINTLN(F(" seconds"));
     blinkLed(PIN_LED_GREEN, 5, 100);
   }
