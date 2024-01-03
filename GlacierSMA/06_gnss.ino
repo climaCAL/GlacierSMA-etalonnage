@@ -25,6 +25,10 @@ void readGnss()
   // Look for GNSS signal for up to gnssTimeout
   while (fixCounter < 10 && millis() - loopStartTime < gnssTimeout * 1000UL) {
 
+    // Call ISDB callback during acquisition of GNSS fix;
+    // This is unrelated to GNSS, but it resets the WDT and blinks the green LED during a potentially slow operation.
+    ISBDCallback();
+
     // Exit loop early if no GNSS data is received after a specified duration
     if ((millis() - loopStartTime) > 5000 && gnss.charsProcessed() < 10) {
       DEBUG_PRINT(F("\nWarning - No GNSS data received; Please check wiring."));
@@ -33,7 +37,7 @@ void readGnss()
 
     if (!GNSS_PORT.available())
       continue;
-    
+
     char c = GNSS_PORT.read();
     #if DEBUG_GNSS
       Serial.write(c); // Echo NMEA sentences to serial
@@ -49,9 +53,6 @@ void readGnss()
 
     fixCounter++; // Increment fix counter
     DEBUG_PRINT(' '); DEBUG_PRINT(fixCounter);
-
-    // Call ISDB callback during acquisition of GNSS fix
-    ISBDCallback(); //DG 12-05: TODO Check if the polling is frequent enough
   }
 
   DEBUG_PRINTLN("");
