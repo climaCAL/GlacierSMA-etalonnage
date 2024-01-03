@@ -27,7 +27,7 @@ void readGnss()
 
     // Exit loop early if no GNSS data is received after a specified duration
     if ((millis() - loopStartTime) > 5000 && gnss.charsProcessed() < 10) {
-      DEBUG_PRINTLN(F("Warning - No GNSS data received; Please check wiring."));
+      DEBUG_PRINT(F("\nWarning - No GNSS data received; Please check wiring."));
       break;
     }
 
@@ -54,6 +54,8 @@ void readGnss()
     ISBDCallback(); //DG 12-05: TODO Check if the polling is frequent enough
   }
 
+  DEBUG_PRINTLN("");
+
   if (fixCounter < 10) {
     DEBUG_PRINTLN(F("Warning - Insufficient GNSS fixes found!"));
     blinkLed(PIN_LED_RED, 5, 100);
@@ -74,7 +76,6 @@ void readGnss()
     // Calculate RTC drift
     long rtcDrift = rtcEpoch - gnssEpoch;
 
-    DEBUG_PRINTLN("");
     DEBUG_PRINT(F("Info - gnssEpoch: ")); DEBUG_PRINTLN(gnssEpoch);
     DEBUG_PRINT(F("Info - rtcEpoch: ")); DEBUG_PRINTLN(rtcEpoch);
 
