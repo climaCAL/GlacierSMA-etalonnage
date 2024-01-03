@@ -35,6 +35,9 @@
 Adafruit_VEML7700::Adafruit_VEML7700(void) {}
 
 Adafruit_VEML7700::~Adafruit_VEML7700(void) {
+  interruptEnable(false);
+  enable(false);
+
   if (ALS_Shutdown) {
     delete ALS_Shutdown;
   }
