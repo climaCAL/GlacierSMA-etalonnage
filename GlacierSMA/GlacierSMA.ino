@@ -295,7 +295,7 @@ typedef union
     uint32_t  unixtime;           // UNIX Epoch time                (4 bytes)
     int16_t   temperatureInt;     // Internal temperature (°C)      (2 bytes)   * 100
     uint16_t  humidityInt;        // Internal humidity (%)          (2 bytes)   * 100
-    uint16_t  pressureInt;        // Internal pressure (hPa)        (2 bytes)   - 850 * 100
+    uint16_t  pressureInt;        // Internal pressure (hPa)        (2 bytes)   - 400 * 100
     int16_t   temperatureExt;     // External temperature (°C)      (2 bytes)   * 100
     uint16_t  humidityExt;        // External humidity (%)          (2 bytes)   * 100
     int16_t   pitch;              // Pitch (°)                      (2 bytes)   * 100

@@ -4,7 +4,7 @@ void calculateStats()
   // Write data to union
   moSbdMessage.temperatureInt = temperatureIntStats.average()   * 100;          // Mean internal temperature (°C)
   moSbdMessage.humidityInt    = humidityIntStats.average()      * 100;          // Mean internal humidity (%)
-  moSbdMessage.pressureInt    = (pressureIntStats.average()     - 850) * 100;   // Mean internal pressure (hPa)
+  moSbdMessage.pressureInt    = (pressureIntStats.average()     - 400) * 100;   // Mean internal pressure (hPa)
   moSbdMessage.temperatureExt = temperatureExtStats.average()   * 100;          // Mean external temperature (°C)
   moSbdMessage.humidityExt    = humidityExtStats.average()      * 100;          // Mean external humidity (%)
   moSbdMessage.solar          = solarStats.average()            * 10;           // Mean solar irradiance (W m-2)
