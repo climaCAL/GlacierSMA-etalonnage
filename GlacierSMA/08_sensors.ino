@@ -1,7 +1,7 @@
 // ----------------------------------------------------------------------------
 // Utility function to detect I2C sensor lockup 
 // ----------------------------------------------------------------------------
-bool scanI2CbusFor(uint8_t address, uint8_t recheck = 3) {
+bool scanI2CbusFor(uint8_t address, uint8_t recheck = 0) {
   Wire.beginTransmission(address);
   uint8_t error = Wire.endTransmission();
 
@@ -30,9 +30,9 @@ bool scanI2CbusFor(uint8_t address, uint8_t recheck = 3) {
 // ----------------------------------------------------------------------------
 void configureBme280Ext()
 {
-  DEBUG_PRINT("Info - Initializing BME280 Ext...");
+  DEBUG_PRINT("Info - Initializing BME280 Ext... ");
 
-  if (bme280Ext.begin(BME280_ADDRESS))
+  if (scanI2CbusFor(BME280_ADDRESS) && bme280Ext.begin(BME280_ADDRESS))
   {
     online.bme280Ext = true;
     DEBUG_PRINTLN("success!");
@@ -98,9 +98,9 @@ void readBme280Ext()
 // ----------------------------------------------------------------------------
 void configureBme280Int()
 {
-  DEBUG_PRINT("Info - Initializing BME280 int...");
+  DEBUG_PRINT("Info - Initializing BME280 int... ");
 
-  if (bme280Int.begin(BME280_ADDRESS_ALTERNATE))
+  if (scanI2CbusFor(BME280_ADDRESS_ALTERNATE) && bme280Int.begin(BME280_ADDRESS_ALTERNATE))
   {
     online.bme280Int = true;
     DEBUG_PRINTLN("success!");
@@ -169,7 +169,7 @@ void readBme280Int()
 Adafruit_VEML7700* configureVEML7700() {
   DEBUG_PRINT("Info - Initializing VEML7700... ");
 
-  if (scanI2CbusFor(vemlI2cAddr)) {
+  if (scanI2CbusFor(vemlI2cAddr, 3)) {
     // Constructed here because the destructor hangs if the sensor is not connected.
     Adafruit_VEML7700* veml = new Adafruit_VEML7700();
 
@@ -272,11 +272,10 @@ void readSht31()
 // ----------------------------------------------------------------------------
 void configureLsm303()
 {
-  DEBUG_PRINT("Info - Initializing LSM303...");
-
+  DEBUG_PRINT("Info - Initializing LSM303... ");
 
   // Initialize LSM303 accelerometer
-  if (lsm303.begin())
+  if (scanI2CbusFor(LSM303_ADDRESS_ACCEL) && lsm303.begin())
   {
     online.lsm303 = true;
     DEBUG_PRINTLN("success!");
@@ -653,15 +652,15 @@ void readDFRWindSensor()
   DEBUG_PRINT("Info - Reading DFRWindSensor... ");
   myDelay(2000); //Let the DFRWindSensor settle a bit... making sure data is accurate at the sensor and ready for us.
 
-  // Requires I2C bus
-  Wire.begin();
-  myDelay(1000);
-
-  if (!scanI2CbusFor(WIND_SENSOR_SLAVE_ADDR)) {
+  if (!scanI2CbusFor(WIND_SENSOR_SLAVE_ADDR, 1)) {
     online.dfrWindSensor = false;
     DEBUG_PRINTLN("failed!");
     return;
   }
+
+  // Requires I2C bus
+  Wire.begin();
+  myDelay(1000);
   
   vent lectureVent;  //Let's use a structure to read wind sensor.
 
