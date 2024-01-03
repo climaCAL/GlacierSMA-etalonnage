@@ -162,7 +162,7 @@ typedef statistic::Statistic<float,uint32_t,false> StatisticCAL;
 StatisticCAL batteryStats;         // Battery voltage
 StatisticCAL temperatureIntStats;  // Internal temperature
 StatisticCAL humidityIntStats;     // Internal humidity
-StatisticCAL pressureIntStats;     // Internal pressure
+StatisticCAL pressureExtStats;     // External pressure
 StatisticCAL temperatureExtStats;  // External temperature
 StatisticCAL humidityExtStats;     // External humidity
 StatisticCAL solarStats;           // Solar radiation
@@ -247,7 +247,7 @@ unsigned long samplesSaved      = 0;      // Log file sample counter
 long          rtcDrift          = 0;      // RTC drift calculated during sync
 float         temperatureInt    = 0.0;    // Internal temperature (°C)
 float         humidityInt       = 0.0;    // Internal hunidity (%)
-float         pressureInt       = 0.0;    // Internal pressure (hPa)
+float         pressureExt       = 0.0;    // External pressure (hPa)
 float         temperatureExt    = 0.0;    // External temperature (°C)
 float         humidityExt       = 0.0;    // External humidity (%)
 float         pitch             = 0.0;    // Pitch (°)
@@ -295,7 +295,7 @@ typedef union
     uint32_t  unixtime;           // UNIX Epoch time                (4 bytes)
     int16_t   temperatureInt;     // Internal temperature (°C)      (2 bytes)   * 100
     uint16_t  humidityInt;        // Internal humidity (%)          (2 bytes)   * 100
-    uint16_t  pressureInt;        // Internal pressure (hPa)        (2 bytes)   - 400 * 100
+    uint16_t  pressureExt;        // External pressure (hPa)        (2 bytes)   - 400 * 100
     int16_t   temperatureExt;     // External temperature (°C)      (2 bytes)   * 100
     uint16_t  humidityExt;        // External humidity (%)          (2 bytes)   * 100
     int16_t   pitch;              // Pitch (°)                      (2 bytes)   * 100

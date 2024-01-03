@@ -76,7 +76,7 @@ void printMoSbd()
   DEBUG_PRINT("unixtime:");         printTab(2);  DEBUG_PRINTLN(moSbdMessage.unixtime);
   DEBUG_PRINT("temperatureInt:");   printTab(2);  DEBUG_PRINTLN(moSbdMessage.temperatureInt);
   DEBUG_PRINT("humidityInt:");      printTab(2);  DEBUG_PRINTLN(moSbdMessage.humidityInt);
-  DEBUG_PRINT("pressureInt:");      printTab(2);  DEBUG_PRINTLN(moSbdMessage.pressureInt);
+  DEBUG_PRINT("pressureExt:");      printTab(2);  DEBUG_PRINTLN(moSbdMessage.pressureExt);
   DEBUG_PRINT("temperatureExt:");   printTab(2);  DEBUG_PRINTLN(moSbdMessage.temperatureExt);
   DEBUG_PRINT("humidityExt:");      printTab(2);  DEBUG_PRINTLN(moSbdMessage.humidityExt);
   DEBUG_PRINT("solar:");            printTab(3);  DEBUG_PRINTLN(moSbdMessage.solar);
