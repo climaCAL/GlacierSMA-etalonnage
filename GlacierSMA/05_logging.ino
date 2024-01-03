@@ -62,7 +62,8 @@ void createLogFile()
 #if LOGGING
 
   // Get timestamp log file name
-  sprintf(logFileName, "AWS_%s_20%02d%02d%02d_%02d%02d%02d.csv",
+  //TODO If the shortest log duration is "daily", we don't really need the time in the file name.
+  sprintf(logFileName, "AWS_%s_20%02d-%02d-%02d_%02d-%02d-%02d.csv",
           CRYOLOGGER_ID, rtc.getYear(), rtc.getMonth(), rtc.getDay(),
           rtc.getHours(), rtc.getMinutes(), rtc.getSeconds());
 
@@ -86,7 +87,7 @@ void createLogFile()
     DEBUG_PRINT("Info - Created log file: "); DEBUG_PRINTLN(logFileName);
   }
 
-  if (!logFile.isOpen())
+  if (!logFile.isOpen()) //FIXME Didn't we just check this above when opening?
   {
     DEBUG_PRINTLN(F("Unable to open file"));
   }
@@ -95,6 +96,7 @@ void createLogFile()
   updateFileCreate(&logFile);
 
   // Write header to file
+  //FIXME Maybe we should skip this if the file already exists? Or we should always prefer starting a new file?
   logFile.println("sample,datetime,voltage,temperature_int,humidity_int,pressure_int,temperature_ext,"
                   "humidity_ext,pitch,roll,wind_speed,wind_direction,latitude,longitude,satellites,hdop,"
                   "online_microSd,online_Bme280,online_Lsm303,timer_readRtc,timer_readBattery,timer_configMicroSd,"
@@ -159,8 +161,7 @@ void logData()
     if (logFile.open(logFileName, O_APPEND | O_WRITE))
     {
       // Sensor information
-      samplesSaved++; //  Increment sample count
-      logFile.print(samplesSaved);        logFile.print(",");
+      logFile.print(++samplesSaved);      logFile.print(","); // Increment saved samples count
       logFile.print(dateTime);            logFile.print(",");
       logFile.print(voltage);             logFile.print(",");
       logFile.print(temperatureInt);      logFile.print(",");

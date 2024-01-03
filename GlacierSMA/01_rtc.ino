@@ -33,7 +33,9 @@ void readRtc()
   // Start the loop timer
   uint32_t loopStartTime = millis();
 
-  DEBUG_PRINT("Info - (readRtc) Current datetime: "); printDateTime();
+  DEBUG_PRINT("Info - (readRtc) Current datetime: ");
+  printDateTime(dateTime); // This writes the date to a persistent string (used for logging)
+  DEBUG_PRINTLN(dateTime);
 
   // Get Unix Epoch time
   unixtime = rtc.getEpoch();
@@ -111,23 +113,28 @@ void alarmIsr()
 // Print the RTC's current date and time
 void printDateTime()
 {
-  char dateTimeBuffer[25];
-  sprintf(dateTimeBuffer, "20%02d-%02d-%02d %02d:%02d:%02d",
+  char dateTimeBuffer[20];
+  printDateTime(dateTimeBuffer);
+  DEBUG_PRINTLN(dateTimeBuffer);
+}
+
+//TODO Create a utility function that can print any datetime parameter, and rename this function "printCurrentTime"
+void printDateTime(char* printBuffer)
+{
+  sprintf(printBuffer, "20%02d-%02d-%02d %02d:%02d:%02d",
           rtc.getYear(), rtc.getMonth(), rtc.getDay(),
           rtc.getHours(), rtc.getMinutes(), rtc.getSeconds());
-  DEBUG_PRINTLN(dateTimeBuffer);
 }
 
 // Print the RTC alarm
 void printAlarm()
 {
-  char alarmBuffer[25];
+  char alarmBuffer[20];
   sprintf(alarmBuffer, "20%02d-%02d-%02d %02d:%02d:%02d",
           rtc.getAlarmYear(), rtc.getAlarmMonth(), rtc.getAlarmDay(),
           rtc.getAlarmHours(), rtc.getAlarmMinutes(), rtc.getAlarmSeconds());
   DEBUG_PRINTLN(alarmBuffer);
 }
-
 
 void checkDate()
 {
