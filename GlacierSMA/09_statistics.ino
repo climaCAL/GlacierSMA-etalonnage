@@ -8,10 +8,10 @@ void calculateStats()
   // Write data to union
   moSbdMessage.temperatureInt = nan2zero(temperatureIntStats.average()   * 100);          // Mean internal temperature (°C)
   moSbdMessage.humidityInt    = nan2zero(humidityIntStats.average()      * 100);          // Mean internal humidity (%)
-  moSbdMessage.pressureInt    = nan2zero((pressureIntStats.average()     - 850) * 100);   // Mean internal pressure (hPa)
+  moSbdMessage.pressureExt    = nan2zero((pressureExtStats.average()     - 400) * 100);   // Mean external pressure (hPa)
   moSbdMessage.temperatureExt = nan2zero(temperatureExtStats.average()   * 100);          // Mean external temperature (°C)
   moSbdMessage.humidityExt    = nan2zero(humidityExtStats.average()      * 100);          // Mean external humidity (%)
-  moSbdMessage.solar          = nan2zero(solarStats.average()            * 10);           // Mean solar irradiance (W m-2)
+  moSbdMessage.solar          = nan2zero(solarStats.average()            * 10000);        // Mean solar irradiance (lx)
   moSbdMessage.voltage        = nan2zero(batteryStats.average()          * 100);          // Mean battery voltage (V)
 
   // Calculate mean wind speed and direction vectors
@@ -38,10 +38,10 @@ void clearStats()
   batteryStats.clear();
   temperatureIntStats.clear();
   humidityIntStats.clear();
-  pressureIntStats.clear();
+  pressureExtStats.clear();
   temperatureExtStats.clear();
-  solarStats.clear();
   humidityExtStats.clear();
+  solarStats.clear();
   windSpeedStats.clear();
   uStats.clear();
   vStats.clear();
@@ -69,11 +69,11 @@ void printStats()
   DEBUG_PRINT(F("Min: "));        DEBUG_PRINT(humidityIntStats.minimum());      printTab(1);
   DEBUG_PRINT(F("Max: "));        DEBUG_PRINT(humidityIntStats.maximum());      printTab(1);
   DEBUG_PRINT(F("Mean: "));       DEBUG_PRINTLN(humidityIntStats.average());
-  DEBUG_PRINT(F("Pressure Int"));                                               printTab(1);
-  DEBUG_PRINT(F("Samples: "));    DEBUG_PRINT(pressureIntStats.count());        printTab(1);
-  DEBUG_PRINT(F("Min: "));        DEBUG_PRINT(pressureIntStats.minimum());      printTab(1);
-  DEBUG_PRINT(F("Max: "));        DEBUG_PRINT(pressureIntStats.maximum());      printTab(1);
-  DEBUG_PRINT(F("Mean: "));       DEBUG_PRINTLN(pressureIntStats.average());
+  DEBUG_PRINT(F("Pressure Ext"));                                               printTab(1);
+  DEBUG_PRINT(F("Samples: "));    DEBUG_PRINT(pressureExtStats.count());        printTab(1);
+  DEBUG_PRINT(F("Min: "));        DEBUG_PRINT(pressureExtStats.minimum());      printTab(1);
+  DEBUG_PRINT(F("Max: "));        DEBUG_PRINT(pressureExtStats.maximum());      printTab(1);
+  DEBUG_PRINT(F("Mean: "));       DEBUG_PRINTLN(pressureExtStats.average());
   DEBUG_PRINT(F("Temp Ext"));                                                   printTab(1);
   DEBUG_PRINT(F("Samples: "));    DEBUG_PRINT(temperatureExtStats.count());     printTab(1);
   DEBUG_PRINT(F("Min: "));        DEBUG_PRINT(temperatureExtStats.minimum());   printTab(1);

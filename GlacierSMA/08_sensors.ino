@@ -63,6 +63,7 @@ void readBme280Ext()
     // Read sensor data
     temperatureExt = tempBmeEXT_CF * bme280Ext.readTemperature() + tempBmeEXT_Offset;
     uint16_t humExt = humBmeEXT_CF * bme280Ext.readHumidity() + humBmeEXT_Offset;
+    pressureExt = bme280Ext.readPressure() / 100.0F;
 
     if (humExt >= 100){
       humidityExt = 100;
@@ -70,16 +71,16 @@ void readBme280Ext()
     else{
       humidityExt = humExt;
     }
-    //pressureExt = bme280.readPressure() / 100.0F;
 
     // Add to statistics object
     temperatureExtStats.add(temperatureExt);
     humidityExtStats.add(humidityExt);
-    //pressureExtStats.add(pressureExt);
+    pressureExtStats.add(pressureExt);
 
     #if CALIBRATE
       DEBUG_PRINT("\tTemperatureExt: "); DEBUG_PRINT(temperatureExt); DEBUG_PRINTLN(" C");
       DEBUG_PRINT("\tHumidityExt: "); DEBUG_PRINT(humidityExt); DEBUG_PRINTLN("%");
+      DEBUG_PRINT("\tPressureExt: "); DEBUG_PRINT(pressureExt); DEBUG_PRINTLN(" hPa");
     #endif
 
     DEBUG_PRINTLN("done.");
@@ -131,7 +132,7 @@ void readBme280Int()
     // Read sensor data
     temperatureInt = tempImeINT_CF * bme280Int.readTemperature() + tempBmeINT_Offset ;
     uint16_t humInt =  humImeINT_CF * bme280Int.readHumidity() + humBmeINT_Offset; // no need of correction
-    pressureInt = bme280Int.readPressure() / 100.0F;
+    //pressureInt = bme280Int.readPressure() / 100.0F;
 
     if (humInt >= 100){
       humidityInt = 100;
@@ -143,12 +144,12 @@ void readBme280Int()
     // Add to statistics object
     temperatureIntStats.add(temperatureInt);
     humidityIntStats.add(humidityInt);
-    pressureIntStats.add(pressureInt);
+    //pressureIntStats.add(pressureInt);
 
     #if CALIBRATE
       DEBUG_PRINT("\tTemperatureInt: "); DEBUG_PRINT(temperatureInt); DEBUG_PRINTLN(" C");
       DEBUG_PRINT("\tHumidityInt: "); DEBUG_PRINT(humidityInt); DEBUG_PRINTLN("%");
-      DEBUG_PRINT("\tPressure(Int): "); DEBUG_PRINT(pressureInt); DEBUG_PRINTLN(" kPa");
+      //DEBUG_PRINT("\tPressureInt: "); DEBUG_PRINT(pressureInt); DEBUG_PRINTLN(" hPa");
     #endif
 
     DEBUG_PRINTLN("done.");

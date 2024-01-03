@@ -157,7 +157,7 @@ typedef statistic::Statistic<float,uint32_t,false> StatisticCAL;
 StatisticCAL batteryStats;         // Battery voltage
 StatisticCAL temperatureIntStats;  // Internal temperature
 StatisticCAL humidityIntStats;     // Internal humidity
-StatisticCAL pressureIntStats;     // Internal pressure
+StatisticCAL pressureExtStats;     // External pressure
 StatisticCAL temperatureExtStats;  // External temperature
 StatisticCAL humidityExtStats;     // External humidity
 StatisticCAL solarStats;           // Solar radiation
@@ -242,12 +242,12 @@ unsigned long samplesSaved      = 0;      // Log file sample counter
 long          rtcDrift          = 0;      // RTC drift calculated during sync
 float         temperatureInt    = 0.0;    // Internal temperature (°C)
 float         humidityInt       = 0.0;    // Internal hunidity (%)
-float         pressureInt       = 0.0;    // Internal pressure (hPa)
+float         pressureExt       = 0.0;    // External pressure (hPa)
 float         temperatureExt    = 0.0;    // External temperature (°C)
 float         humidityExt       = 0.0;    // External humidity (%)
 float         pitch             = 0.0;    // Pitch (°)
 float         roll              = 0.0;    // Roll (°)
-float         solar             = 0.0;    // Solar radiation
+float         solar             = 0.0;    // Solar radiation (lx)
 float         windSpeed         = 0.0;    // Wind speed (m/s)
 float         windDirection     = 0.0;    // Wind direction (°)
 float         windGustSpeed     = 0.0;    // Wind gust speed  (m/s)
@@ -290,12 +290,12 @@ typedef union
     uint32_t  unixtime;           // UNIX Epoch time                (4 bytes)
     int16_t   temperatureInt;     // Internal temperature (°C)      (2 bytes)   * 100
     uint16_t  humidityInt;        // Internal humidity (%)          (2 bytes)   * 100
-    uint16_t  pressureInt;        // Internal pressure (hPa)        (2 bytes)   - 850 * 100
+    uint16_t  pressureExt;        // External pressure (hPa)        (2 bytes)   - 400 * 100
     int16_t   temperatureExt;     // External temperature (°C)      (2 bytes)   * 100
     uint16_t  humidityExt;        // External humidity (%)          (2 bytes)   * 100
     int16_t   pitch;              // Pitch (°)                      (2 bytes)   * 100
     int16_t   roll;               // Roll (°)                       (2 bytes)   * 100
-    uint32_t  solar;              // Solar illuminance (Lux)        (4 bytes)   * 10
+    uint32_t  solar;              // Solar illuminance (lx)         (4 bytes)   * 10000
     uint16_t  windSpeed;          // Mean wind speed (m/s)          (2 bytes)   * 100
     uint16_t  windDirection;      // Mean wind direction (°)        (2 bytes)	* 10
     uint16_t  windGustSpeed;      // Wind gust speed (m/s)          (2 bytes)   * 100

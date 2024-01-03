@@ -97,7 +97,7 @@ void createLogFile()
 
   // Write header to file
   //FIXME Maybe we should skip this if the file already exists? Or we should always prefer starting a new file?
-  logFile.println("sample,datetime,voltage,temperature_int,humidity_int,pressure_int,temperature_ext,"
+  logFile.println("sample,datetime,voltage,temperature_int,humidity_int,pressure_ext,temperature_ext,"
                   "humidity_ext,pitch,roll,wind_speed,wind_direction,latitude,longitude,satellites,hdop,"
                   "online_microSd,online_Bme280,online_Lsm303,timer_readRtc,timer_readBattery,timer_configMicroSd,"
                   "timer_readGnss,timer_bme280,timer_lsm303,timer_readHmp60,timer_read5103l,"
@@ -166,7 +166,7 @@ void logData()
       logFile.print(voltage);             logFile.print(",");
       logFile.print(temperatureInt);      logFile.print(",");
       logFile.print(humidityInt);         logFile.print(",");
-      logFile.print(pressureInt);         logFile.print(",");
+      logFile.print(pressureExt);         logFile.print(",");
       logFile.print(temperatureExt);      logFile.print(",");
       logFile.print(humidityExt);         logFile.print(",");
       logFile.print(pitch);               logFile.print(",");
@@ -234,7 +234,7 @@ void logData()
       DEBUG_PRINT(voltage);             DEBUG_PRINT(",");
       DEBUG_PRINT(temperatureInt);      DEBUG_PRINT(",");
       DEBUG_PRINT(humidityInt);         DEBUG_PRINT(",");
-      DEBUG_PRINT(pressureInt);         DEBUG_PRINT(",");
+      DEBUG_PRINT(pressureExt);         DEBUG_PRINT(",");
       DEBUG_PRINT(temperatureExt);      DEBUG_PRINT(",");
       DEBUG_PRINT(humidityExt);         DEBUG_PRINT(",");
       DEBUG_PRINT(pitch);               DEBUG_PRINT(",");
