@@ -146,9 +146,9 @@ void transmitData()
 
     petDog();
 
-    // Store return error code
+    // Store return status code
     transmitStatus = returnCode;
-    Serial.print("transmitStatus: "); Serial.println(transmitStatus);
+    DEBUG_PRINT("transmitStatus: "); DEBUG_PRINTLN(transmitStatus);
     moSbdMessage.transmitStatus = transmitStatus;
 
     // Store message in transmit buffer if transmission or modem begin fails

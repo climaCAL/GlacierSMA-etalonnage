@@ -98,7 +98,7 @@ void readBme280Ext()
 // ----------------------------------------------------------------------------
 void configureBme280Int()
 {
-  DEBUG_PRINT("Info - Initializing BME280 int... ");
+  DEBUG_PRINT("Info - Initializing BME280 Int... ");
 
   if (scanI2CbusFor(BME280_ADDRESS_ALTERNATE) && bme280Int.begin(BME280_ADDRESS_ALTERNATE))
   {
@@ -155,7 +155,7 @@ void readBme280Int()
   }
   else
   {
-    DEBUG_PRINTLN("Warning - BME280 int offline!");
+    DEBUG_PRINTLN("Warning - BME280 Int offline!");
   }
   // Stop the loop timer
   timer.readBme280 = millis() - loopStartTime;
