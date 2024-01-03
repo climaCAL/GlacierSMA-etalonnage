@@ -51,6 +51,7 @@ void transmitData()
 
     // Wake up the RockBLOCK 9603 and begin communications
     DEBUG_PRINTLN("Info - Starting modem...");
+    petDog(); // The following might take a while, so best reset the WDT here
 
     int returnCode = modem.begin();
     if (returnCode != ISBD_SUCCESS)
@@ -70,6 +71,7 @@ void transmitData()
       memset(mtSbdBuffer, 0x00, sizeof(mtSbdBuffer)); // Clear MT-SBD buffer
 
       DEBUG_PRINTLN("Info - Attempting to transmit message...");
+      petDog(); // The following might take a while, so best reset the WDT here
 
       // Transmit and receieve SBD message data in binary format
       returnCode = modem.sendReceiveSBDBinary(moSbdBuffer, moSbdBufferSize, mtSbdBuffer, mtSbdBufferSize);
@@ -141,6 +143,8 @@ void transmitData()
         blinkLed(PIN_LED_RED, 10, 500);
       }
     }
+
+    petDog();
 
     // Store return error code
     transmitStatus = returnCode;
