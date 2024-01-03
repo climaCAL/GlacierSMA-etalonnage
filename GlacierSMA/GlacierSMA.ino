@@ -252,7 +252,7 @@ float         temperatureExt    = 0.0;    // External temperature (°C)
 float         humidityExt       = 0.0;    // External humidity (%)
 float         pitch             = 0.0;    // Pitch (°)
 float         roll              = 0.0;    // Roll (°)
-float         solar             = 0.0;    // Solar radiation
+float         solar             = 0.0;    // Solar radiation (lx)
 float         windSpeed         = 0.0;    // Wind speed (m/s)
 float         windDirection     = 0.0;    // Wind direction (°)
 float         windGustSpeed     = 0.0;    // Wind gust speed  (m/s)
@@ -300,7 +300,7 @@ typedef union
     uint16_t  humidityExt;        // External humidity (%)          (2 bytes)   * 100
     int16_t   pitch;              // Pitch (°)                      (2 bytes)   * 100
     int16_t   roll;               // Roll (°)                       (2 bytes)   * 100
-    uint32_t  solar;              // Solar illuminance (Lux)        (4 bytes)   * 10
+    uint32_t  solar;              // Solar illuminance (lx)         (4 bytes)   * 10000
     uint16_t  windSpeed;          // Mean wind speed (m/s)          (2 bytes)   * 100
     uint16_t  windDirection;      // Mean wind direction (°)        (2 bytes)	* 10
     uint16_t  windGustSpeed;      // Wind gust speed (m/s)          (2 bytes)   * 100

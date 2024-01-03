@@ -7,7 +7,7 @@ void calculateStats()
   moSbdMessage.pressureExt    = (pressureExtStats.average()     - 400) * 100;   // Mean external pressure (hPa)
   moSbdMessage.temperatureExt = temperatureExtStats.average()   * 100;          // Mean external temperature (°C)
   moSbdMessage.humidityExt    = humidityExtStats.average()      * 100;          // Mean external humidity (%)
-  moSbdMessage.solar          = solarStats.average()            * 10;           // Mean solar irradiance (W m-2)
+  moSbdMessage.solar          = solarStats.average()            * 10000;        // Mean solar irradiance (lx)
   moSbdMessage.voltage        = batteryStats.average()          * 100;          // Mean battery voltage (V)
 
   // Calculate mean wind speed and direction vectors
