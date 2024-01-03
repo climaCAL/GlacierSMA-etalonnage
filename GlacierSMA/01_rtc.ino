@@ -78,9 +78,9 @@ void setRtcAlarm()
   DEBUG_PRINT("Info - (setRtcAlarm) Alarm mode: "); DEBUG_PRINTLN("MMSS");
 }
 
-void setCutoffAlarm() //FIXME Is this function really necessary? Why not use setRtcAlarm()?
+void setCutoffAlarm() //FIXME Is this function really necessary? Why not reuse setRtcAlarm() with a parameter?
 {
-  // Set next alarm at a "round" minute, guaranteed to be in the future
+  // Set next alarm at a "whole" minute, guaranteed to be in the future
   alarmTime = rtc.getEpoch() + min(sampleInterval * 60, 3600); // Max 1 hour since we match MM:SS
   rtc.setAlarmTime(hour(alarmTime), minute(alarmTime), 0); // hours, minutes, seconds
 
@@ -92,7 +92,14 @@ void setCutoffAlarm() //FIXME Is this function really necessary? Why not use set
 
   DEBUG_PRINT("Info - (setCOAlrm) Current datetime: "); printDateTime();
   DEBUG_PRINT("Info - (setCOAlrm) Next alarm: "); printAlarm();
-  DEBUG_PRINT("Info - (setCOAlrm) Alarm mode: "); DEBUG_PRINTLN(rtc.MATCH_MMSS);
+  DEBUG_PRINT("Info - (setCOAlrm) Alarm mode: "); DEBUG_PRINTLN("MMSS");
+}
+
+// Check that the next alarm is set correctly;
+//TODO Unfortunately there is no method to check that the alarm is enabled in the first place...
+bool checkAlarm()
+{
+  return alarmTime > rtc.getEpoch() && alarmTime < rtc.getEpoch() + sampleInterval * 60;
 }
 
 // RTC alarm interrupt service routine (ISR)

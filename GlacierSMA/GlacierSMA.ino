@@ -187,7 +187,7 @@ unsigned int  iridiumTimeout    = 240;    // Timeout for Iridium transmission (s
 unsigned int  gnssTimeout       = 120;    // Timeout for GNSS signal acquisition (seconds)
 float         batteryCutoff     = 11.0;   // Battery voltage cutoff threshold (V)
 byte          loggingMode       = 2;      // Flag for new log file creation. 1: daily, 2: monthly, 3: yearly
-unsigned int  systemRstWDTCountLimit = 15; // Nombre d'alertes WDT autorisées avant de faire un system Reset (8s par cycle)
+unsigned int  systemRstWDTCountLimit = 15;// Nombre d'alertes WDT autorisées avant de faire un system Reset (8s par cycle)
 #endif
 
 // ----------------------------------------------------------------------------
@@ -612,11 +612,23 @@ void loop()
   // Check for WDT interrupts
   if (wdtFlag)
   {
-    petDog(); // Reset the WDT
-  }
+    if (checkAlarm())
+    {
+      // Blink LED to indicate WDT interrupt and nominal system operation
+      blinkLed(PIN_LED_GREEN, 1, 25);
 
-  // Blink LED to indicate WDT interrupt and nominal system operation
-  blinkLed(PIN_LED_GREEN, 1, 25);
+      // Reset the WDT
+      petDog();
+    }
+    else
+    {
+      // Blink red LED to indicate abnormal system operation
+      blinkLed(PIN_LED_RED, 1, 250);
+
+      // Reset the RTC alarm based on current time
+      setCutoffAlarm();
+    }
+  }
 
   // Enter deep sleep and wait for WDT or RTC alarm interrupt
   goToSleep();
