@@ -37,7 +37,7 @@
 #include <Adafruit_Sensor.h>        // https://github.com/adafruit/Adafruit_Sensor (v1.1.4)
 #include <Arduino.h>                // Required for new Serial instance. Include before <wiring_private.h>
 #include <ArduinoLowPower.h>        // https://github.com/arduino-libraries/ArduinoLowPower (v1.2.2)
-#include <IridiumSBD.h>             // https://github.com/sparkfun/SparkFun_IridiumSBD_I2C_Arduino_Library (v3.0.5)
+#include <IridiumSBD.h>             // https://github.com/sparkfun/SparkFun_IridiumSBD_I2C_Arduino_Library (v3.0.6)
 #include <RTCZero.h>                // https://github.com/arduino-libraries/RTCZero (v1.6.0)
 #include <SdFat.h>                  // https://github.com/greiman/SdFat (v2.1.2)
 #include <sensirion.h>              // https://github.com/HydroSense/sensirion
@@ -51,7 +51,7 @@
 // ----------------------------------------------------------------------------
 // Define unique identifier
 // ----------------------------------------------------------------------------
-#define CRYOLOGGER_ID "AL2"
+#define CRYOLOGGER_ID "AL3"
 
 // ----------------------------------------------------------------------------
 // Data logging
@@ -69,8 +69,8 @@
 #define DEBUG           true  // Output debug messages to Serial Monitor
 #define DEBUG_GNSS      false // Output GNSS debug information
 #define DEBUG_IRIDIUM   false // Output Iridium debug messages to Serial Monitor
-#define NO_TRANSMIT     true  // Prevent sending satellite messages
-#define CALIBRATE       true  // Enable sensor calibration code
+#define NO_TRANSMIT     false  // Prevent sending satellite messages
+#define CALIBRATE       false  // Enable sensor calibration code
 
 #if DEBUG
 #define DEBUG_PRINT(x)            SERIAL_PORT.print(x)
@@ -174,8 +174,8 @@ StatisticCAL vStats;               // Wind north-south wind vector component (v)
 // User defined global variable declarations
 // ----------------------------------------------------------------------------
 #if DEBUG
-unsigned long sampleInterval    = 1;      // Sampling interval (minutes). Default: 5 min (300 seconds)
-unsigned int  averageInterval   = 5;      // Number of samples to be averaged in each message. Default: 12 (hourly)
+unsigned long sampleInterval    = 2;      // Sampling interval (minutes). Default: 5 min (300 seconds)
+unsigned int  averageInterval   = 15;     // Number of samples to be averaged in each message. Default: 12 (hourly)
 unsigned int  transmitInterval  = 1;      // Number of messages in each Iridium transmission (340-byte limit)
 unsigned int  retransmitLimit   = 4;      // Failed data transmission reattempts (340-byte limit)
 unsigned int  gnssTimeout       = 30;     // Timeout for GNSS signal acquisition (seconds)
@@ -199,14 +199,14 @@ byte          loggingMode       = 2;      // Flag for new log file creation. 1: 
 // Sensors correction factor and offsets -- to modify -- 
 // ----------------------------------------------------------------------------
 //BME280 -- Exterior sensor
-float tempBmeEXT_CF             = 1.046;    // Correction factor for exterior temperature acquisition.
-float tempBmeEXT_Offset         = -0.805;   // Offset for exterior temperature acquisition.
-float humBmeEXT_CF              = 1.09;     // Correction factor for exterior humidity acquisition.
-float humBmeEXT_Offset          = 2.3;      // Offset for exterior humidity acquisition.
+float tempBmeEXT_CF             = 1.00;    // Correction factor for exterior temperature acquisition.
+float tempBmeEXT_Offset         = 0.0;   // Offset for exterior temperature acquisition.
+float humBmeEXT_CF              = 1.00;     // Correction factor for exterior humidity acquisition.
+float humBmeEXT_Offset          = 0.0;      // Offset for exterior humidity acquisition.
 
 //BME280 -- Interior sensor
-float tempImeINT_CF             = 1.05;     // Correction factor for interior temperature acquisition.
-float tempBmeINT_Offset         = -1.07;    // Offset for interior temperature acquisition.
+float tempImeINT_CF             = 1.00;     // Correction factor for interior temperature acquisition.
+float tempBmeINT_Offset         = 0.0;    // Offset for interior temperature acquisition.
 float humImeINT_CF              = 1.0;      // Correction factor for interior humidity acquisition.
 float humBmeINT_Offset          = 0.0;      // Offset for interior humidity acquisition.
 
@@ -221,6 +221,7 @@ volatile bool alarmFlag         = false;  // Flag for alarm interrupt service ro
 volatile bool wdtFlag           = false;  // Flag for Watchdog Timer interrupt service routine
 volatile int  wdtCounter        = 0;      // Watchdog Timer interrupt counter
 volatile int  revolutions       = 0;      // Wind speed ISR counter
+int           systemRstWDTCountLimit = 12; //Nombre de WDT autorisé avant de faire un system Reset par WDT
 bool          resetFlag         = false;  // Flag to force system reset using Watchdog Timer
 uint8_t       moSbdBuffer[340];           // Buffer for Mobile Originated SBD (MO-SBD) message (340 bytes max)
 uint8_t       mtSbdBuffer[270];           // Buffer for Mobile Terminated SBD (MT-SBD) message (270 bytes max)

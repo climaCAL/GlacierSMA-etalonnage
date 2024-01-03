@@ -46,7 +46,7 @@ void enableSerial()
   USBDevice.attach(); // Re-attach USB
   SERIAL_PORT.begin(115200);
   blinkLed(PIN_LED_RED, 4, 250); // Blink LED
-  //myDelay(3000); // Non-blocking delay to allow user to open Serial Monitor
+  myDelay(3000); // Non-blocking delay to allow user to open Serial Monitor
 #endif
 }
 
