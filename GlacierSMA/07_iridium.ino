@@ -3,7 +3,7 @@ void configureIridium()
 {
   modem.setPowerProfile(IridiumSBD::DEFAULT_POWER_PROFILE); // Assume battery power (USB power: IridiumSBD::USB_POWER_PROFILE)
   modem.adjustSendReceiveTimeout(iridiumTimeout);           // Timeout for Iridium send/receive commands (default = 300 s)
-  modem.adjustStartupTimeout(120);                          // Timeout for Iridium startup (default = 240 s)
+  modem.adjustStartupTimeout(iridiumTimeout / 2);           // Timeout for Iridium startup (default = 240 s)
 }
 
 // Write data from structure to transmit buffer
@@ -169,11 +169,13 @@ void transmitData()
     }
 
     // Put modem to sleep
-    DEBUG_PRINTLN("Info - Putting modem to sleep...");
-    returnCode = modem.sleep();
-    if (returnCode != ISBD_SUCCESS)
-    {
-      DEBUG_PRINT("Warning - Sleep failed error "); DEBUG_PRINTLN(returnCode);
+    if (returnCode != ISBD_NO_MODEM_DETECTED) {
+      DEBUG_PRINTLN("Info - Putting modem to sleep...");
+      returnCode = modem.sleep();
+      if (returnCode != ISBD_SUCCESS)
+      {
+        DEBUG_PRINT("Warning - Sleep failed error "); DEBUG_PRINTLN(returnCode);
+      }
     }
 
     // Close the Iridium serial port
