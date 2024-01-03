@@ -61,7 +61,7 @@
 // ----------------------------------------------------------------------------
 // Debugging macros
 // ----------------------------------------------------------------------------
-#define DEBUG           true  // Output debug messages to Serial Monitor
+#define DEBUG           false // Output debug messages to Serial Monitor
 #define DEBUG_GNSS      false // Output GNSS debug information
 #define DEBUG_IRIDIUM   false // Output Iridium debug messages to Serial Monitor
 #define NO_TRANSMIT     false // Prevent sending satellite messages
@@ -580,8 +580,8 @@ void loop()
           {
             readGnss(); // Sync RTC with the GNSS
             currentDate = newDate;
-            Serial.print("currentDate: "); Serial.println(currentDate);
-            Serial.print("newDate: "); Serial.println(newDate);
+            DEBUG_PRINT("currentDate: "); DEBUG_PRINTLN(currentDate);
+            DEBUG_PRINT("newDate: "); DEBUG_PRINTLN(newDate);
           }
           transmitData(); // Transmit data via Iridium transceiver
         }
