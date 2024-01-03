@@ -222,8 +222,8 @@ uint8_t       moSbdBuffer[340];           // Buffer for Mobile Originated SBD (M
 uint8_t       mtSbdBuffer[270];           // Buffer for Mobile Terminated SBD (MT-SBD) message (270 bytes max)
 size_t        moSbdBufferSize;
 size_t        mtSbdBufferSize;
-char          logFileName[30]   = "";     // Log file name
-char          dateTime[30]      = "";     // Datetime buffer
+char          logFileName[50]   = "";     // Log file name
+char          dateTime[20]      = "";     // Datetime buffer
 byte          retransmitCounter = 0;      // Counter for Iridium 9603 transmission reattempts
 byte          transmitCounter   = 0;      // Counter for Iridium 9603 transmission intervals
 byte          currentLogFile    = 0;      // Variable for tracking when new microSD log files are created

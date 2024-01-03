@@ -228,7 +228,6 @@ void logData()
 
 #if DEBUG
       // Print logged data to Serial Monitor
-
       DEBUG_PRINT("Info - Logging data to: "); DEBUG_PRINTLN(logFileName);
       DEBUG_PRINT(samplesSaved);        DEBUG_PRINT(",");
       DEBUG_PRINT(dateTime);            DEBUG_PRINT(",");
@@ -279,6 +278,7 @@ void logData()
       DEBUG_PRINT(gnssTimeout);         DEBUG_PRINT(",");
       DEBUG_PRINTLN(iridiumTimeout);
 #endif
+
       blinkLed(PIN_LED_GREEN, 2, 100);
     }
     else
