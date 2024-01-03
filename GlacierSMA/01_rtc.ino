@@ -11,27 +11,20 @@ void configureRtc()
   // 6: MATCH_YYMMDDHHMMSS Once, on a specific date and a specific time
 
   // Initialize RTC
-  rtc.begin();
+  rtc.begin(); // begin(bool resetTime = true) would reset time to 0 on startup
 
   // Set time manually
   //rtc.setTime(22, 55, 0); // Must be in the form: rtc.setTime(hours, minutes, seconds);
   //rtc.setDate(27, 1, 23); // Must be in the form: rtc.setDate(day, month, year);
 
-  // Set initial RTC alarm time
-  rtc.setAlarmTime(0, sampleInterval, 0); // hours, minutes, seconds
+  // Read RTC initially and display time
+  readRtc();
 
-  // Enable alarm for hour rollover match
-  //rtc.enableAlarm(rtc.MATCH_MMSS);
-  rtc.enableAlarm(rtc.MATCH_SS);  //Yh 281223: réveil dans la prochaine minute...
+  // Set initial RTC alarm time (FIXME This isn't needed unless loop() never gets called)
+  setRtcAlarm();
 
   // Attach alarm interrupt service routine (ISR)
   rtc.attachInterrupt(alarmIsr);
-
-  alarmFlag = false; // Clear flag
-
-  DEBUG_PRINT("Info - (cfgRtc) RTC initialized: "); printDateTime();
-  DEBUG_PRINT("Info - (cfgRtc) Initial alarm: "); printAlarm();
-  DEBUG_PRINT("Info - (cfgRtc) Alarm match "); DEBUG_PRINTLN(rtc.MATCH_SS);
 }
 
 // Read RTC
@@ -40,7 +33,7 @@ void readRtc()
   // Start the loop timer
   uint32_t loopStartTime = millis();
 
-  DEBUG_PRINT("Info - (RdRtc) Current datetime: "); printDateTime();
+  DEBUG_PRINT("Info - (readRtc) Current datetime: "); printDateTime();
 
   // Get Unix Epoch time
   unixtime = rtc.getEpoch();
@@ -56,54 +49,40 @@ void readRtc()
 void setRtcAlarm()
 {
   // Calculate next alarm
-  alarmTime = unixtime + (sampleInterval * 60UL);
-  DEBUG_PRINT(F("Info - (setRtcAlrm) unixtime: ")); DEBUG_PRINTLN(unixtime);
-  DEBUG_PRINT(F("Info - (setRtcAlrm) alarmTime: ")); DEBUG_PRINTLN(alarmTime);
+  alarmTime = unixtime + sampleInterval * 60;
+  alarmTime -= second(alarmTime); // Discard the seconds
 
-  // Check if alarm was set in the past or too far in the future
-  //Yh 281223: mis 20 afin de s'assurer d'avoir au moins 20 secondes avant le prochain cycle.
-  if ((rtc.getEpoch() + 20 >= alarmTime) || ((alarmTime - unixtime) > 86400) || firstTimeFlag) {
-    //Yh 281223: changé pour "Info" car n'est pas vraiment une erreur
-    DEBUG_PRINTLN(F("Info - (setRtcAlrm) RTC alarm set in the past (or too tight), too far in the future, or program running for the first time."));
+  DEBUG_PRINT(F("Info - (setRtcAlarm) unixtime: ")); DEBUG_PRINTLN(unixtime);
+  DEBUG_PRINT(F("Info - (setRtcAlarm) alarmTime: ")); DEBUG_PRINTLN(alarmTime);
 
-    // Set next alarm at a "round" minute, guaranteed to be in the future
-    alarmTime = rtc.getEpoch() + min(sampleInterval * 60UL, 86400);
+  // Check if alarm is set in the past (or less than 5 seconds from now) or too far in the future
+  if (alarmTime <= rtc.getEpoch() + 5 || alarmTime > rtc.getEpoch() + sampleInterval * 60) {
+    DEBUG_PRINTLN(F("Warning - (setRtcAlarm) RTC alarm set in the past or too far in the future."));
 
-// Yh 281223: future work: calculer alarmTime pour ramener sur un boundary de la minute (par +/-30 secondes).
-
-    // Reset sample counter
-    sampleCounter = 0;
-
-    // Clear all statistics objects
-    clearStats(); //FIXME Do we really need to discard all collected data here?
-  }
-  else {
-    DEBUG_PRINTLN(F("Info - (setRtcAlrm) Setting RTC alarm based on specified interval."));
-
-//Yh 281223: reporté plus bas    rtc.setAlarmTime(hour(alarmTime), minute(alarmTime), second(alarmTime)); // hours, minutes, seconds
-
+    // Update alarm time based on current time + sample interval so it is guaranteed to be in the future
+    // This is basically akin to "skipping" a sample (in the worst case)
+    alarmTime = rtc.getEpoch() + min(sampleInterval * 60, 3600); // Max 1 hour since we match MM:SS
   }
 
-  // Set alarm time
-  rtc.setAlarmTime(hour(alarmTime), minute(alarmTime), second(alarmTime)); // hours, minutes, seconds
-
-  // Enable alarm for hour rollover match; Yh 281223: doit être un match MMSS afin d'éviter le cas limite qui entre en dormance pour 1 journée (cas possible avec HHMMSS)
+  // Set next alarm at a "whole" minute
+  rtc.setAlarmTime(hour(alarmTime), minute(alarmTime), 0); // hours, minutes, seconds
+  
+  // Enable alarm for minute-and-second match
   rtc.enableAlarm(rtc.MATCH_MMSS);
-
 
   // Clear flag
   alarmFlag = false;
 
-  DEBUG_PRINT("Info - (setRtcAlrm) Current datetime: "); printDateTime();
-  DEBUG_PRINT("Info - (setRtcAlrm) Next alarm: "); printAlarm();
-  DEBUG_PRINT("Info - (setRtcAlrm) Alarm mode: "); DEBUG_PRINTLN(rtc.MATCH_MMSS);
+  DEBUG_PRINT("Info - (setRtcAlarm) Current datetime: "); printDateTime();
+  DEBUG_PRINT("Info - (setRtcAlarm) Next alarm: "); printAlarm();
+  DEBUG_PRINT("Info - (setRtcAlarm) Alarm mode: "); DEBUG_PRINTLN("MMSS");
 }
 
 void setCutoffAlarm() //FIXME Is this function really necessary? Why not use setRtcAlarm()?
 {
   // Set next alarm at a "round" minute, guaranteed to be in the future
-  alarmTime = rtc.getEpoch() + min(sampleInterval * 60UL, 86400);
-  rtc.setAlarmTime(hour(alarmTime), minute(alarmTime) + 1, 0); // hours, minutes, seconds
+  alarmTime = rtc.getEpoch() + min(sampleInterval * 60, 3600); // Max 1 hour since we match MM:SS
+  rtc.setAlarmTime(hour(alarmTime), minute(alarmTime), 0); // hours, minutes, seconds
 
   // Enable alarm (matching hours, minutes and seconds)
   rtc.enableAlarm(rtc.MATCH_MMSS);
