@@ -59,18 +59,13 @@
 #define LOGGING         true  // Log data to microSD
 
 // ----------------------------------------------------------------------------
-// Define modifed addresses
-// ----------------------------------------------------------------------------
-#define BME280_ADR2 0x76    // Second addresse for the BME280 - Used for the interiror sensor.
-
-// ----------------------------------------------------------------------------
 // Debugging macros
 // ----------------------------------------------------------------------------
 #define DEBUG           true  // Output debug messages to Serial Monitor
 #define DEBUG_GNSS      false // Output GNSS debug information
 #define DEBUG_IRIDIUM   false // Output Iridium debug messages to Serial Monitor
 #define NO_TRANSMIT     false  // Prevent sending satellite messages
-#define CALIBRATE       false  // Enable sensor calibration code
+#define CALIBRATE       true  // Enable sensor calibration code
 
 #if DEBUG
 #define DEBUG_PRINT(x)            SERIAL_PORT.print(x)
@@ -171,28 +166,28 @@ StatisticCAL uStats;               // Wind east-west wind vector component (u)
 StatisticCAL vStats;               // Wind north-south wind vector component (v)
 
 // ----------------------------------------------------------------------------
-// User defined global variable declarations
+// User defined configuration variables
 // ----------------------------------------------------------------------------
 #if DEBUG
-unsigned long sampleInterval    = 2;      // Sampling interval (minutes). Default: 5 min (300 seconds)
+unsigned int  sampleInterval    = 2;      // Sampling interval (minutes). Default: 5 min (300 seconds)
 unsigned int  averageInterval   = 15;     // Number of samples to be averaged in each message. Default: 12 (hourly)
 unsigned int  transmitInterval  = 1;      // Number of messages in each Iridium transmission (340-byte limit)
 unsigned int  retransmitLimit   = 4;      // Failed data transmission reattempts (340-byte limit)
 unsigned int  gnssTimeout       = 30;     // Timeout for GNSS signal acquisition (seconds)
 unsigned int  iridiumTimeout    = 180;    // Timeout for Iridium transmission (seconds)
-bool          firstTimeFlag     = true;   // Flag to determine if program is running for the first time
 float         batteryCutoff     = 3.0;    // Battery voltage cutoff threshold (V)
 byte          loggingMode       = 3;      // Flag for new log file creation. 1: daily, 2: monthly, 3: yearly
+unsigned int  systemRstWDTCountLimit = 5; // Nombre d'alertes WDT autorisées avant de faire un system Reset (8s par cycle)
 #else
-unsigned long sampleInterval    = 5;      // Sampling interval (minutes). Default: 5 min (300 seconds)
+unsigned int  sampleInterval    = 5;      // Sampling interval (minutes). Default: 5 min (300 seconds)
 unsigned int  averageInterval   = 12;     // Number of samples to be averaged in each message. Default: 12 (hourly)
 unsigned int  transmitInterval  = 1;      // Number of messages in each Iridium transmission (340-byte limit)
 unsigned int  retransmitLimit   = 4;      // Failed data transmission reattempts (340-byte lim
 unsigned int  iridiumTimeout    = 180;    // Timeout for Iridium transmission (seconds)
-bool          firstTimeFlag     = true;   // Flag to determine if program is running for the first timeit)
 unsigned int  gnssTimeout       = 120;    // Timeout for GNSS signal acquisition (seconds)
 float         batteryCutoff     = 11.0;   // Battery voltage cutoff threshold (V)
 byte          loggingMode       = 2;      // Flag for new log file creation. 1: daily, 2: monthly, 3: yearly
+unsigned int  systemRstWDTCountLimit = 15; // Nombre d'alertes WDT autorisées avant de faire un system Reset (8s par cycle)
 #endif
 
 // ----------------------------------------------------------------------------
@@ -221,7 +216,7 @@ volatile bool alarmFlag         = false;  // Flag for alarm interrupt service ro
 volatile bool wdtFlag           = false;  // Flag for Watchdog Timer interrupt service routine
 volatile int  wdtCounter        = 0;      // Watchdog Timer interrupt counter
 volatile int  revolutions       = 0;      // Wind speed ISR counter
-int           systemRstWDTCountLimit = 12; //Nombre de WDT autorisé avant de faire un system Reset par WDT
+bool          firstTimeFlag     = true;   // Flag to determine if program is running for the first time
 bool          resetFlag         = false;  // Flag to force system reset using Watchdog Timer
 uint8_t       moSbdBuffer[340];           // Buffer for Mobile Originated SBD (MO-SBD) message (340 bytes max)
 uint8_t       mtSbdBuffer[270];           // Buffer for Mobile Terminated SBD (MT-SBD) message (270 bytes max)
@@ -453,11 +448,10 @@ void setup()
 
   // Configure devices
   configureRtc();       // Configure real-time clock (RTC)
-  readRtc();            // Read date and time from RTC
   configureWdt();       // Configure Watchdog Timer (WDT)
-  readBattery();        // Read battery voltage
   configureSd();        // Configure microSD
   printSettings();      // Print configuration settings
+  readBattery();        // Read battery voltage
   readGnss();           // Sync RTC with GNSS
   configureIridium();   // Configure Iridium 9603 transceiver
   createLogFile();      // Create initial log file
