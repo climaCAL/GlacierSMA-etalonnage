@@ -48,21 +48,21 @@ void printTimers()
   printLine();
   DEBUG_PRINTLN("Function Execution Timers");
   printLine();
-  DEBUG_PRINT("battery: ");         printTab(1);  DEBUG_PRINTLN(timer.readBattery);
   DEBUG_PRINT("readRtc: ");         printTab(1);  DEBUG_PRINTLN(timer.readRtc);
+  DEBUG_PRINT("battery: ");         printTab(1);  DEBUG_PRINTLN(timer.readBattery);
   DEBUG_PRINT("configMicroSd: ");   printTab(1);  DEBUG_PRINTLN(timer.configMicroSd);
   DEBUG_PRINT("writeMicroSd: ");    printTab(1);  DEBUG_PRINTLN(timer.writeMicroSd);
-  DEBUG_PRINT("readBme280: ");      printTab(1);  DEBUG_PRINTLN(timer.readBme280);
+  DEBUG_PRINT("readBme280Ext: ");   printTab(1);  DEBUG_PRINTLN(timer.readBme280Ext);
+  DEBUG_PRINT("readBme280Int: ");   printTab(1);  DEBUG_PRINTLN(timer.readBme280Int);
   DEBUG_PRINT("readLsm303: ");      printTab(1);  DEBUG_PRINTLN(timer.readLsm303);
-  DEBUG_PRINT("readHmp60: ");       printTab(1);  DEBUG_PRINTLN(timer.readHmp60);
+  DEBUG_PRINT("readVeml7700: ");    printTab(1);  DEBUG_PRINTLN(timer.readVeml7700);
+  //DEBUG_PRINT("readHmp60: ");       printTab(1);  DEBUG_PRINTLN(timer.readHmp60);
   //DEBUG_PRINT("readSht31: ");       printTab(1);  DEBUG_PRINTLN(timer.readSht31);
-  DEBUG_PRINT("read5103L: ");       printTab(1);  DEBUG_PRINTLN(timer.read5103L);
-  DEBUG_PRINT("readDFRWS: ");       printTab(1);  DEBUG_PRINTLN(timer.readDFRWS);
+  //DEBUG_PRINT("read5103L: ");       printTab(1);  DEBUG_PRINTLN(timer.read5103L);
   //DEBUG_PRINT("read7911: ");        printTab(1);  DEBUG_PRINTLN(timer.read7911);
+  DEBUG_PRINT("readDFRWS: ");       printTab(1);  DEBUG_PRINTLN(timer.readDFRWS);
   DEBUG_PRINT("readGnss: ");        printTab(1);  DEBUG_PRINTLN(timer.readGnss);
   DEBUG_PRINT("transmitData: ");    printTab(1);  DEBUG_PRINTLN(timer.iridium);
-  DEBUG_PRINT("freeRam(): ");       printTab(1);  DEBUG_PRINTLN(freeRam());
-
   printLine();
 }
 
@@ -104,7 +104,7 @@ void printMtSbd()
   printLine();
   DEBUG_PRINTLN("MT-SBD Message Data");
   printLine();
-  DEBUG_PRINT("sampleInterval:");    printTab(2);  DEBUG_PRINTLN(mtSbdMessage.sampleInterval);
+  DEBUG_PRINT("sampleInterval:");   printTab(2);  DEBUG_PRINTLN(mtSbdMessage.sampleInterval);
   DEBUG_PRINT("averageInterval:");  printTab(1);  DEBUG_PRINTLN(mtSbdMessage.averageInterval);
   DEBUG_PRINT("transmitInterval:"); printTab(1);  DEBUG_PRINTLN(mtSbdMessage.transmitInterval);
   DEBUG_PRINT("retransmitLimit:");  printTab(1);  DEBUG_PRINTLN(mtSbdMessage.retransmitLimit);

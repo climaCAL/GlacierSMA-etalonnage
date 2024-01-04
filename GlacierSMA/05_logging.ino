@@ -98,10 +98,11 @@ void createLogFile()
   // Write header to file
   //FIXME Maybe we should skip this if the file already exists? Or we should always prefer starting a new file?
   logFile.println("sample,datetime,voltage,temperature_int,humidity_int,pressure_ext,temperature_ext,"
-                  "humidity_ext,pitch,roll,wind_speed,wind_direction,latitude,longitude,satellites,hdop,"
-                  "online_microSd,online_Bme280,online_Lsm303,timer_readRtc,timer_readBattery,timer_configMicroSd,"
-                  "timer_readGnss,timer_bme280,timer_lsm303,timer_readHmp60,timer_read5103l,"
-                  "timer_iridium,transmit_status,rtc_drift,free_ram,"
+                  "humidity_ext,pitch,roll,wind_speed,wind_direction,solar,latitude,longitude,satellites,hdop,"
+                  "online_microSd,online_iridium,online_gnss,online_bme280_ext,online_bme280_int,online_lsm303,online_veml7700,"
+                  "timer_readRtc,timer_readBattery,timer_configMicroSd,timer_writeMicroSd,timer_readGnss,"
+                  "timer_bme280_ext,timer_bme280_int,timer_lsm303,timer_veml7700,timer_dfrws,timer_iridium,"
+                  "transmit_status,rtc_drift,free_ram,"
                   "sampleInterval,averageInterval,transmitInterval,retransmitLimit,gnssTimeout,iridiumTimeout");
 
   // Close log file
@@ -181,20 +182,27 @@ void logData()
 
       // Online information
       logFile.print(online.microSd);      logFile.print(",");
+      logFile.print(online.iridium);      logFile.print(",");
+      logFile.print(online.gnss);         logFile.print(",");
       logFile.print(online.bme280Ext);    logFile.print(",");
       logFile.print(online.bme280Int);    logFile.print(",");
       logFile.print(online.lsm303);       logFile.print(",");
+      logFile.print(online.veml7700);     logFile.print(",");
 
       // Timer information
       logFile.print(timer.readRtc);       logFile.print(",");
       logFile.print(timer.readBattery);   logFile.print(",");
       logFile.print(timer.configMicroSd); logFile.print(",");
+      logFile.print(timer.writeMicroSd);  logFile.print(",");
       logFile.print(timer.readGnss);      logFile.print(",");
-      logFile.print(timer.readBme280);    logFile.print(",");
+      logFile.print(timer.readBme280Ext); logFile.print(",");
+      logFile.print(timer.readBme280Int); logFile.print(",");
       logFile.print(timer.readLsm303);    logFile.print(",");
-      logFile.print(timer.readHmp60);     logFile.print(",");
-      logFile.print(timer.read5103L);     logFile.print(",");
+      logFile.print(timer.readVeml7700);  logFile.print(",");
+      //logFile.print(timer.readHmp60);     logFile.print(",");
+      //logFile.print(timer.read5103L);     logFile.print(",");
       //logFile.print(timer.readSp212);     logFile.print(",");
+      logFile.print(timer.readDFRWS);     logFile.print(",");
       logFile.print(timer.iridium);       logFile.print(",");
 
       // Debugging information
@@ -229,6 +237,7 @@ void logData()
 #if DEBUG
       // Print logged data to Serial Monitor
       DEBUG_PRINT("Info - Logging data to: "); DEBUG_PRINTLN(logFileName);
+
       DEBUG_PRINT(samplesSaved);        DEBUG_PRINT(",");
       DEBUG_PRINT(dateTime);            DEBUG_PRINT(",");
       DEBUG_PRINT(voltage);             DEBUG_PRINT(",");
@@ -249,26 +258,33 @@ void logData()
 
       // Online information
       DEBUG_PRINT(online.microSd);      DEBUG_PRINT(",");
+      DEBUG_PRINT(online.iridium);      DEBUG_PRINT(",");
+      DEBUG_PRINT(online.gnss);         DEBUG_PRINT(",");
       DEBUG_PRINT(online.bme280Ext);    DEBUG_PRINT(",");
       DEBUG_PRINT(online.bme280Int);    DEBUG_PRINT(",");
       DEBUG_PRINT(online.lsm303);       DEBUG_PRINT(",");
+      DEBUG_PRINT(online.veml7700);     DEBUG_PRINT(",");
 
       // Timer information
       DEBUG_PRINT(timer.readRtc);       DEBUG_PRINT(",");
       DEBUG_PRINT(timer.readBattery);   DEBUG_PRINT(",");
       DEBUG_PRINT(timer.configMicroSd); DEBUG_PRINT(",");
+      DEBUG_PRINT(timer.writeMicroSd);  DEBUG_PRINT(",");
       DEBUG_PRINT(timer.readGnss);      DEBUG_PRINT(",");
-      DEBUG_PRINT(timer.readBme280);    DEBUG_PRINT(",");
+      DEBUG_PRINT(timer.readBme280Ext); DEBUG_PRINT(",");
+      DEBUG_PRINT(timer.readBme280Int); DEBUG_PRINT(",");
       DEBUG_PRINT(timer.readLsm303);    DEBUG_PRINT(",");
-      DEBUG_PRINT(timer.readHmp60);     DEBUG_PRINT(",");
-      DEBUG_PRINT(timer.read5103L);     DEBUG_PRINT(",");
+      DEBUG_PRINT(timer.readVeml7700);  DEBUG_PRINT(",");
+      //DEBUG_PRINT(timer.readHmp60);     DEBUG_PRINT(",");
+      //DEBUG_PRINT(timer.read5103L);     DEBUG_PRINT(",");
       //DEBUG_PRINT(timer.readSp212);     DEBUG_PRINT(",");
+      DEBUG_PRINT(timer.readDFRWS);     DEBUG_PRINT(",");
       DEBUG_PRINT(timer.iridium);       DEBUG_PRINT(",");
 
       // Debugging information
       DEBUG_PRINT(transmitStatus);      DEBUG_PRINT(",");
       DEBUG_PRINT(rtcDrift);            DEBUG_PRINT(",");
-      DEBUG_PRINT(freeRam());
+      DEBUG_PRINT(freeRam());           DEBUG_PRINT(",");
 
       // Sampling information
       DEBUG_PRINT(sampleInterval);      DEBUG_PRINT(",");
