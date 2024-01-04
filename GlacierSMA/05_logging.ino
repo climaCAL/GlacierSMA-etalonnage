@@ -92,9 +92,9 @@ void createLogFile()
   //FIXME Maybe we should skip this if the file already exists? Or we should always prefer starting a new file?
   logFile.println(F("sample,datetime,voltage,temperature_int,humidity_int,pressure_ext,temperature_ext,"
                     "humidity_ext,pitch,roll,wind_speed,wind_direction,solar,latitude,longitude,satellites,hdop,"
-                    "online_bme280_ext,online_bme280_int,online_lsm303,online_veml7700,online_gnss,online_microSd,"
-                    "online_iridium,timer_readRtc,timer_readBattery,timer_bme280_ext,timer_bme280_int,timer_lsm303,"
-                    "timer_veml7700,timer_dfrws,timer_readGnss,timer_writeMicroSd,timer_iridium,"
+                    "online_bme280_ext,online_bme280_int,online_lsm303,online_veml7700,online_dfrws,online_gnss,"
+                    "online_microSd,online_iridium,timer_readRtc,timer_readBattery,timer_bme280_ext,timer_bme280_int,"
+                    "timer_lsm303,timer_veml7700,timer_dfrws,timer_readGnss,timer_writeMicroSd,timer_iridium,"
                     "transmit_status,rtc_drift,free_ram,"
                     "sampleInterval,averageInterval,transmitInterval,retransmitLimit,gnssTimeout,iridiumTimeout"));
 
@@ -189,6 +189,7 @@ void logData()
       LOG_PRINT(online.bme280Int);
       LOG_PRINT(online.lsm303);
       LOG_PRINT(online.veml7700);
+      LOG_PRINT(online.dfrws);
       LOG_PRINT(online.gnss);
       LOG_PRINT(online.microSd);
       LOG_PRINT(online.iridium);

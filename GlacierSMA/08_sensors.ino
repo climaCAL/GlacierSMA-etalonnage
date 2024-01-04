@@ -641,7 +641,7 @@ void readDFRWindSensor()
   myDelay(2000); //Let the DFRWindSensor settle a bit... making sure data is accurate at the sensor and ready for us.
 
   if (!scanI2CbusFor(WIND_SENSOR_SLAVE_ADDR, 3)) {
-    online.dfrWindSensor = false;
+    online.dfrws = false;
     DEBUG_PRINTLN("failed!");
     return;
   }
@@ -654,12 +654,12 @@ void readDFRWindSensor()
 
   byte len = Wire.requestFrom(WIND_SENSOR_SLAVE_ADDR, ventRegMemMapSize);  //Requesting 6 bytes from slave
   if (len == 0) {
-    online.dfrWindSensor = false;
+    online.dfrws = false;
     DEBUG_PRINTLN("failed!");
     return;
   }
   else {
-    online.dfrWindSensor = true;
+    online.dfrws = true;
     
     for (int i = 0; i < len/2 && Wire.available() >= 2; i++) { //TODO I'm 99% sure the Wire.available() is redundant but I'll confirm later.
       uint8_t LSB = Wire.read();

@@ -338,14 +338,14 @@ struct struct_online
 {
   bool bme280Ext = 0;
   bool bme280Int = 0;
-  bool dfrWindSensor = 0;
-  bool di7911   = 1; //TODO Retirer
-  bool hmp60    = 1; //TODO Retirer
   bool lsm303   = 0;
-  bool sht31    = 1; //TODO Retirer
-  bool sp212    = 1; //TODO Retirer
   bool veml7700 = 0;
+  bool hmp60    = 1; //TODO Retirer
+  bool sht31    = 1; //TODO Retirer
   bool wm5103L  = 1; //TODO Retirer
+  bool di7911   = 1; //TODO Retirer
+  bool sp212    = 1; //TODO Retirer
+  bool dfrws    = 0;
   bool gnss     = 0;
   bool iridium  = 0;
   bool microSd  = 0;
@@ -560,8 +560,8 @@ void loop()
       else
         readVeml7700();
 
-      if (disabled.dfrWindSensor)
-        DEBUG_PRINTLN("Info - DFR disabled");
+      if (disabled.dfrws)
+        DEBUG_PRINTLN("Info - DFRWS disabled");
       else
         readDFRWindSensor(); // Read anemometer and windDirection
 
