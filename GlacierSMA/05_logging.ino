@@ -67,7 +67,7 @@ void createLogFile()
           CRYOLOGGER_ID, rtc.getYear(), rtc.getMonth(), rtc.getDay(),
           rtc.getHours(), rtc.getMinutes(), rtc.getSeconds());
 
-  DEBUG_PRINT("Info - Log file name: "); DEBUG_PRINTLN(logFileName);
+  DEBUG_PRINT("Info - New log file name: "); DEBUG_PRINTLN(logFileName);
 
   // Check if log file is open
   if (logFile.isOpen())
@@ -99,8 +99,8 @@ void createLogFile()
   //FIXME Maybe we should skip this if the file already exists? Or we should always prefer starting a new file?
   logFile.println("sample,datetime,voltage,temperature_int,humidity_int,pressure_ext,temperature_ext,"
                   "humidity_ext,pitch,roll,wind_speed,wind_direction,solar,latitude,longitude,satellites,hdop,"
-                  "online_microSd,online_iridium,online_gnss,online_bme280_ext,online_bme280_int,online_lsm303,online_veml7700,"
-                  "timer_readRtc,timer_readBattery,timer_configMicroSd,timer_writeMicroSd,timer_readGnss,"
+                  "online_microSd,online_iridium,online_gnss,online_bme280_ext,online_bme280_int,online_lsm303,"
+                  "online_veml7700,timer_readRtc,timer_readBattery,timer_writeMicroSd,timer_readGnss,"
                   "timer_bme280_ext,timer_bme280_int,timer_lsm303,timer_veml7700,timer_dfrws,timer_iridium,"
                   "transmit_status,rtc_drift,free_ram,"
                   "sampleInterval,averageInterval,transmitInterval,retransmitLimit,gnssTimeout,iridiumTimeout");
@@ -136,7 +136,8 @@ void checkLogFile()
     newLogFile = rtc.getMonth();
 }
 
-
+//TODO This really shouldn't be a macro but instead a template function, but it'll do for now...
+#define LOG_PRINT(data) logFile.print(data); logFile.print(","); DEBUG_PRINT(data); DEBUG_PRINT(",");
 
 // Write data to log file
 void logData()
@@ -149,169 +150,105 @@ void logData()
   unsigned long loopStartTime = millis();
 
   // Check if microSD is online
-  if (online.microSd)
-  {
-    // Check if new log file should be created
+  if (!online.microSd) {
+    DEBUG_PRINTLN(F("Warning - Logging failed since microSD is offline!"));
+  }
+  else {
+    // Check if a new log file should be created
     checkLogFile();
-    if (currentLogFile != newLogFile)
-    {
+    if (currentLogFile != newLogFile) {
       createLogFile();
       currentLogFile = newLogFile;
       samplesSaved = 0;
     }
 
-    // Write to microSD card
-    if (logFile.open(logFileName, O_APPEND | O_WRITE))
-    {
+    // Check if the log file is accessible
+    if (!logFile.open(logFileName, O_APPEND | O_WRITE)) {
+      DEBUG_PRINT(F("Warning - Unable to open log file ")); DEBUG_PRINTLN(logFileName);
+    }
+    else {
+      // Print data to log file and serial monitor at the same time
+      DEBUG_PRINT("Info - Logging data to: "); DEBUG_PRINTLN(logFileName);
+
       // Sensor information
-      logFile.print(samplesSaved);        logFile.print(",");
-      logFile.print(dateTime);            logFile.print(",");
-      logFile.print(voltage);             logFile.print(",");
-      logFile.print(temperatureInt);      logFile.print(",");
-      logFile.print(humidityInt);         logFile.print(",");
-      logFile.print(pressureExt);         logFile.print(",");
-      logFile.print(temperatureExt);      logFile.print(",");
-      logFile.print(humidityExt);         logFile.print(",");
-      logFile.print(pitch);               logFile.print(",");
-      logFile.print(roll);                logFile.print(",");
-      logFile.print(windSpeed);           logFile.print(",");
-      logFile.print(windDirection);       logFile.print(",");
-      logFile.print(solar);               logFile.print(",");
-      logFile.print(latitude, 6);         logFile.print(",");
-      logFile.print(longitude, 6);        logFile.print(",");
-      logFile.print(satellites);          logFile.print(",");
-      logFile.print(hdop);                logFile.print(",");
+      LOG_PRINT(samplesSaved);
+      LOG_PRINT(dateTime);
+      LOG_PRINT(voltage);
+      LOG_PRINT(temperatureInt);
+      LOG_PRINT(humidityInt);
+      LOG_PRINT(pressureExt);
+      LOG_PRINT(temperatureExt);
+      LOG_PRINT(humidityExt);
+      LOG_PRINT(pitch);
+      LOG_PRINT(roll);
+      LOG_PRINT(windSpeed);
+      LOG_PRINT(windDirection);
+      LOG_PRINT(solar);
+      logFile.print(latitude, 6);       logFile.print(",");
+      DEBUG_PRINT_DEC(latitude, 6);     DEBUG_PRINT(",");
+      logFile.print(longitude, 6);      logFile.print(",");
+      DEBUG_PRINT_DEC(longitude, 6);    DEBUG_PRINT(",");
+      LOG_PRINT(satellites);
+      LOG_PRINT(hdop);
 
       // Online information
-      logFile.print(online.microSd);      logFile.print(",");
-      logFile.print(online.iridium);      logFile.print(",");
-      logFile.print(online.gnss);         logFile.print(",");
-      logFile.print(online.bme280Ext);    logFile.print(",");
-      logFile.print(online.bme280Int);    logFile.print(",");
-      logFile.print(online.lsm303);       logFile.print(",");
-      logFile.print(online.veml7700);     logFile.print(",");
+      LOG_PRINT(online.microSd);
+      LOG_PRINT(online.iridium);
+      LOG_PRINT(online.gnss);
+      LOG_PRINT(online.bme280Ext);
+      LOG_PRINT(online.bme280Int);
+      LOG_PRINT(online.lsm303);
+      LOG_PRINT(online.veml7700);
 
       // Timer information
-      logFile.print(timer.readRtc);       logFile.print(",");
-      logFile.print(timer.readBattery);   logFile.print(",");
-      logFile.print(timer.configMicroSd); logFile.print(",");
-      logFile.print(timer.writeMicroSd);  logFile.print(",");
-      logFile.print(timer.readGnss);      logFile.print(",");
-      logFile.print(timer.readBme280Ext); logFile.print(",");
-      logFile.print(timer.readBme280Int); logFile.print(",");
-      logFile.print(timer.readLsm303);    logFile.print(",");
-      logFile.print(timer.readVeml7700);  logFile.print(",");
-      //logFile.print(timer.readHmp60);     logFile.print(",");
-      //logFile.print(timer.read5103L);     logFile.print(",");
-      //logFile.print(timer.readSp212);     logFile.print(",");
-      logFile.print(timer.readDFRWS);     logFile.print(",");
-      logFile.print(timer.iridium);       logFile.print(",");
+      LOG_PRINT(timer.readRtc);
+      LOG_PRINT(timer.readBattery);
+      LOG_PRINT(timer.configMicroSd);
+      LOG_PRINT(timer.writeMicroSd);
+      LOG_PRINT(timer.readGnss);
+      LOG_PRINT(timer.readBme280Ext);
+      LOG_PRINT(timer.readBme280Int);
+      LOG_PRINT(timer.readLsm303);
+      LOG_PRINT(timer.readVeml7700);
+      //LOG_PRINT(timer.readHmp60);
+      //LOG_PRINT(timer.read5103L);
+      //LOG_PRINT(timer.readSp212);
+      LOG_PRINT(timer.readDFRWS);
+      LOG_PRINT(timer.iridium);
 
       // Debugging information
-      logFile.print(transmitStatus);      logFile.print(",");
-      logFile.print(rtcDrift);            logFile.print(",");
-      logFile.print(freeRam());           logFile.print(",");
+      LOG_PRINT(transmitStatus);
+      LOG_PRINT(rtcDrift);
+      LOG_PRINT(freeRam());
 
       // Sampling information
-      logFile.print(sampleInterval);      logFile.print(",");
-      logFile.print(averageInterval);     logFile.print(",");
-      logFile.print(transmitInterval);    logFile.print(",");
-      logFile.print(retransmitLimit);     logFile.print(",");
-      logFile.print(gnssTimeout);         logFile.print(",");
-      logFile.println(iridiumTimeout);      
+      LOG_PRINT(sampleInterval);
+      LOG_PRINT(averageInterval);
+      LOG_PRINT(transmitInterval);
+      LOG_PRINT(retransmitLimit);
+      LOG_PRINT(gnssTimeout);
+      logFile.println(iridiumTimeout); DEBUG_PRINTLN(iridiumTimeout);
 
       // Update file access timestamps
       updateFileAccess(&logFile);
 
       // Force data to SD and update the directory entry to avoid data loss
-      if (!logFile.sync())
-      {
+      if (!logFile.sync()) {
         DEBUG_PRINTLN(F("Warning - microSD sync error!"));
       }
 
       // Close the log file
-      if (!logFile.close())
-      {
+      if (!logFile.close()) {
         DEBUG_PRINTLN("Warning - Failed to close log file!");
         //closeFailCounter++; // Count number of failed file closes
       }
 
-#if DEBUG
-      // Print logged data to Serial Monitor
-      DEBUG_PRINT("Info - Logging data to: "); DEBUG_PRINTLN(logFileName);
-
-      //TODO This is a pain to maintain in sync with the list above; Could be fixed with a short function (and some patience).
-      DEBUG_PRINT(samplesSaved);        DEBUG_PRINT(",");
-      DEBUG_PRINT(dateTime);            DEBUG_PRINT(",");
-      DEBUG_PRINT(voltage);             DEBUG_PRINT(",");
-      DEBUG_PRINT(temperatureInt);      DEBUG_PRINT(",");
-      DEBUG_PRINT(humidityInt);         DEBUG_PRINT(",");
-      DEBUG_PRINT(pressureExt);         DEBUG_PRINT(",");
-      DEBUG_PRINT(temperatureExt);      DEBUG_PRINT(",");
-      DEBUG_PRINT(humidityExt);         DEBUG_PRINT(",");
-      DEBUG_PRINT(pitch);               DEBUG_PRINT(",");
-      DEBUG_PRINT(roll);                DEBUG_PRINT(",");      
-      DEBUG_PRINT(windSpeed);           DEBUG_PRINT(",");
-      DEBUG_PRINT(windDirection);       DEBUG_PRINT(",");
-      DEBUG_PRINT(solar);               DEBUG_PRINT(",");
-      DEBUG_PRINT_DEC(latitude, 6);     DEBUG_PRINT(",");
-      DEBUG_PRINT_DEC(longitude, 6);    DEBUG_PRINT(",");
-      DEBUG_PRINT(satellites);          DEBUG_PRINT(",");
-      DEBUG_PRINT(hdop);                DEBUG_PRINT(",");
-
-      // Online information
-      DEBUG_PRINT(online.microSd);      DEBUG_PRINT(",");
-      DEBUG_PRINT(online.iridium);      DEBUG_PRINT(",");
-      DEBUG_PRINT(online.gnss);         DEBUG_PRINT(",");
-      DEBUG_PRINT(online.bme280Ext);    DEBUG_PRINT(",");
-      DEBUG_PRINT(online.bme280Int);    DEBUG_PRINT(",");
-      DEBUG_PRINT(online.lsm303);       DEBUG_PRINT(",");
-      DEBUG_PRINT(online.veml7700);     DEBUG_PRINT(",");
-
-      // Timer information
-      DEBUG_PRINT(timer.readRtc);       DEBUG_PRINT(",");
-      DEBUG_PRINT(timer.readBattery);   DEBUG_PRINT(",");
-      DEBUG_PRINT(timer.configMicroSd); DEBUG_PRINT(",");
-      DEBUG_PRINT(timer.writeMicroSd);  DEBUG_PRINT(",");
-      DEBUG_PRINT(timer.readGnss);      DEBUG_PRINT(",");
-      DEBUG_PRINT(timer.readBme280Ext); DEBUG_PRINT(",");
-      DEBUG_PRINT(timer.readBme280Int); DEBUG_PRINT(",");
-      DEBUG_PRINT(timer.readLsm303);    DEBUG_PRINT(",");
-      DEBUG_PRINT(timer.readVeml7700);  DEBUG_PRINT(",");
-      //DEBUG_PRINT(timer.readHmp60);     DEBUG_PRINT(",");
-      //DEBUG_PRINT(timer.read5103L);     DEBUG_PRINT(",");
-      //DEBUG_PRINT(timer.readSp212);     DEBUG_PRINT(",");
-      DEBUG_PRINT(timer.readDFRWS);     DEBUG_PRINT(",");
-      DEBUG_PRINT(timer.iridium);       DEBUG_PRINT(",");
-
-      // Debugging information
-      DEBUG_PRINT(transmitStatus);      DEBUG_PRINT(",");
-      DEBUG_PRINT(rtcDrift);            DEBUG_PRINT(",");
-      DEBUG_PRINT(freeRam());           DEBUG_PRINT(",");
-
-      // Sampling information
-      DEBUG_PRINT(sampleInterval);      DEBUG_PRINT(",");
-      DEBUG_PRINT(averageInterval);     DEBUG_PRINT(",");
-      DEBUG_PRINT(transmitInterval);    DEBUG_PRINT(",");
-      DEBUG_PRINT(retransmitLimit);     DEBUG_PRINT(",");
-      DEBUG_PRINT(gnssTimeout);         DEBUG_PRINT(",");
-      DEBUG_PRINTLN(iridiumTimeout);
-#endif
-
       blinkLed(PIN_LED_GREEN, 2, 100);
     }
-    else
-    {
-      DEBUG_PRINTLN(F("Warning - Unable to open file!"));
-    }
-  }
-  else
-  {
-    DEBUG_PRINTLN(F("Warning - microSD is offline!"));
   }
 
-  //NEW We increment the samplesSaved counter wether the save actually worked or not, so that we can identify missed saves if they occur.
-  samplesSaved++; // Increment saved samples count
+  //NEW We increment the samplesSaved counter whether the save actually worked or not, so that we can identify missed saves if they occur.
+  samplesSaved++;
 
   // Stop the loop timer
   timer.writeMicroSd = millis() - loopStartTime;
