@@ -136,6 +136,8 @@ void checkLogFile()
     newLogFile = rtc.getMonth();
 }
 
+
+
 // Write data to log file
 void logData()
 {
@@ -162,7 +164,7 @@ void logData()
     if (logFile.open(logFileName, O_APPEND | O_WRITE))
     {
       // Sensor information
-      logFile.print(++samplesSaved);      logFile.print(","); // Increment saved samples count
+      logFile.print(samplesSaved);        logFile.print(",");
       logFile.print(dateTime);            logFile.print(",");
       logFile.print(voltage);             logFile.print(",");
       logFile.print(temperatureInt);      logFile.print(",");
@@ -238,6 +240,7 @@ void logData()
       // Print logged data to Serial Monitor
       DEBUG_PRINT("Info - Logging data to: "); DEBUG_PRINTLN(logFileName);
 
+      //TODO This is a pain to maintain in sync with the list above; Could be fixed with a short function (and some patience).
       DEBUG_PRINT(samplesSaved);        DEBUG_PRINT(",");
       DEBUG_PRINT(dateTime);            DEBUG_PRINT(",");
       DEBUG_PRINT(voltage);             DEBUG_PRINT(",");
@@ -307,18 +310,20 @@ void logData()
     DEBUG_PRINTLN(F("Warning - microSD is offline!"));
   }
 
+  //NEW We increment the samplesSaved counter wether the save actually worked or not, so that we can identify missed saves if they occur.
+  samplesSaved++; // Increment saved samples count
+
   // Stop the loop timer
   timer.writeMicroSd = millis() - loopStartTime;
 #endif
 }
-
 
 // Update the file create timestamp
 void updateFileCreate(FsFile *dataFile)
 {
   if (!dataFile->timestamp(T_CREATE, (rtc.getYear() + 2000), rtc.getMonth(), rtc.getDay(), rtc.getHours(), rtc.getMinutes(), rtc.getSeconds()))
   {
-    DEBUG_PRINT("Warning - Could not update file create timestamp.");
+    DEBUG_PRINT(F("Warning - Could not update file create timestamp."));
   }
 }
 
@@ -327,10 +332,10 @@ void updateFileAccess(FsFile *dataFile)
 {
   if (!dataFile->timestamp(T_ACCESS, (rtc.getYear() + 2000), rtc.getMonth(), rtc.getDay(), rtc.getHours(), rtc.getMinutes(), rtc.getSeconds()))
   {
-    DEBUG_PRINTLN("Warning - Could not update file access timestamp.");
+    DEBUG_PRINTLN(F("Warning - Could not update file access timestamp."));
   }
   if (!dataFile->timestamp(T_WRITE, (rtc.getYear() + 2000), rtc.getMonth(), rtc.getDay(), rtc.getHours(), rtc.getMinutes(), rtc.getSeconds()))
   {
-    DEBUG_PRINTLN("Warning - Could not update file write timestamp.");
+    DEBUG_PRINTLN(F("Warning - Could not update file write timestamp."));
   }
 }
