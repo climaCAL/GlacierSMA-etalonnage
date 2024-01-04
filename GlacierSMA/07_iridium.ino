@@ -53,17 +53,19 @@ void transmitData()
     DEBUG_PRINTLN("Info - Starting modem...");
 
     int returnCode = modem.begin();
+
     if (returnCode != ISBD_SUCCESS)
     {
-      DEBUG_PRINT("Warning - Begin failed with error ");
-      DEBUG_PRINTLN(returnCode);
+      online.iridium = false;
       if (returnCode == ISBD_NO_MODEM_DETECTED)
-      {
         DEBUG_PRINTLN("Warning - No modem detected! Please check wiring.");
-      }
+      else
+        DEBUG_PRINT("Warning - Modem begin failed with error "); DEBUG_PRINTLN(returnCode);
     }
     else
     {
+      online.iridium = true;
+
       // Calculate SBD message buffer sizes
       moSbdBufferSize = sizeof(moSbdMessage) * (transmitCounter + (retransmitCounter * transmitInterval));
       mtSbdBufferSize = sizeof(mtSbdBuffer);

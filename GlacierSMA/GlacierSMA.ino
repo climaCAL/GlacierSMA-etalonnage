@@ -352,6 +352,7 @@ struct struct_online
   bool veml7700 = 0;
   bool wm5103L  = 1; //TODO Retirer
   bool gnss     = 0;
+  bool iridium  = 0;
   bool microSd  = 0;
 } disabled, online;
 
