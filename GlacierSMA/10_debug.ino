@@ -18,6 +18,7 @@ void printTab(byte _times)
 // Print user-defined beacon settings
 void printWakeUp(unsigned int sampleNumber)
 {
+  DEBUG_PRINTLN();
   printLine();
   DEBUG_PRINT("Station awake, collecting sample #"); DEBUG_PRINTLN(sampleNumber);
   printLine();
@@ -49,7 +50,7 @@ void printTimers()
   DEBUG_PRINTLN("Function Execution Timers");
   printLine();
   DEBUG_PRINT("readRtc: ");         printTab(1);  DEBUG_PRINTLN(timer.readRtc);
-  DEBUG_PRINT("battery: ");         printTab(1);  DEBUG_PRINTLN(timer.readBattery);
+  DEBUG_PRINT("readBattery: ");     printTab(1);  DEBUG_PRINTLN(timer.readBattery);
   DEBUG_PRINT("readBme280Ext: ");   printTab(1);  DEBUG_PRINTLN(timer.readBme280Ext);
   DEBUG_PRINT("readBme280Int: ");   printTab(1);  DEBUG_PRINTLN(timer.readBme280Int);
   DEBUG_PRINT("readLsm303: ");      printTab(1);  DEBUG_PRINTLN(timer.readLsm303);

@@ -2,19 +2,21 @@
 void configureSd()
 {
 #if LOGGING
-  // Check if microSD has been initialized
+  // Check if microSD is force disabled
   if (disabled.microSd) {
     DEBUG_PRINTLN("Info - microSD disabled.");
     return;
   }
-  else if (online.microSd) {
+
+  // Check if microSD has already been initialized
+  if (online.microSd) {
     DEBUG_PRINTLN("Info - microSD already initialized.");
     return;
   }
 
   // Initialize microSD
-  if (!sd.begin(PIN_MICROSD_CS, SD_SCK_MHZ(12)))
-  {
+  if (!sd.begin(PIN_MICROSD_CS, SD_SCK_MHZ(12))) {
+    // Try again if it failed
     DEBUG_PRINT("Warning - microSD failed to initialize (error code ");
     DEBUG_PRINT_HEX(sd.sdErrorCode());
     DEBUG_PRINTLN("); Reattempting...");
@@ -22,31 +24,15 @@ void configureSd()
     // Delay between initialization attempts
     myDelay(2000);
 
-    if (!sd.begin(PIN_MICROSD_CS, SD_SCK_MHZ(4)))
-    {
+    if (!sd.begin(PIN_MICROSD_CS, SD_SCK_MHZ(4))) {
       online.microSd = false;
-      DEBUG_PRINTLN("Warning - microSD failed to initialize.");
+      DEBUG_PRINTLN("Warning - microSD failed to initialize again.");
+      return;
+    }
+  }
 
-      /*
-        while (1)
-        {
-        // Force WDT to reset system
-        blinkLed(PIN_LED_RED, 2, 250);
-        delay(2000);
-        }
-      */
-    }
-    else
-    {
-      online.microSd = true; // Set flag
-      DEBUG_PRINTLN("Info - microSD initialized.");
-    }
-  }
-  else
-  {
-    online.microSd = true; // Set flag
-    DEBUG_PRINTLN("Info - microSD initialized.");
-  }
+  online.microSd = true; // Set online flag
+  DEBUG_PRINTLN("Info - microSD initialized.");
 #endif
 }
 

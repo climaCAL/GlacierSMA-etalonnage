@@ -44,7 +44,7 @@ void readRtc()
   moSbdMessage.unixtime = unixtime;
 
   // Stop the loop timer
-  timer.readRtc = millis() - loopStartTime;
+  timer.readRtc += millis() - loopStartTime;
 }
 
 // Set RTC alarm
@@ -54,8 +54,8 @@ void setRtcAlarm()
   alarmTime = unixtime + sampleInterval * 60;
   alarmTime -= second(alarmTime); // Discard the seconds
 
-  DEBUG_PRINT(F("Info - (setRtcAlarm) unixtime: ")); DEBUG_PRINTLN(unixtime);
-  DEBUG_PRINT(F("Info - (setRtcAlarm) alarmTime: ")); DEBUG_PRINTLN(alarmTime);
+  DEBUG_PRINT("unixtime: "); DEBUG_PRINTLN(unixtime);
+  DEBUG_PRINT("alarmTime: "); DEBUG_PRINTLN(alarmTime);
 
   // Check if alarm is set in the past (or less than 5 seconds from now) or too far in the future
   if (alarmTime <= rtc.getEpoch() + 5 || alarmTime > rtc.getEpoch() + sampleInterval * 60) {
@@ -144,6 +144,6 @@ void checkDate()
     currentDate = rtc.getDay();
   }
   newDate = rtc.getDay();
-  DEBUG_PRINT("Info - (chkDt) currentDate: "); DEBUG_PRINTLN(currentDate);
-  DEBUG_PRINT("Info - (chkDt) newDate: "); DEBUG_PRINTLN(newDate);
+  DEBUG_PRINT("currentDate: "); DEBUG_PRINTLN(currentDate);
+  DEBUG_PRINT("newDate: "); DEBUG_PRINTLN(newDate);
 }

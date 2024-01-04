@@ -156,3 +156,11 @@ void myDelay(unsigned long ms)
       return;
   }
 }
+
+// Force WDT to reset system (assuming WDT is configured, else it's an infinite loop)
+void forceReset() {
+  while (true) {
+    blinkLed(PIN_LED_RED, 2, 250);
+    myDelay(2000);
+  }
+}

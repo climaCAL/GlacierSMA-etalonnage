@@ -583,8 +583,6 @@ void loop()
           {
             readGnss(); // Sync RTC with the GNSS
             currentDate = newDate;
-            DEBUG_PRINT("currentDate: "); DEBUG_PRINTLN(currentDate);
-            DEBUG_PRINT("newDate: "); DEBUG_PRINTLN(newDate);
           }
           transmitData(); // Transmit data via Iridium transceiver
         }

@@ -641,8 +641,9 @@ void readDFRWindSensor()
   myDelay(2000); //Let the DFRWindSensor settle a bit... making sure data is accurate at the sensor and ready for us.
 
   if (!scanI2CbusFor(WIND_SENSOR_SLAVE_ADDR, 3)) {
-    online.dfrws = false;
     DEBUG_PRINTLN("failed!");
+    online.dfrws = false;
+    timer.readDFRWS += millis() - loopStartTime; // Update the loop timer anyway
     return;
   }
 
@@ -654,8 +655,9 @@ void readDFRWindSensor()
 
   byte len = Wire.requestFrom(WIND_SENSOR_SLAVE_ADDR, ventRegMemMapSize);  //Requesting 6 bytes from slave
   if (len == 0) {
-    online.dfrws = false;
     DEBUG_PRINTLN("failed!");
+    online.dfrws = false;
+    timer.readDFRWS += millis() - loopStartTime; // Update the loop timer anyway
     return;
   }
   else {
@@ -708,7 +710,7 @@ void readDFRWindSensor()
   DEBUG_PRINT(F("\tWind Dir. Sector: ")); DEBUG_PRINTLN(windDirectionSector);
 
   // Stop the loop timer
-  timer.readDFRWS = millis() - loopStartTime;
+  timer.readDFRWS += millis() - loopStartTime;
 }
 
 
