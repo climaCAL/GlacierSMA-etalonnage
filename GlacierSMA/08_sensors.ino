@@ -640,7 +640,7 @@ void readDFRWindSensor()
   DEBUG_PRINT("Info - Reading DFRWindSensor... ");
   myDelay(2000); //Let the DFRWindSensor settle a bit... making sure data is accurate at the sensor and ready for us.
 
-  if (!scanI2CbusFor(WIND_SENSOR_SLAVE_ADDR, 1)) {
+  if (!scanI2CbusFor(WIND_SENSOR_SLAVE_ADDR, 3)) {
     online.dfrWindSensor = false;
     DEBUG_PRINTLN("failed!");
     return;
@@ -661,13 +661,12 @@ void readDFRWindSensor()
   else {
     online.dfrWindSensor = true;
     
-    while (Wire.available() > 0) {
-      for (int i = 0; i < len/2; i++) {   //modif par Yh le 18déc2023 pour s'ajuster aux nb de bytes recus, avant était i<3
-        uint8_t LSB = Wire.read();
-        uint8_t MSB = Wire.read();
-        lectureVent.regMemoryMap[i] = (MSB<<8)+LSB;
-      }
+    for (int i = 0; i < len/2 && Wire.available() >= 2; i++) { //TODO I'm 99% sure the Wire.available() is redundant but I'll confirm later.
+      uint8_t LSB = Wire.read();
+      uint8_t MSB = Wire.read();
+      lectureVent.regMemoryMap[i] = (MSB<<8)+LSB;
     }
+
     lectureVent.angleVentFloat = lectureVent.regMemoryMap[0]/10.0;
     lectureVent.directionVentInt = lectureVent.regMemoryMap[1];
     lectureVent.vitesseVentFloat = lectureVent.regMemoryMap[2]/10.0;

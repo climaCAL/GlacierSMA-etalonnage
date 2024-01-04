@@ -271,7 +271,7 @@ tmElements_t  tm;                         // Variable for converting time elemen
 // regMemoryMap[2] = vitesse vent en m/s *10
 // regMemoryMap[3] = hauteur de neige en mm
 // regMemoryMap[4] = temperature de reference pour la mesure hauteur de neige, em Celcius resolution de 1C
-typedef struct {
+typedef struct { //TODO This would make more sense as a union actually.
   uint16_t regMemoryMap[5] = {0,0,0,0,0};  //total 5 words = 10 bytes; utile: 3 bytes (2 derniers byte seront pour hauteur de neige, futur)
   float angleVentFloat = 0;
   uint16_t directionVentInt = 0;
