@@ -81,8 +81,9 @@ void readBme280Ext()
   {
     DEBUG_PRINTLN("Warning - BME280 Ext offline!");
   }
+
   // Stop the loop timer
-  timer.readBme280 = millis() - loopStartTime;
+  timer.readBme280Ext = millis() - loopStartTime;
 }
 
 // ----------------------------------------------------------------------------
@@ -150,8 +151,9 @@ void readBme280Int()
   {
     DEBUG_PRINTLN("Warning - BME280 int offline!");
   }
+  
   // Stop the loop timer
-  timer.readBme280 = millis() - loopStartTime;
+  timer.readBme280Int = millis() - loopStartTime;
 }
 
 // ----------------------------------------------------------------------------

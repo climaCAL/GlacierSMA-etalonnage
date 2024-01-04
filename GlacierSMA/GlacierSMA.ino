@@ -352,7 +352,7 @@ struct struct_online
   bool veml7700 = 0;
   bool wm5103L  = 1; //TODO Retirer
   bool gnss     = 0;
-  bool microSd  = 0; // Set to 0 initially otherwise the SD card will not be initialized
+  bool microSd  = 0;
 } disabled, online;
 
 // Structure to store function timers
@@ -363,15 +363,16 @@ struct struct_timer
   unsigned long configMicroSd;
   unsigned long writeMicroSd;
   unsigned long readGnss;
-  unsigned long readBme280;
+  unsigned long readBme280Ext;
+  unsigned long readBme280Int;
   unsigned long readVeml7700;
   unsigned long readLsm303;
   unsigned long readHmp60;
   unsigned long readSht31;
   unsigned long read5103L;
   unsigned long read7911;
-  unsigned long readDFRWS;
   unsigned long readSp212;
+  unsigned long readDFRWS;
   unsigned long iridium;
 } timer;
 
