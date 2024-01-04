@@ -62,15 +62,8 @@ void readBme280Ext()
 
     // Read sensor data
     temperatureExt = tempBmeEXT_CF * bme280Ext.readTemperature() + tempBmeEXT_Offset;
-    uint16_t humExt = humBmeEXT_CF * bme280Ext.readHumidity() + humBmeEXT_Offset;
+    humidityExt = min(humBmeEXT_CF * bme280Ext.readHumidity() + humBmeEXT_Offset, 100);
     pressureExt = bme280Ext.readPressure() / 100.0F;
-
-    if (humExt >= 100){
-      humidityExt = 100;
-    }
-    else{
-      humidityExt = humExt;
-    }
 
     // Add to statistics object
     temperatureExtStats.add(temperatureExt);
@@ -131,15 +124,8 @@ void readBme280Int()
 
     // Read sensor data
     temperatureInt = tempImeINT_CF * bme280Int.readTemperature() + tempBmeINT_Offset ;
-    uint16_t humInt =  humImeINT_CF * bme280Int.readHumidity() + humBmeINT_Offset; // no need of correction
+    humidityInt = min(humImeINT_CF * bme280Int.readHumidity() + humBmeINT_Offset, 100);
     //pressureInt = bme280Int.readPressure() / 100.0F;
-
-    if (humInt >= 100){
-      humidityInt = 100;
-    }
-    else{
-      humidityInt = humInt;
-    }
 
     // Add to statistics object
     temperatureIntStats.add(temperatureInt);
