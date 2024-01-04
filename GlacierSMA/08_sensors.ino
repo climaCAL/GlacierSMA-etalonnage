@@ -198,9 +198,8 @@ void readVeml7700()
     DEBUG_PRINT("Info - Reading VEML7700...");
     myDelay(250);
 
-    // Add acquisition
-    int32_t soleil = veml_CF * veml->readLux() + veml_Offset; // Default = VEML_LUX_NORMAL
-    solar = soleil > 0 ? soleil : 0;
+    // Add acquisition (Default mode for readLux() = VEML_LUX_NORMAL)
+    solar = max(veml_CF * veml->readLux() + veml_Offset, 0.0f);
     solarStats.add(solar);
   
     // Delete sensor object
