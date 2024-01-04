@@ -2,9 +2,6 @@
 void configureSd()
 {
 #if LOGGING
-  // Start loop timer
-  unsigned long loopStartTime = millis();
-
   // Check if microSD has been initialized
   if (disabled.microSd) {
     DEBUG_PRINTLN("Info - microSD disabled.");
@@ -50,9 +47,6 @@ void configureSd()
     online.microSd = true; // Set flag
     DEBUG_PRINTLN("Info - microSD initialized.");
   }
-
-  // Stop the loop timer
-  timer.configMicroSd = millis() - loopStartTime;
 #endif
 }
 
@@ -60,7 +54,6 @@ void configureSd()
 void createLogFile()
 {
 #if LOGGING
-
   // Get timestamp log file name
   //TODO If the shortest log duration is "daily", we don't really need the time in the file name.
   sprintf(logFileName, "AWS_%s_20%02d-%02d-%02d_%02d-%02d-%02d.csv",
@@ -99,9 +92,9 @@ void createLogFile()
   //FIXME Maybe we should skip this if the file already exists? Or we should always prefer starting a new file?
   logFile.println(F("sample,datetime,voltage,temperature_int,humidity_int,pressure_ext,temperature_ext,"
                     "humidity_ext,pitch,roll,wind_speed,wind_direction,solar,latitude,longitude,satellites,hdop,"
-                    "online_microSd,online_iridium,online_gnss,online_bme280_ext,online_bme280_int,online_lsm303,"
-                    "online_veml7700,timer_readRtc,timer_readBattery,timer_writeMicroSd,timer_readGnss,"
-                    "timer_bme280_ext,timer_bme280_int,timer_lsm303,timer_veml7700,timer_dfrws,timer_iridium,"
+                    "online_bme280_ext,online_bme280_int,online_lsm303,online_veml7700,online_gnss,online_microSd,"
+                    "online_iridium,timer_readRtc,timer_readBattery,timer_bme280_ext,timer_bme280_int,timer_lsm303,"
+                    "timer_veml7700,timer_dfrws,timer_readGnss,timer_writeMicroSd,timer_iridium,"
                     "transmit_status,rtc_drift,free_ram,"
                     "sampleInterval,averageInterval,transmitInterval,retransmitLimit,gnssTimeout,iridiumTimeout"));
 
@@ -143,11 +136,11 @@ void checkLogFile()
 void logData()
 {
 #if LOGGING
-  // Configure microSD
-  configureSd();
-
   // Start loop timer
   unsigned long loopStartTime = millis();
+
+  // Configure microSD (timed separately)
+  configureSd();
 
   // Check if microSD is online
   if (!online.microSd) {
@@ -192,20 +185,17 @@ void logData()
       LOG_PRINT(hdop);
 
       // Online information
-      LOG_PRINT(online.microSd);
-      LOG_PRINT(online.iridium);
-      LOG_PRINT(online.gnss);
       LOG_PRINT(online.bme280Ext);
       LOG_PRINT(online.bme280Int);
       LOG_PRINT(online.lsm303);
       LOG_PRINT(online.veml7700);
+      LOG_PRINT(online.gnss);
+      LOG_PRINT(online.microSd);
+      LOG_PRINT(online.iridium);
 
       // Timer information
       LOG_PRINT(timer.readRtc);
       LOG_PRINT(timer.readBattery);
-      LOG_PRINT(timer.configMicroSd);
-      LOG_PRINT(timer.writeMicroSd);
-      LOG_PRINT(timer.readGnss);
       LOG_PRINT(timer.readBme280Ext);
       LOG_PRINT(timer.readBme280Int);
       LOG_PRINT(timer.readLsm303);
@@ -214,6 +204,8 @@ void logData()
       //LOG_PRINT(timer.read5103L);
       //LOG_PRINT(timer.readSp212);
       LOG_PRINT(timer.readDFRWS);
+      LOG_PRINT(timer.readGnss);
+      LOG_PRINT(timer.writeMicroSd);
       LOG_PRINT(timer.iridium);
 
       // Debugging information
@@ -251,11 +243,11 @@ void logData()
   samplesSaved++;
 
   // Stop the loop timer
-  timer.writeMicroSd = millis() - loopStartTime;
+  timer.writeMicroSd += millis() - loopStartTime;
 #endif
 }
 
-// Update the file create timestamp
+// Update the file created timestamp
 void updateFileCreate(FsFile *dataFile)
 {
   if (!dataFile->timestamp(T_CREATE, (rtc.getYear() + 2000), rtc.getMonth(), rtc.getDay(), rtc.getHours(), rtc.getMinutes(), rtc.getSeconds()))

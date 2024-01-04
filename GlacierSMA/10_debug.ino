@@ -50,8 +50,6 @@ void printTimers()
   printLine();
   DEBUG_PRINT("readRtc: ");         printTab(1);  DEBUG_PRINTLN(timer.readRtc);
   DEBUG_PRINT("battery: ");         printTab(1);  DEBUG_PRINTLN(timer.readBattery);
-  DEBUG_PRINT("configMicroSd: ");   printTab(1);  DEBUG_PRINTLN(timer.configMicroSd);
-  DEBUG_PRINT("writeMicroSd: ");    printTab(1);  DEBUG_PRINTLN(timer.writeMicroSd);
   DEBUG_PRINT("readBme280Ext: ");   printTab(1);  DEBUG_PRINTLN(timer.readBme280Ext);
   DEBUG_PRINT("readBme280Int: ");   printTab(1);  DEBUG_PRINTLN(timer.readBme280Int);
   DEBUG_PRINT("readLsm303: ");      printTab(1);  DEBUG_PRINTLN(timer.readLsm303);
@@ -62,6 +60,7 @@ void printTimers()
   //DEBUG_PRINT("read7911: ");        printTab(1);  DEBUG_PRINTLN(timer.read7911);
   DEBUG_PRINT("readDFRWS: ");       printTab(1);  DEBUG_PRINTLN(timer.readDFRWS);
   DEBUG_PRINT("readGnss: ");        printTab(1);  DEBUG_PRINTLN(timer.readGnss);
+  DEBUG_PRINT("writeMicroSd: ");    printTab(1);  DEBUG_PRINTLN(timer.writeMicroSd);
   DEBUG_PRINT("transmitData: ");    printTab(1);  DEBUG_PRINTLN(timer.iridium);
   printLine();
 }

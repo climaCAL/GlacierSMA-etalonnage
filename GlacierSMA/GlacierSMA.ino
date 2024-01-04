@@ -356,19 +356,18 @@ struct struct_timer
 {
   unsigned long readRtc;
   unsigned long readBattery;
-  unsigned long configMicroSd;
-  unsigned long writeMicroSd;
-  unsigned long readGnss;
   unsigned long readBme280Ext;
   unsigned long readBme280Int;
-  unsigned long readVeml7700;
   unsigned long readLsm303;
+  unsigned long readVeml7700;
   unsigned long readHmp60;
   unsigned long readSht31;
   unsigned long read5103L;
   unsigned long read7911;
   unsigned long readSp212;
   unsigned long readDFRWS;
+  unsigned long readGnss;
+  unsigned long writeMicroSd;
   unsigned long iridium;
 } timer;
 
