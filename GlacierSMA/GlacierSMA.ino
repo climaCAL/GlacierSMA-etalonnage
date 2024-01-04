@@ -513,7 +513,7 @@ void loop()
 
       // In the event that the battery voltage never recovers, force a reset of the
       // system after 1 week
-      if (cutoffCounter > 168)
+      if (cutoffCounter > 7 * 24 * (60/sampleInterval))
       {
         // Force WDT reset
         while (1);
@@ -521,11 +521,15 @@ void loop()
 
       DEBUG_PRINTLN("Warning - Battery voltage cutoff exceeded. Entering deep sleep...");
 
+      /* I understand the idea of discarding the whole dataset in this scenario, but it can lead to a scenario where
+         we no longer receive data because we can't reliably complete 15 full cycles.
+
       // Reset sample counter
       sampleCounter = 0;
 
       // Clear statistics objects
       clearStats();
+      */
 
       // Go to sleep
       setCutoffAlarm();
