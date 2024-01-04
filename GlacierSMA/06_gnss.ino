@@ -4,6 +4,14 @@ void readGnss()
   // Start loop timer
   unsigned long loopStartTime = millis();
 
+  if (disabled.gnss) {
+    DEBUG_PRINTLN("Info - GNSS module disabled.");
+    return;
+  }
+
+  // Assume the GNSS module is present until proven otherwise
+  online.gnss = true;
+  
   // Reset GNSS fix counter
   byte fixCounter = 0;
 
@@ -27,7 +35,7 @@ void readGnss()
 
     // Exit loop early if no GNSS data is received after a specified duration
     if ((millis() - loopStartTime) > 5000 && gnss.charsProcessed() < 10) {
-      DEBUG_PRINTLN(F("Warning - No GNSS data received; Please check wiring."));
+      online.gnss = false;
       break;
     }
 
@@ -55,7 +63,10 @@ void readGnss()
   }
 
   if (fixCounter < 10) {
-    DEBUG_PRINTLN(F("Warning - Insufficient GNSS fixes found!"));
+    if (online.gnss)
+      DEBUG_PRINTLN(F("Warning - Insufficient GNSS fixes found before timeout!"));
+    else
+      DEBUG_PRINTLN(F("Warning - No GNSS data received; Please check wiring."));
     blinkLed(PIN_LED_RED, 5, 100);
   }
   else {

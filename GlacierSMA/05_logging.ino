@@ -95,7 +95,7 @@ void createLogFile()
   // Write header to file
   logFile.println("sample,datetime,voltage,temperature_int,humidity_int,pressure_ext,temperature_ext,"
                   "humidity_ext,pitch,roll,wind_speed,wind_direction,solar,latitude,longitude,satellites,hdop,"
-                  "online_microSd,online_bme280_ext,online_bme280_int,online_lsm303,online_veml7700,"
+                  "online_microSd,online_gnss,online_bme280_ext,online_bme280_int,online_lsm303,online_veml7700,"
                   "timer_readRtc,timer_readBattery,timer_configMicroSd,timer_writeMicroSd,timer_readGnss,"
                   "timer_bme280_ext,timer_bme280_int,timer_lsm303,timer_veml7700,timer_dfrws,timer_iridium,"
                   "transmit_status,rtc_drift,free_ram,"
@@ -179,6 +179,7 @@ void logData()
 
       // Online information
       logFile.print(online.microSd);      logFile.print(",");
+      logFile.print(online.gnss);         logFile.print(",");
       logFile.print(online.bme280Ext);    logFile.print(",");
       logFile.print(online.bme280Int);    logFile.print(",");
       logFile.print(online.lsm303);       logFile.print(",");
@@ -253,10 +254,11 @@ void logData()
 
       // Online information
       DEBUG_PRINT(online.microSd);      DEBUG_PRINT(",");
+      DEBUG_PRINT(online.gnss);         DEBUG_PRINT(",");
       DEBUG_PRINT(online.bme280Ext);    DEBUG_PRINT(",");
       DEBUG_PRINT(online.bme280Int);    DEBUG_PRINT(",");
       DEBUG_PRINT(online.lsm303);       DEBUG_PRINT(",");
-      DEBUG_PRINT(online.veml7700);       DEBUG_PRINT(",");
+      DEBUG_PRINT(online.veml7700);     DEBUG_PRINT(",");
 
       // Timer information
       DEBUG_PRINT(timer.readRtc);       DEBUG_PRINT(",");
