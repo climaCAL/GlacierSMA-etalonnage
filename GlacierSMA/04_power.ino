@@ -21,11 +21,6 @@ void readBattery()
   // Add to statistics object
   batteryStats.add(voltage);
 
-  if (firstTimeFlag)
-  {
-    DEBUG_PRINT("Info - Battery voltage: "); DEBUG_PRINTLN(voltage);
-  }
-
   // Stop loop timer
   timer.readBattery = millis() - loopStartTime;
 }

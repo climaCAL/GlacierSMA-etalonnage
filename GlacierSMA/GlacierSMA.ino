@@ -227,7 +227,6 @@ char          dateTime[20]      = "";     // Datetime buffer
 byte          retransmitCounter = 0;      // Counter for Iridium 9603 transmission reattempts
 byte          transmitCounter   = 0;      // Counter for Iridium 9603 transmission intervals
 byte          currentLogFile    = 0;      // Variable for tracking when new microSD log files are created
-byte          newLogFile        = 0;      // Variable for tracking when new microSD log files are created
 byte          currentDate       = 0;      // Variable for tracking when the date changes
 byte          newDate           = 0;      // Variable for tracking when the date changes
 int           transmitStatus    = 0;      // Iridium transmission status code
@@ -452,14 +451,15 @@ void setup()
   // Configure devices
   configureRtc();       // Configure real-time clock (RTC)
   configureWdt();       // Configure Watchdog Timer (WDT)
-  configureSd();        // Configure microSD
   printSettings();      // Print configuration settings
-  readBattery();        // Read battery voltage
+  readBattery();        DEBUG_PRINT("Info - Battery voltage: "); DEBUG_PRINTLN(voltage);
   readGnss();           // Sync RTC with GNSS
   configureIridium();   // Configure Iridium 9603 transceiver
+  configureSd();        // Configure microSD
   createLogFile();      // Create initial log file
 
   // Close serial port if immediately entering deep sleep
+  //TODO This looks like "legacy" code to me... Do we still need this?
   if (!firstTimeFlag)
   {
     disableSerial();
@@ -486,9 +486,6 @@ void loop()
     // Read the RTC
     readRtc();
 
-    // Print date and time
-    DEBUG_PRINT("Info - Alarm trigger: "); printDateTime();
-
     // Reset WDT
     petDog();
 
@@ -501,6 +498,9 @@ void loop()
       // Wake from deep sleep
       wakeUp();
       printWakeUp(sampleCounter);
+
+      // Print date and time
+      DEBUG_PRINT("Info - Alarm triggered at "); printDateTime();
     }
 
     // Read battery voltage
@@ -585,6 +585,7 @@ void loop()
             currentDate = newDate;
           }
           transmitData(); // Transmit data via Iridium transceiver
+          printSettings(); // Print current settings (in case they changed)
         }
         sampleCounter = 0; // Reset sample counter
       }

@@ -41,12 +41,11 @@ void createLogFile()
 {
 #if LOGGING
   // Get timestamp log file name
-  //TODO If the shortest log duration is "daily", we don't really need the time in the file name.
+  //TODO If the shortest log duration is "daily", we don't really need the time in the file name;
+  //     It does mean we (almost) always create a new file, but do we even want that behavior?
   sprintf(logFileName, "AWS_%s_20%02d-%02d-%02d_%02d-%02d-%02d.csv",
           CRYOLOGGER_ID, rtc.getYear(), rtc.getMonth(), rtc.getDay(),
           rtc.getHours(), rtc.getMinutes(), rtc.getSeconds());
-
-  DEBUG_PRINT(F("Info - New log file name: ")); DEBUG_PRINTLN(logFileName);
 
   // Check if log file is open
   if (logFile.isOpen())
@@ -69,13 +68,14 @@ void createLogFile()
   if (!logFile.isOpen()) //FIXME Didn't we just check this above when opening?
   {
     DEBUG_PRINT(F("Warning - Unable to open log file ")); DEBUG_PRINTLN(logFileName);
+    return;
   }
 
   // Update file create timestamp
   updateFileCreate(&logFile);
 
   // Write header to file
-  //FIXME Maybe we should skip this if the file already exists? Or we should always prefer starting a new file?
+  //FIXME Maybe we should skip this if the file already exists?
   logFile.println(F("sample,datetime,voltage,temperature_int,humidity_int,pressure_ext,temperature_ext,"
                     "humidity_ext,pitch,roll,wind_speed,wind_direction,solar,latitude,longitude,satellites,hdop,"
                     "online_bme280_ext,online_bme280_int,online_lsm303,online_veml7700,online_dfrws,online_gnss,"
@@ -86,33 +86,23 @@ void createLogFile()
 
   // Close log file
   logFile.close();
+
+  // Reset related global variables
+  currentLogFile = newLogFile();
+  samplesSaved = 0;
 #endif
 }
 
-void checkLogFile()
-{
-  // Record log file tracker the first time program runs
-  if (firstTimeFlag)
-  {
-    if (loggingMode == 1) // Daily
-      currentLogFile = rtc.getDay();
-    else if (loggingMode == 2) // Monthly
-      currentLogFile = rtc.getMonth();
-    else if (loggingMode == 3) // Yearly
-      currentLogFile = rtc.getYear();
-    else // Default to monthly
-      currentLogFile = rtc.getMonth();
+byte newLogFile() {
+  switch (loggingMode) {
+  case 1: // Daily
+    return rtc.getDay();
+  case 3: // Yearly
+    return rtc.getYear();
+  case 2: // Monthly
+  default:
+    return rtc.getMonth();
   }
-
-  // Update log file tracker
-  if (loggingMode == 1) // Daily
-    newLogFile = rtc.getDay();
-  else if (loggingMode == 2) // Monthly
-    newLogFile = rtc.getMonth();
-  else if (loggingMode == 3) // Yearly
-    newLogFile = rtc.getYear();
-  else // Default to monthly
-    newLogFile = rtc.getMonth();
 }
 
 //TODO This really shouldn't be a macro but instead a template function, but it'll do for now...
@@ -125,7 +115,7 @@ void logData()
   // Start loop timer
   unsigned long loopStartTime = millis();
 
-  // Configure microSD (timed separately)
+  // Configure microSD
   configureSd();
 
   // Check if microSD is online
@@ -134,11 +124,8 @@ void logData()
   }
   else {
     // Check if a new log file should be created
-    checkLogFile();
-    if (currentLogFile != newLogFile) {
+    if (newLogFile() != currentLogFile) {
       createLogFile();
-      currentLogFile = newLogFile;
-      samplesSaved = 0;
     }
 
     // Check if the log file is accessible

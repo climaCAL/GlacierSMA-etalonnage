@@ -3,7 +3,7 @@ float nan2zero(float f) {
 }
 
 // Calculate statistics
-void calculateStats()
+void calculateStats() //FIXME What an awful name for a function that DELETES all stats afterwards...
 {
   // Write data to union
   moSbdMessage.temperatureInt = nan2zero(temperatureIntStats.average()   * 100);          // Mean internal temperature (°C)

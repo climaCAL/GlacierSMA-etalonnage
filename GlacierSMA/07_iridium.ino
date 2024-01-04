@@ -201,8 +201,6 @@ void transmitData()
     // Write duration of last transmission to union
     moSbdMessage.transmitDuration = timer.iridium / 1000;
 
-    printSettings(); // Print current settings
-
     // Check if reset flag was transmitted
     if (resetFlag)
     {
