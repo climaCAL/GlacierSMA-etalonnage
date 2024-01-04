@@ -67,7 +67,7 @@ void createLogFile()
           CRYOLOGGER_ID, rtc.getYear(), rtc.getMonth(), rtc.getDay(),
           rtc.getHours(), rtc.getMinutes(), rtc.getSeconds());
 
-  DEBUG_PRINT("Info - New log file name: "); DEBUG_PRINTLN(logFileName);
+  DEBUG_PRINT(F("Info - New log file name: ")); DEBUG_PRINTLN(logFileName);
 
   // Check if log file is open
   if (logFile.isOpen())
@@ -79,17 +79,17 @@ void createLogFile()
   // O_WRITE  - Open the file for writing
   if (!logFile.open(logFileName, O_CREAT | O_APPEND | O_WRITE))
   {
-    DEBUG_PRINT("Warning - Failed to create log file"); DEBUG_PRINTLN(logFileName);
+    DEBUG_PRINT(F("Warning - Failed to create log file ")); DEBUG_PRINTLN(logFileName);
     return;
   }
   else
   {
-    DEBUG_PRINT("Info - Created log file: "); DEBUG_PRINTLN(logFileName);
+    DEBUG_PRINT(F("Info - Created log file: ")); DEBUG_PRINTLN(logFileName);
   }
 
   if (!logFile.isOpen()) //FIXME Didn't we just check this above when opening?
   {
-    DEBUG_PRINTLN(F("Unable to open file"));
+    DEBUG_PRINT(F("Warning - Unable to open log file ")); DEBUG_PRINTLN(logFileName);
   }
 
   // Update file create timestamp
@@ -97,13 +97,13 @@ void createLogFile()
 
   // Write header to file
   //FIXME Maybe we should skip this if the file already exists? Or we should always prefer starting a new file?
-  logFile.println("sample,datetime,voltage,temperature_int,humidity_int,pressure_ext,temperature_ext,"
-                  "humidity_ext,pitch,roll,wind_speed,wind_direction,solar,latitude,longitude,satellites,hdop,"
-                  "online_microSd,online_iridium,online_gnss,online_bme280_ext,online_bme280_int,online_lsm303,"
-                  "online_veml7700,timer_readRtc,timer_readBattery,timer_writeMicroSd,timer_readGnss,"
-                  "timer_bme280_ext,timer_bme280_int,timer_lsm303,timer_veml7700,timer_dfrws,timer_iridium,"
-                  "transmit_status,rtc_drift,free_ram,"
-                  "sampleInterval,averageInterval,transmitInterval,retransmitLimit,gnssTimeout,iridiumTimeout");
+  logFile.println(F("sample,datetime,voltage,temperature_int,humidity_int,pressure_ext,temperature_ext,"
+                    "humidity_ext,pitch,roll,wind_speed,wind_direction,solar,latitude,longitude,satellites,hdop,"
+                    "online_microSd,online_iridium,online_gnss,online_bme280_ext,online_bme280_int,online_lsm303,"
+                    "online_veml7700,timer_readRtc,timer_readBattery,timer_writeMicroSd,timer_readGnss,"
+                    "timer_bme280_ext,timer_bme280_int,timer_lsm303,timer_veml7700,timer_dfrws,timer_iridium,"
+                    "transmit_status,rtc_drift,free_ram,"
+                    "sampleInterval,averageInterval,transmitInterval,retransmitLimit,gnssTimeout,iridiumTimeout"));
 
   // Close log file
   logFile.close();
@@ -137,7 +137,7 @@ void checkLogFile()
 }
 
 //TODO This really shouldn't be a macro but instead a template function, but it'll do for now...
-#define LOG_PRINT(data) logFile.print(data); logFile.print(","); DEBUG_PRINT(data); DEBUG_PRINT(",");
+#define LOG_PRINT(data) logFile.print(data); logFile.print(','); DEBUG_PRINT(data); DEBUG_PRINT(',');
 
 // Write data to log file
 void logData()

@@ -5,7 +5,7 @@ void readGnss()
   unsigned long loopStartTime = millis();
 
   if (disabled.gnss) {
-    DEBUG_PRINTLN("Info - GNSS module disabled.");
+    DEBUG_PRINTLN(F("Info - GNSS module disabled."));
     return;
   }
 
@@ -20,7 +20,7 @@ void readGnss()
 
   // Open serial port at 9600 baud
   GNSS_PORT.begin(9600);
-  DEBUG_PRINT("Info - Beginning to listen for GNSS traffic...");
+  DEBUG_PRINT(F("Info - Beginning to listen for GNSS traffic..."));
  
   // Configure GNSS
   // Note: a delay of at least 1 s is required after powering on GNSS module
@@ -62,8 +62,7 @@ void readGnss()
     fixCounter++; // Increment fix counter
     DEBUG_PRINT(' '); DEBUG_PRINT(fixCounter);
   }
-
-  DEBUG_PRINTLN("");
+  DEBUG_PRINTLN();
 
   if (fixCounter < 10) {
     if (online.gnss)

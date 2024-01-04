@@ -405,6 +405,8 @@ void setup()
 #endif
 
   DEBUG_PRINTLN();
+  DEBUG_PRINTLN();
+  DEBUG_PRINTLN();
   printLine();
   DEBUG_PRINT("Cryologger - Automatic Weather Station #"); DEBUG_PRINTLN(CRYOLOGGER_ID);
   printLine();
