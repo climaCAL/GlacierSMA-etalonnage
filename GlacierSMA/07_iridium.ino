@@ -50,7 +50,7 @@ void transmitData()
     pinPeripheral(PIN_IRIDIUM_RX, PIO_SERCOM);
 
     // Wake up the RockBLOCK 9603 and begin communications
-    DEBUG_PRINTLN("Info - Starting modem...");
+    DEBUG_PRINTLN("Info - Starting iridium modem...");
     petDog(); // The following might take a while, so best reset the WDT here
 
     int returnCode = modem.begin();
@@ -58,10 +58,12 @@ void transmitData()
     if (returnCode != ISBD_SUCCESS)
     {
       online.iridium = false;
-      if (returnCode == ISBD_NO_MODEM_DETECTED)
+      if (returnCode == ISBD_NO_MODEM_DETECTED) {
         DEBUG_PRINTLN("Warning - No modem detected! Please check wiring.");
-      else
+      }
+      else {
         DEBUG_PRINT("Warning - Modem begin failed with error "); DEBUG_PRINTLN(returnCode);
+      }
     }
     else
     {
