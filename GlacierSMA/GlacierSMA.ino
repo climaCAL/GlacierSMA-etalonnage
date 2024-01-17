@@ -172,8 +172,8 @@ StatisticCAL vStats;               // Wind north-south wind vector component (v)
 unsigned int  sampleInterval    = 1;      // Sampling interval (minutes). Default: 5 min (300 seconds)
 unsigned int  averageInterval   = 15;     // Number of samples to be averaged in each message. Default: 12 (hourly)
 unsigned int  transmitInterval  = 1;      // Number of messages in each Iridium transmission (340-byte limit)
-unsigned int  retransmitLimit   = 4;      // Failed data transmission reattempts (340-byte limit)
-unsigned int  iridiumTimeout    = 60;     // Timeout for Iridium transmission (seconds)
+unsigned int  retransmitLimit   = 5;      // Failed data transmission reattempts (340-byte limit)
+unsigned int  iridiumTimeout    = 120;    // Timeout for Iridium transmission (seconds)
 unsigned int  gnssTimeout       = 30;     // Timeout for GNSS signal acquisition (seconds)
 float         batteryCutoff     = 3.0;    // Battery voltage cutoff threshold (V)
 byte          loggingMode       = 3;      // Flag for new log file creation. 1: daily, 2: monthly, 3: yearly
@@ -182,13 +182,15 @@ unsigned int  systemRstWDTCountLimit = 5; // Nombre d'alertes WDT autorisées av
 unsigned int  sampleInterval    = 5;      // Sampling interval (minutes). Default: 5 min (300 seconds)
 unsigned int  averageInterval   = 12;     // Number of samples to be averaged in each message. Default: 12 (hourly)
 unsigned int  transmitInterval  = 1;      // Number of messages in each Iridium transmission (340-byte limit)
-unsigned int  retransmitLimit   = 4;      // Failed data transmission reattempts (340-byte limit)
+unsigned int  retransmitLimit   = 5;      // Failed data transmission reattempts (340-byte limit)
 unsigned int  iridiumTimeout    = 240;    // Timeout for Iridium transmission (seconds)
 unsigned int  gnssTimeout       = 120;    // Timeout for GNSS signal acquisition (seconds)
 float         batteryCutoff     = 11.0;   // Battery voltage cutoff threshold (V)
 byte          loggingMode       = 2;      // Flag for new log file creation. 1: daily, 2: monthly, 3: yearly
 unsigned int  systemRstWDTCountLimit = 15;// Nombre d'alertes WDT autorisées avant de faire un system Reset (8s par cycle)
 #endif
+//TODO If the values above were constants, we could include compile-time checks to make sure they are within range;
+//     However, we'd then lose the ability to modify them remotely, so it's probably not worth it.
 
 // ----------------------------------------------------------------------------
 // Sensors correction factor and offsets -- to modify -- 
@@ -310,7 +312,8 @@ typedef union
   } __attribute__((packed));                                    // Total: (48 bytes)
   uint8_t bytes[48];
 } SBD_MO_MESSAGE;
-
+static_assert(sizeof(SBD_MO_MESSAGE) <= 50, "Message structure exceeds a single credit (50 bytes).");
+//static_assert(sizeof(SBD_MO_MESSAGE) * (1 + retransmitLimit) <= 340, "Retransmit limit too high for a single message (340 bytes).");
 SBD_MO_MESSAGE moSbdMessage;
 
 // Union to store received Iridium SBD Mobile Terminated (MT) message
