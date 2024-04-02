@@ -203,6 +203,8 @@ void readVeml7700()
     // Add acquisition (Default mode for readLux() = VEML_LUX_NORMAL)
     solar = max(veml_CF * veml->readLux() + veml_Offset, 0.0f);
     solarStats.add(solar);
+
+    DEBUG_PRINT(solar);
   
     // Delete sensor object
     delete veml;
