@@ -86,6 +86,14 @@
 #endif
 
 // ----------------------------------------------------------------------------
+// I2C address definitions
+// ----------------------------------------------------------------------------
+#define BME280_EXT_ADDR     BME280_ADDRESS            // Defined in Adafruit Library = 0x77 - Used for the outside sensor.
+#define BME280_INT_ADDR     BME280_ADDRESS_ALTERNATE  // defined in Adafruit Library = 0x76 - Used for the inside sensor.
+#define BRIDGE_SENSOR_SLAVE_ADDR 0x66                 // WindSensor module I2C address declaration
+#define VEML_ADDR           0x10 // According to datasheet page 6 (https://www.vishay.com/docs/84286/veml7700.pdf)
+
+// ----------------------------------------------------------------------------
 // Pin definitions
 // ----------------------------------------------------------------------------
 #define PIN_VBAT            A0
@@ -120,9 +128,6 @@ Uart Serial2 (&sercom1, PIN_IRIDIUM_RX, PIN_IRIDIUM_TX, SERCOM_RX_PAD_2, UART_TX
 #define SERIAL_PORT   Serial
 #define GNSS_PORT     Serial1
 #define IRIDIUM_PORT  Serial2
-
-//WindSensor module I2C address declaration:
-const uint8_t WIND_SENSOR_SLAVE_ADDR = 0x66;
 
 // Attach interrupt handler to SERCOM for new Serial instance
 void SERCOM1_Handler()

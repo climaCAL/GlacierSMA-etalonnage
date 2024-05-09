@@ -32,7 +32,7 @@ void configureBme280Ext()
 {
   DEBUG_PRINT("Info - Initializing BME280 Ext... ");
 
-  if (scanI2CbusFor(BME280_ADDRESS) && bme280Ext.begin(BME280_ADDRESS))
+  if (scanI2CbusFor(BME280_EXT_ADDR) && bme280Ext.begin(BME280_EXT_ADDR))
   {
     online.bme280Ext = true;
     DEBUG_PRINTLN("success!");
@@ -95,7 +95,7 @@ void configureBme280Int()
 {
   DEBUG_PRINT("Info - Initializing BME280 Int... ");
 
-  if (scanI2CbusFor(BME280_ADDRESS_ALTERNATE) && bme280Int.begin(BME280_ADDRESS_ALTERNATE))
+  if (scanI2CbusFor(BME280_INT_ADDR) && bme280Int.begin(BME280_INT_ADDR))
   {
     online.bme280Int = true;
     DEBUG_PRINTLN("success!");
@@ -153,12 +153,10 @@ void readBme280Int()
 // ----------------------------------------------------------------------------
 // Adafruit VEML7700 Lux Meter -- Basé sur le BME280
 // ----------------------------------------------------------------------------
-#define vemlI2cAddr 0x10
-
 Adafruit_VEML7700* configureVEML7700() {
   DEBUG_PRINT("Info - Initializing VEML7700... ");
 
-  if (scanI2CbusFor(vemlI2cAddr, 3)) {
+  if (scanI2CbusFor(VEML_ADDR, 3)) {
     // Constructed here because the destructor hangs if the sensor is not connected.
     Adafruit_VEML7700* veml = new Adafruit_VEML7700();
 
@@ -640,9 +638,8 @@ void readDFRWindSensor()
   unsigned long loopStartTime = millis();
 
   DEBUG_PRINT("Info - Reading DFRWindSensor... ");
-  myDelay(2000); //Let the DFRWindSensor settle a bit... making sure data is accurate at the sensor and ready for us.
 
-  if (!scanI2CbusFor(WIND_SENSOR_SLAVE_ADDR, 3)) {
+  if (!scanI2CbusFor(BRIDGE_SENSOR_SLAVE_ADDR, 3)) {
     DEBUG_PRINTLN("failed!");
     online.dfrws = false;
     timer.readDFRWS += millis() - loopStartTime; // Update the loop timer anyway
@@ -651,11 +648,11 @@ void readDFRWindSensor()
 
   // Requires I2C bus
   Wire.begin();
-  myDelay(1000);
+  myDelay(10000); // Laisser du temps au bridgeI2C de collecter les capteurs sur le modbus RS485, tout en laissant les capteurs faire leur travail.
   
   vent lectureVent;  //Let's use a structure to read wind sensor.
 
-  byte len = Wire.requestFrom(WIND_SENSOR_SLAVE_ADDR, ventRegMemMapSize);  //Requesting 6 bytes from slave
+  byte len = Wire.requestFrom(BRIDGE_SENSOR_SLAVE_ADDR, ventRegMemMapSize);  //Requesting 6 bytes from slave
   if (len == 0) {
     DEBUG_PRINTLN("failed!");
     online.dfrws = false;
