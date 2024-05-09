@@ -8,7 +8,7 @@ void calculateStats() //FIXME What an awful name for a function that DELETES all
   // Write data to union
   moSbdMessage.temperatureInt = nan2zero(temperatureIntStats.average()   * 100);          // Mean internal temperature (°C)
   moSbdMessage.humidityInt    = nan2zero(humidityIntStats.average()      * 100);          // Mean internal humidity (%)
-  moSbdMessage.pressureExt    = nan2zero((pressureExtStats.average()     - 400) * 100);   // Mean external pressure (hPa)
+  moSbdMessage.pressureExt    = nan2zero((pressureExtStats.average() - 400) * 100);       // Mean external pressure (hPa)
   moSbdMessage.temperatureExt = nan2zero(temperatureExtStats.average()   * 100);          // Mean external temperature (°C)
   moSbdMessage.humidityExt    = nan2zero(humidityExtStats.average()      * 100);          // Mean external humidity (%)
   moSbdMessage.solar          = nan2zero(solarStats.average()            * 10000);        // Mean solar irradiance (lx)
@@ -42,6 +42,7 @@ void clearStats()
   temperatureExtStats.clear();
   humidityExtStats.clear();
   solarStats.clear();
+  hauteurNeige.clear();
   windSpeedStats.clear();
   uStats.clear();
   vStats.clear();
@@ -54,41 +55,55 @@ void printStats()
   DEBUG_PRINTLN(F("Statistics"));
   printLine();
   DEBUG_PRINT("Datetime: ");      printTab(1);  printDateTime();
+
   DEBUG_PRINT(F("Voltage"));      printTab(2);
   DEBUG_PRINT(F("Samples: "));    DEBUG_PRINT(batteryStats.count());            printTab(1);
   DEBUG_PRINT(F("Min: "));        DEBUG_PRINT(batteryStats.minimum());          printTab(1);
   DEBUG_PRINT(F("Max: "));        DEBUG_PRINT(batteryStats.maximum());          printTab(1);
   DEBUG_PRINT(F("Mean: "));       DEBUG_PRINTLN(batteryStats.average());
+
   DEBUG_PRINT(F("Temp Int"));                                                   printTab(1);
   DEBUG_PRINT(F("Samples: "));    DEBUG_PRINT(temperatureIntStats.count());     printTab(1);
   DEBUG_PRINT(F("Min: "));        DEBUG_PRINT(temperatureIntStats.minimum());   printTab(1);
   DEBUG_PRINT(F("Max: "));        DEBUG_PRINT(temperatureIntStats.maximum());   printTab(1);
   DEBUG_PRINT(F("Mean: "));       DEBUG_PRINTLN(temperatureIntStats.average());
+
   DEBUG_PRINT(F("Humidity Int"));                                               printTab(1);
   DEBUG_PRINT(F("Samples: "));    DEBUG_PRINT(humidityIntStats.count());        printTab(1);
   DEBUG_PRINT(F("Min: "));        DEBUG_PRINT(humidityIntStats.minimum());      printTab(1);
   DEBUG_PRINT(F("Max: "));        DEBUG_PRINT(humidityIntStats.maximum());      printTab(1);
   DEBUG_PRINT(F("Mean: "));       DEBUG_PRINTLN(humidityIntStats.average());
+
   DEBUG_PRINT(F("Pressure Ext"));                                               printTab(1);
   DEBUG_PRINT(F("Samples: "));    DEBUG_PRINT(pressureExtStats.count());        printTab(1);
   DEBUG_PRINT(F("Min: "));        DEBUG_PRINT(pressureExtStats.minimum());      printTab(1);
   DEBUG_PRINT(F("Max: "));        DEBUG_PRINT(pressureExtStats.maximum());      printTab(1);
   DEBUG_PRINT(F("Mean: "));       DEBUG_PRINTLN(pressureExtStats.average());
+
   DEBUG_PRINT(F("Temp Ext"));                                                   printTab(1);
   DEBUG_PRINT(F("Samples: "));    DEBUG_PRINT(temperatureExtStats.count());     printTab(1);
   DEBUG_PRINT(F("Min: "));        DEBUG_PRINT(temperatureExtStats.minimum());   printTab(1);
   DEBUG_PRINT(F("Max: "));        DEBUG_PRINT(temperatureExtStats.maximum());   printTab(1);
   DEBUG_PRINT(F("Mean: "));       DEBUG_PRINTLN(temperatureExtStats.average());
+
   DEBUG_PRINT(F("Humidity Ext"));                                               printTab(1);
   DEBUG_PRINT(F("Samples: "));    DEBUG_PRINT(humidityExtStats.count());        printTab(1);
   DEBUG_PRINT(F("Min: "));        DEBUG_PRINT(humidityExtStats.minimum());      printTab(1);
   DEBUG_PRINT(F("Max: "));        DEBUG_PRINT(humidityExtStats.maximum());      printTab(1);
   DEBUG_PRINT(F("Mean: "));       DEBUG_PRINTLN(humidityExtStats.average());
+
   DEBUG_PRINT(F("Solar"));                                                      printTab(2);
   DEBUG_PRINT(F("Samples: "));    DEBUG_PRINT(solarStats.count());              printTab(1);
   DEBUG_PRINT(F("Min: "));        DEBUG_PRINT(solarStats.minimum());            printTab(1);
   DEBUG_PRINT(F("Max: "));        DEBUG_PRINT(solarStats.maximum());            printTab(1);
   DEBUG_PRINT(F("Mean: "));       DEBUG_PRINTLN(solarStats.average());
+
+  DEBUG_PRINT(F("HauteurNeige"));                                               printTab(1);
+  DEBUG_PRINT(F("Samples: "));    DEBUG_PRINT(hauteurNeige.count());            printTab(1);
+  DEBUG_PRINT(F("Min: "));        DEBUG_PRINT(hauteurNeige.minimum());          printTab(1);
+  DEBUG_PRINT(F("Max: "));        DEBUG_PRINT(hauteurNeige.maximum());          printTab(1);
+  DEBUG_PRINT(F("Mean: "));       DEBUG_PRINTLN(hauteurNeige.average());
+
   DEBUG_PRINT(F("Wind speed"));   printTab(1);
   DEBUG_PRINT(F("Samples: "));    DEBUG_PRINT(windSpeedStats.count());          printTab(1);
   DEBUG_PRINT(F("Min: "));        DEBUG_PRINT(windSpeedStats.minimum());        printTab(1);

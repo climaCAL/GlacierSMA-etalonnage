@@ -632,6 +632,10 @@ void read7911()
   * North	                16	            348.8° - 360°
  */
 // ----------------------------------------------------------------------------
+const uint16_t bridgeSettleDelay = 15000; // 15 secondes! oui... pas encore optimisé - Yh - 26 avril 2024
+const uint16_t valeurLimiteHauteurNeige = 4000; // Max acceptable pour la valeur de mesure hauteur de neige
+const float facteurMultLumino = 3800.0; // Facteur d'échelonnage lors de la conversion à un 16bits (encodage) pour mettre dans le registre
+
 void readDFRWindSensor() 
 {
   // Start the loop timer
@@ -646,13 +650,15 @@ void readDFRWindSensor()
     return;
   }
 
-  // Requires I2C bus
-  Wire.begin();
-  myDelay(10000); // Laisser du temps au bridgeI2C de collecter les capteurs sur le modbus RS485, tout en laissant les capteurs faire leur travail.
+  // Il faut laisser du temps au bridgeI2C de collecter les donnees sur le modbus RS485, tout en laissant les capteurs faire leur travail.
+  DEBUG_PRINT("(sensor settle time: "); DEBUG_PRINT(bridgeSettleDelay/1000); DEBUG_PRINT("s)");
+  Wire.begin(); // Requires I2C bus
+  myDelay(bridgeSettleDelay);
   
-  vent lectureVent;  //Let's use a structure to read wind sensor.
+  sensorsDataRaw bridgeDataRaw; // Struct for raw sensor data (read from i2c)
+  sensorsData bridgeData; // Struct for parsed sensor data
 
-  byte len = Wire.requestFrom(BRIDGE_SENSOR_SLAVE_ADDR, ventRegMemMapSize);  //Requesting 6 bytes from slave
+  byte len = Wire.requestFrom(BRIDGE_SENSOR_SLAVE_ADDR, regMemoryMapSize * sizeof(uint16_t));  // Requesting _ bytes from slave
   if (len == 0) {
     DEBUG_PRINTLN("failed!");
     online.dfrws = false;
@@ -665,19 +671,145 @@ void readDFRWindSensor()
     for (int i = 0; i < len/2 && Wire.available() >= 2; i++) { //TODO I'm 99% sure the Wire.available() is redundant but I'll confirm later.
       uint8_t LSB = Wire.read();
       uint8_t MSB = Wire.read();
-      lectureVent.regMemoryMap[i] = (MSB<<8)+LSB;
+      bridgeDataRaw.regMemoryMap[i] = (MSB<<8)+LSB;
     }
 
-    lectureVent.angleVentFloat = lectureVent.regMemoryMap[0]/10.0;
-    lectureVent.directionVentInt = lectureVent.regMemoryMap[1];
-    lectureVent.vitesseVentFloat = lectureVent.regMemoryMap[2]/10.0;
-
-    windSpeed = lectureVent.vitesseVentFloat;
-    if (windSpeed > 0) {
-      // Update wind direction only if wind was detected.
-      windDirection = lectureVent.angleVentFloat;
-      windDirectionSector = lectureVent.directionVentInt;
+    DEBUG_PRINTLN();
+    DEBUG_PRINTF("\t*RAW* readings: ");
+    for (int i = 0; i < regMemoryMapSize; i++) {
+      DEBUG_PRINT(' '); DEBUG_PRINT(bridgeDataRaw.regMemoryMap[i]);
     }
+    DEBUG_PRINTLN();
+
+    //--- Grande section de la récupération des valeurs et validation des codes d'erreurs --------------------------
+
+    { // VITESSE ET DIRECTION DU VENT
+      //Traitement direction des vents - angle - Application du décodage:
+      bridgeData.angleVentFloat = bridgeDataRaw.angleVentReg / 10.0;
+      //Traitement direction des vents - secteur
+      bridgeData.directionVentInt = bridgeDataRaw.dirVentReg;
+      //Traitement vitesse des vents - Application du décodage:
+      bridgeData.vitesseVentFloat = bridgeDataRaw.vitVentReg / 10.0;
+
+      windSpeed = bridgeData.vitesseVentFloat;
+      if (windSpeed > 0) {
+        // Update wind direction only if wind was detected.
+        windDirection = bridgeData.angleVentFloat;
+        windDirectionSector = bridgeData.directionVentInt;
+      }
+    }
+
+    { // HAUTEUR DE NEIGE
+      //Traitement hauteur de neige et température capteur HN:
+      if (bridgeDataRaw.HNeigeReg == HN_ERRORVAL) {
+        DEBUG_PRINTFLN("\tInvalid data: hauteurNeige");
+        hNeige = 0.0;
+        temperatureHN = 0.0;
+      }
+      else {
+        bridgeData.hauteurNeige = (float)bridgeDataRaw.HNeigeReg;
+        bridgeData.temperatureHN = (float)bridgeDataRaw.tempHNReg;
+        
+        #if CALIBRATE
+          DEBUG_PRINTF("\thauteurNeige Raw: "); DEBUG_PRINT(bridgeData.hauteurNeige); DEBUG_PRINTFLN(" mm");
+        #endif
+
+        //Yh 18Déc2023: TODO
+        //Traitement nécessaire si la temperatureHN est trop différente de la température du BME280 EXT (si disponible) ET que la hauteurNeige est disponible (pas 0 ou négatif)
+        //Pour l'instant on y va directement:
+        if (bridgeData.hauteurNeige < valeurLimiteHauteurNeige) {  //Limite de la lecture: 4000mm = 4m sinon pas valide pcq pas fiable
+          hNeige = bridgeData.hauteurNeige;
+          temperatureHN = bridgeData.temperatureHN;
+          hauteurNeige.add(hNeige);
+        } else {
+          hNeige = 0.0;
+          temperatureHN = 0.0;
+        }
+
+        #if CALIBRATE
+          DEBUG_PRINTF("\thNeige: "); DEBUG_PRINT(hNeige); DEBUG_PRINTFLN(" mm");
+        #endif
+      }
+    }
+
+    { // HPT (BME280 EXT)
+      //Traitement data Stevenson - humidité (BME280):
+      if ((int16_t)bridgeDataRaw.humExtReg != hum_ERRORVAL) {
+        //Application du décodage:
+        bridgeData.humiditeExt = bridgeDataRaw.humExtReg / 100.0;
+
+        //Application de la correction selon étalonnage
+        float humExt = humBmeEXT_CF * bridgeData.humiditeExt + humBmeEXT_Offset;
+
+        // Protection en cas de mauvaise valeur après étalonnage
+        if (humExt >= 100) {
+          humidityExt = 100.0;
+        } else {
+          humidityExt = humExt;
+        }
+
+        humidityExtStats.add(humidityExt);
+
+        #if CALIBRATE
+            DEBUG_PRINTF("\tHumidityExt: "); DEBUG_PRINT(bridgeData.humiditeExt); DEBUG_PRINTFLN("%");
+        #endif
+      }
+      // Question: est-ce qu'il faut injecter 0 dans le cas contraire?
+
+      //Traitement data Stevenson - pression atmoshpérique (BME280):
+      if ((int16_t)bridgeDataRaw.presExtReg != pres_ERRORVAL) {
+
+        //Application du décodage:
+        bridgeData.presAtmospExt = bridgeDataRaw.presExtReg / 10.0;  //On veut en hPa
+
+        //Application de la correction selon étalonnage  
+        pressureExt = presBmeEXT_CF * bridgeData.presAtmospExt + presBmeEXT_Offset;
+
+        // Protection en cas de mauvaise valeur après étalonnage?  n'a pas (encore) au 30 avril 2024 Yh
+        pressureExtStats.add(pressureExt);
+
+        #if CALIBRATE
+            DEBUG_PRINTF("\tpressureExt: "); DEBUG_PRINT(bridgeData.presAtmospExt); DEBUG_PRINTFLN(" hPa");
+        #endif
+      }  
+      // Question: est-ce qu'il faut injecter 0 dans le cas contraire?
+    }
+
+    { // LUMINOSITE (VEML7700)
+      //Traitement data Stevenson - luminosité (VEML7700):
+      // Lumino: en cas d'erreur, la valeur recue sera 0
+
+      //Application du décodage:
+      if (bridgeDataRaw.luminoReg > 0) {
+        float tempLum = bridgeDataRaw.luminoReg / facteurMultLumino;
+        bridgeData.luminoAmbExt = pow(10,tempLum);
+      } else bridgeData.luminoAmbExt = 0.0;
+
+      //Application de la correction selon étalonnage
+      solar = veml_CF * bridgeData.luminoAmbExt + veml_Offset;
+
+      // Protection en cas de mauvaise valeur après étalonnage
+      if (solar > 0 && solar < 188000) {  
+        solarStats.add(solar);   // Add acquisition        
+      } else solar = 0.0; 
+
+      // Ex en date du 2 mai 2024: 
+      #if CALIBRATE
+          DEBUG_PRINTF(">\tluminosite: raw="); DEBUG_PRINT(((uint16_t)bridgeData.regMemoryMap[luminoRegOffset]));
+          DEBUG_PRINTF(" luminoAmbExt="); DEBUG_PRINT(bridgeData.luminoAmbExt);
+          DEBUG_PRINTF(" solar="); DEBUG_PRINT(solar);
+          DEBUG_PRINTF(" solarStats="); DEBUG_PRINT(solarStats.average());
+          DEBUG_PRINTFLN(" ");
+      #endif
+    }
+
+    //Recupération de l'information d'état de lecture par le périphérique:
+    uint16_t stvsnErrCode = ((uint16_t)bridgeDataRaw.stvsnErrReg);
+    DEBUG_PRINTF("\tstvsnErrCode: ");
+    if (stvsnErrCode) DEBUG_PRINTF("*ATTN* ");
+    DEBUG_PRINTLN(stvsnErrCode);
+
+    //--- Fin de la grande section de la récupération des valeurs et validation des codes d'erreurs --------------------------
   }
 
   // Check and update wind gust speed and direction
@@ -700,13 +832,15 @@ void readDFRWindSensor()
   DEBUG_PRINTLN("done.");
 
   // Print debug info:
-  char smallMsg[48]={0};  //Temps buffer
-  sprintf(smallMsg,"%x %x %x",lectureVent.regMemoryMap[0],lectureVent.regMemoryMap[1],lectureVent.regMemoryMap[2]);
-
-  DEBUG_PRINT(F("\t*RAW* readings: ")); DEBUG_PRINTLN(smallMsg);
-  DEBUG_PRINT(F("\tWind Speed: ")); DEBUG_PRINTLN(windSpeed);
-  DEBUG_PRINT(F("\tWind Direction: ")); DEBUG_PRINTLN(windDirection);
-  DEBUG_PRINT(F("\tWind Dir. Sector: ")); DEBUG_PRINTLN(windDirectionSector);
+  DEBUG_PRINTF("\tWind Speed: "); DEBUG_PRINTLN(windSpeed);
+  DEBUG_PRINTF("\tWind Direction: "); DEBUG_PRINTLN(windDirection);
+  DEBUG_PRINTF("\tWind Dir. Sector: "); DEBUG_PRINTLN(windDirectionSector);
+  DEBUG_PRINTF("\thauteurNeige: "); DEBUG_PRINTLN(hNeige);
+  DEBUG_PRINTF("\tTemp. hauteurNeige: "); DEBUG_PRINTLN(temperatureHN);
+  DEBUG_PRINTF("\tTemperatureExt: "); DEBUG_PRINTLN(temperatureExt);
+  DEBUG_PRINTF("\tHumidityExt: "); DEBUG_PRINTLN(humidityExt);
+  DEBUG_PRINTF("\tpressureExt: "); DEBUG_PRINTLN(pressureExt);
+  DEBUG_PRINTF("\tluminoAmbExt: "); DEBUG_PRINTLN(solar);
 
   // Stop the loop timer
   timer.readDFRWS += millis() - loopStartTime;

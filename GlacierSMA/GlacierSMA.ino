@@ -69,7 +69,9 @@
 
 #if DEBUG
 #define DEBUG_PRINT(x)            SERIAL_PORT.print(x)
+#define DEBUG_PRINTF(x)           SERIAL_PORT.print(F(x))
 #define DEBUG_PRINTLN(x)          SERIAL_PORT.println(x)
+#define DEBUG_PRINTFLN(x)         SERIAL_PORT.println(F(x))
 #define DEBUG_PRINT_HEX(x)        SERIAL_PORT.print(x, HEX)
 #define DEBUG_PRINTLN_HEX(x)      SERIAL_PORT.println(x, HEX)
 #define DEBUG_PRINT_DEC(x, y)     SERIAL_PORT.print(x, y)
@@ -166,6 +168,7 @@ StatisticCAL pressureExtStats;     // External pressure
 StatisticCAL temperatureExtStats;  // External temperature
 StatisticCAL humidityExtStats;     // External humidity
 StatisticCAL solarStats;           // Solar radiation
+StatisticCAL hauteurNeige;         // Suivi hauteur de neige
 StatisticCAL windSpeedStats;       // Wind speed
 StatisticCAL uStats;               // Wind east-west wind vector component (u)
 StatisticCAL vStats;               // Wind north-south wind vector component (v)
@@ -205,6 +208,8 @@ float tempBmeEXT_CF             = 1.00;    // Correction factor for exterior tem
 float tempBmeEXT_Offset         = 0.0;   // Offset for exterior temperature acquisition.
 float humBmeEXT_CF              = 1.00;     // Correction factor for exterior humidity acquisition.
 float humBmeEXT_Offset          = 0.0;      // Offset for exterior humidity acquisition.
+float presBmeEXT_CF             = 1.00;
+float presBmeEXT_Offset         = 0.0;
 
 //BME280 -- Interior sensor
 float tempImeINT_CF             = 1.00;     // Correction factor for interior temperature acquisition.
@@ -215,6 +220,17 @@ float humBmeINT_Offset          = 0.0;      // Offset for interior humidity acqu
 //VEML7700
 float veml_CF                   = 15.172;   // Correction factor for light intensity acquisition.
 float veml_Offset               = -998;     // Offset for light intensity acquisition.
+
+// ----------------------------------------------------------------------------
+// Error codes and values
+// ----------------------------------------------------------------------------
+
+// Cas d'erreurs des valeurs du Stevenson:
+const int16_t temp_ERRORVAL  = -25500;   //temperature
+const int16_t hum_ERRORVAL   = -25500;   //humidite
+const int16_t pres_ERRORVAL  = -2550;    //pression atmospherique
+const uint16_t lux_ERROVAL   = 0;        //Luminosité
+const uint16_t HN_ERRORVAL   = 0xFFFF;   //Hauteur de neige
 
 // ----------------------------------------------------------------------------
 // Global variable declarations
@@ -254,6 +270,8 @@ float         humidityExt       = 0.0;    // External humidity (%)
 float         pitch             = 0.0;    // Pitch (°)
 float         roll              = 0.0;    // Roll (°)
 float         solar             = 0.0;    // Solar radiation (lx)
+float         hNeige            = 0.0;    // Mesure de la hauteur de neige, en mm
+float         temperatureHN     = 0.0;    // Temperature au moment de la mesure de la hauteur de neige (en C, 1C pres)
 float         windSpeed         = 0.0;    // Wind speed (m/s)
 float         windDirection     = 0.0;    // Wind direction (°)
 float         windGustSpeed     = 0.0;    // Wind gust speed  (m/s)
@@ -271,22 +289,34 @@ tmElements_t  tm;                         // Variable for converting time elemen
 // ----------------------------------------------------------------------------
 
 // DFRWindSensor (CAL) struc to store/retreive data
-// Attention structure prévue pour la hauteur de neige ET PAS UTILISÉE ICI
-// regMemoryMap[0] = direction vent en degrés (0-360)
-// regMemoryMap[1] = direction vent en secteur (0-15)
-// regMemoryMap[2] = vitesse vent en m/s *10
-// regMemoryMap[3] = hauteur de neige en mm
-// regMemoryMap[4] = temperature de reference pour la mesure hauteur de neige, em Celcius resolution de 1C
-typedef struct { //TODO This would make more sense as a union actually.
-  uint16_t regMemoryMap[5] = {0,0,0,0,0};  //total 5 words = 10 bytes; utile: 3 bytes (2 derniers byte seront pour hauteur de neige, futur)
-  float angleVentFloat = 0;
-  uint16_t directionVentInt = 0;
-  float vitesseVentFloat = 0;
-  float hauteurNeige = 0;  //Futur
-  float temperatureHN = 0; //Futur
-} vent;
+const int regMemoryMapSize = 9;
+union sensorsDataRaw {
+  struct {
+    uint16_t angleVentReg = 0; // direction vent en degrés (0-360)
+    uint16_t dirVentReg   = 0; // direction vent en secteur (0-15)
+    uint16_t vitVentReg   = 0; // vitesse vent en m/s *10
+    uint16_t HNeigeReg    = 0; // hauteur de neige en mm
+    uint16_t tempHNReg    = 0; // temperature de reference pour la mesure hauteur de neige, en Celcius, resolution de 1C
+    uint16_t tempExtReg   = 0; // temperature du BME280 dans le Stevenson
+    uint16_t humExtReg    = 0; // humidite du BME280 dans le Stevenson
+    uint16_t presExtReg   = 0; // pression du BME280 dans le Stevenson
+    uint16_t luminoReg    = 0; // Luminosite du VEML7700 dans le Stevenson
+    uint16_t stvsnErrReg  = 0;
+  } __attribute__((packed));
+  uint16_t regMemoryMap[regMemoryMapSize];
+};
 
-const uint8_t ventRegMemMapSize = 0x06;  //6 = 3 capteurs * 2 bytes (instruments de vent seulement)
+struct sensorsData {
+  float angleVentFloat = 0.0;
+  uint16_t directionVentInt = 0;
+  float vitesseVentFloat = 0.0;
+  float hauteurNeige = 0.0;              //V0.6
+  float temperatureHN = 0.0;             //V0.6
+  float temperatureExt = 0.0;            //V0.7
+  float humiditeExt = 0.0;               //V0.7
+  float presAtmospExt = 0.0;             //V0.7
+  float luminoAmbExt = 0.0;              //V0.7
+};
 
 // Union to store Iridium Short Burst Data (SBD) Mobile Originated (MO) messages
 typedef union
