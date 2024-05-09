@@ -20,7 +20,7 @@ Les mesures des différents capteurs ainsi que la position GPS sont enregistrée
 
 Tableau de bord de la station météo installée à Kuujjuarapik en mai 2023 :
 
-https://thingsboard.cloud/dashboard/17a06570-f024-11ed-97ca-e57c88951dd5?publicId=cb8d6950-f06c-11ed-97ca-e57c88951dd5
+<a href="https://thingsboard.cloud/dashboard/17a06570-f024-11ed-97ca-e57c88951dd5?publicId=cb8d6950-f06c-11ed-97ca-e57c88951dd5" target="_blank">Lien page Thingsboard</a>
 
 ## Contenu du référentiel (Repository )
 La branche StationMeteoGlacier contient un programme Arduino qui fonctionne avec différents capteurs et un enregistreur de données qui a été développé en même temps que le projet. Le programme a été conçu pour fonctionner avec le ESP32 Firebeetle de DFRobot.
