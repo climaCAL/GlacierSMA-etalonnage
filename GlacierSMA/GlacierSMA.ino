@@ -168,7 +168,7 @@ StatisticCAL pressureExtStats;     // External pressure
 StatisticCAL temperatureExtStats;  // External temperature
 StatisticCAL humidityExtStats;     // External humidity
 StatisticCAL solarStats;           // Solar radiation
-StatisticCAL hauteurNeige;         // Suivi hauteur de neige
+StatisticCAL hauteurNeigeStats;    // Suivi hauteur de neige
 StatisticCAL windSpeedStats;       // Wind speed
 StatisticCAL uStats;               // Wind east-west wind vector component (u)
 StatisticCAL vStats;               // Wind north-south wind vector component (v)
@@ -270,7 +270,7 @@ float         humidityExt       = 0.0;    // External humidity (%)
 float         pitch             = 0.0;    // Pitch (°)
 float         roll              = 0.0;    // Roll (°)
 float         solar             = 0.0;    // Solar radiation (lx)
-float         hNeige            = 0.0;    // Mesure de la hauteur de neige, en mm
+float         hauteurNeige      = 0.0;    // Mesure de la hauteur de neige, en mm
 float         temperatureHN     = 0.0;    // Temperature au moment de la mesure de la hauteur de neige (en C, 1C pres)
 float         windSpeed         = 0.0;    // Wind speed (m/s)
 float         windDirection     = 0.0;    // Wind direction (°)

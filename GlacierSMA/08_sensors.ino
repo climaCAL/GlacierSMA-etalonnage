@@ -703,7 +703,7 @@ void readDFRWindSensor()
       //Traitement hauteur de neige et température capteur HN:
       if (bridgeDataRaw.HNeigeReg == HN_ERRORVAL) {
         DEBUG_PRINTFLN("\tInvalid data: hauteurNeige");
-        hNeige = 0.0;
+        hauteurNeige = 0.0;
         temperatureHN = 0.0;
       }
       else {
@@ -718,21 +718,41 @@ void readDFRWindSensor()
         //Traitement nécessaire si la temperatureHN est trop différente de la température du BME280 EXT (si disponible) ET que la hauteurNeige est disponible (pas 0 ou négatif)
         //Pour l'instant on y va directement:
         if (bridgeData.hauteurNeige < valeurLimiteHauteurNeige) {  //Limite de la lecture: 4000mm = 4m sinon pas valide pcq pas fiable
-          hNeige = bridgeData.hauteurNeige;
+          hauteurNeige = bridgeData.hauteurNeige;
           temperatureHN = bridgeData.temperatureHN;
-          hauteurNeige.add(hNeige);
+          hauteurNeigeStats.add(hauteurNeige);
         } else {
-          hNeige = 0.0;
+          hauteurNeige = 0.0;
           temperatureHN = 0.0;
         }
 
         #if CALIBRATE
-          DEBUG_PRINTF("\thNeige: "); DEBUG_PRINT(hNeige); DEBUG_PRINTFLN(" mm");
+          DEBUG_PRINTF("\tHauteurNeige: "); DEBUG_PRINT(hauteurNeige); DEBUG_PRINTFLN(" mm");
         #endif
       }
     }
 
-    { // HPT (BME280 EXT)
+    { // TPH (BME280 EXT)
+      //Traitement data Stevenson - température (BME280):
+      if ((int16_t)bridgeDataRaw.tempExtReg != temp_ERRORVAL) {
+        //Application du décodage:
+        bridgeData.temperatureExt = bridgeDataRaw.tempExtReg / 100.0;
+
+        //Application de la correction selon étalonnage
+        bridgeData.temperatureExt  = tempBmeEXT_CF * bridgeData.temperatureExt + tempBmeEXT_Offset;
+
+        temperatureExt = bridgeData.temperatureExt;  // External temperature (°C)
+
+        // Protection en cas de mauvaise valeur après étalonnage?  n'a pas (encore) au 30 avril 2024 Yh
+
+        temperatureExtStats.add(temperatureExt);
+
+        #if CALIBRATE
+            DEBUG_PRINTF("\tTemperatureExt: "); DEBUG_PRINT(bridgeData.temperatureExt); DEBUG_PRINTFLN(" C");
+        #endif
+      }
+      // Question: est-ce qu'il faut injecter 0 dans le cas contraire?
+
       //Traitement data Stevenson - humidité (BME280):
       if ((int16_t)bridgeDataRaw.humExtReg != hum_ERRORVAL) {
         //Application du décodage:
@@ -766,10 +786,11 @@ void readDFRWindSensor()
         pressureExt = presBmeEXT_CF * bridgeData.presAtmospExt + presBmeEXT_Offset;
 
         // Protection en cas de mauvaise valeur après étalonnage?  n'a pas (encore) au 30 avril 2024 Yh
+
         pressureExtStats.add(pressureExt);
 
         #if CALIBRATE
-            DEBUG_PRINTF("\tpressureExt: "); DEBUG_PRINT(bridgeData.presAtmospExt); DEBUG_PRINTFLN(" hPa");
+            DEBUG_PRINTF("\tPressureExt: "); DEBUG_PRINT(bridgeData.presAtmospExt); DEBUG_PRINTFLN(" hPa");
         #endif
       }  
       // Question: est-ce qu'il faut injecter 0 dans le cas contraire?
@@ -835,11 +856,11 @@ void readDFRWindSensor()
   DEBUG_PRINTF("\tWind Speed: "); DEBUG_PRINTLN(windSpeed);
   DEBUG_PRINTF("\tWind Direction: "); DEBUG_PRINTLN(windDirection);
   DEBUG_PRINTF("\tWind Dir. Sector: "); DEBUG_PRINTLN(windDirectionSector);
-  DEBUG_PRINTF("\thauteurNeige: "); DEBUG_PRINTLN(hNeige);
-  DEBUG_PRINTF("\tTemp. hauteurNeige: "); DEBUG_PRINTLN(temperatureHN);
+  DEBUG_PRINTF("\tHauteurNeige: "); DEBUG_PRINTLN(hauteurNeige);
+  DEBUG_PRINTF("\tTemp. HauteurNeige: "); DEBUG_PRINTLN(temperatureHN);
   DEBUG_PRINTF("\tTemperatureExt: "); DEBUG_PRINTLN(temperatureExt);
   DEBUG_PRINTF("\tHumidityExt: "); DEBUG_PRINTLN(humidityExt);
-  DEBUG_PRINTF("\tpressureExt: "); DEBUG_PRINTLN(pressureExt);
+  DEBUG_PRINTF("\tPressureExt: "); DEBUG_PRINTLN(pressureExt);
   DEBUG_PRINTF("\tluminoAmbExt: "); DEBUG_PRINTLN(solar);
 
   // Stop the loop timer
