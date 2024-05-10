@@ -816,7 +816,7 @@ void readDFRWindSensor()
 
       // Ex en date du 2 mai 2024: 
       #if CALIBRATE
-          DEBUG_PRINTF(">\tluminosite: raw="); DEBUG_PRINT(((uint16_t)bridgeData.regMemoryMap[luminoRegOffset]));
+          DEBUG_PRINTF(">\tluminosite: raw="); DEBUG_PRINT(bridgeDataRaw.luminoReg);
           DEBUG_PRINTF(" luminoAmbExt="); DEBUG_PRINT(bridgeData.luminoAmbExt);
           DEBUG_PRINTF(" solar="); DEBUG_PRINT(solar);
           DEBUG_PRINTF(" solarStats="); DEBUG_PRINT(solarStats.average());
@@ -825,9 +825,9 @@ void readDFRWindSensor()
     }
 
     //Recupération de l'information d'état de lecture par le périphérique:
-    uint16_t stvsnErrCode = ((uint16_t)bridgeDataRaw.stvsnErrReg);
+    uint16_t stvsnErrCode = bridgeDataRaw.stvsnErrReg;
     DEBUG_PRINTF("\tstvsnErrCode: ");
-    if (stvsnErrCode) DEBUG_PRINTF("*ATTN* ");
+    if (stvsnErrCode) { DEBUG_PRINTF("*ATTN* "); }
     DEBUG_PRINTLN(stvsnErrCode);
 
     //--- Fin de la grande section de la récupération des valeurs et validation des codes d'erreurs --------------------------
