@@ -51,7 +51,7 @@
 // ----------------------------------------------------------------------------
 // Define unique identifier
 // ----------------------------------------------------------------------------
-#define CRYOLOGGER_ID "P4_Kuujju2024"
+#define CRYOLOGGER_ID "P04_Kuujju2024"
 
 // ----------------------------------------------------------------------------
 // Data logging
@@ -65,7 +65,7 @@
 #define DEBUG_GNSS      false // Output GNSS debug information
 #define DEBUG_IRIDIUM   false // Output Iridium debug messages to Serial Monitor
 #define NO_TRANSMIT     false // Prevent sending satellite messages
-#define CALIBRATE       true  // Enable sensor calibration code
+#define CALIBRATE       false // Enable sensor calibration code
 
 #if DEBUG
 #define DEBUG_PRINT(x)            SERIAL_PORT.print(x)
@@ -374,16 +374,16 @@ SBD_MT_MESSAGE mtSbdMessage;
 //       Sensors set to `0` will be initialized automatically when needed.
 struct struct_online
 {
-  bool bme280Ext = 1;
+  bool bme280Ext = 1; // Derrière le bridge RS-485
   bool bme280Int = 0;
   bool lsm303   = 0;
-  bool veml7700 = 1;
+  bool veml7700 = 1; // Derrière le bridge RS-485
   bool hmp60    = 1; //TODO Retirer
   bool sht31    = 1; //TODO Retirer
   bool wm5103L  = 1; //TODO Retirer
   bool di7911   = 1; //TODO Retirer
   bool sp212    = 1; //TODO Retirer
-  bool dfrws    = 0;
+  bool dfrws    = 0; // Est le bridge RS-485 (TODO: Renommer)
   bool gnss     = 0;
   bool iridium  = 0;
   bool microSd  = 0;
