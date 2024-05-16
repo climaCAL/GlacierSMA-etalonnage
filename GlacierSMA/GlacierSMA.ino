@@ -51,7 +51,7 @@
 // ----------------------------------------------------------------------------
 // Define unique identifier
 // ----------------------------------------------------------------------------
-#define CRYOLOGGER_ID "AL4"
+#define CRYOLOGGER_ID "P4_Kuujju2024"
 
 // ----------------------------------------------------------------------------
 // Data logging
@@ -289,7 +289,7 @@ tmElements_t  tm;                         // Variable for converting time elemen
 // ----------------------------------------------------------------------------
 
 // DFRWindSensor (CAL) struc to store/retreive data
-const int regMemoryMapSize = 9;
+const int regMemoryMapSize = 10;
 union sensorsDataRaw {
   struct {
     uint16_t angleVentReg = 0; // direction vent en degrés (0-360)
@@ -305,6 +305,7 @@ union sensorsDataRaw {
   } __attribute__((packed));
   uint16_t regMemoryMap[regMemoryMapSize];
 };
+static_assert(sizeof(sensorsDataRaw) == regMemoryMapSize * sizeof(uint16_t));
 
 struct sensorsData {
   float angleVentFloat = 0.0;

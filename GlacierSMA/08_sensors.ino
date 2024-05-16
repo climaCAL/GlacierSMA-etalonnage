@@ -658,7 +658,7 @@ void readDFRWindSensor()
   sensorsDataRaw bridgeDataRaw; // Struct for raw sensor data (read from i2c)
   sensorsData bridgeData; // Struct for parsed sensor data
 
-  byte len = Wire.requestFrom(BRIDGE_SENSOR_SLAVE_ADDR, regMemoryMapSize * sizeof(uint16_t));  // Requesting _ bytes from slave
+  byte len = Wire.requestFrom(BRIDGE_SENSOR_SLAVE_ADDR, sizeof(sensorsDataRaw));  // Requesting _ bytes from slave
   if (len == 0) {
     DEBUG_PRINTLN("failed!");
     online.dfrws = false;
@@ -702,7 +702,7 @@ void readDFRWindSensor()
     { // HAUTEUR DE NEIGE
       //Traitement hauteur de neige et température capteur HN:
       if (bridgeDataRaw.HNeigeReg == HN_ERRORVAL) {
-        DEBUG_PRINTFLN("\tInvalid data: hauteurNeige");
+        DEBUG_PRINTFLN("\thauteurNeige: Invalid data");
         hauteurNeige = 0.0;
         temperatureHN = 0.0;
       }
