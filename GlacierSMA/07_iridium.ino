@@ -224,18 +224,16 @@ bool ISBDCallback()
   return true;
 }
 
-// Callback to sniff the conversation with the Iridium modem
-void ISBDConsoleCallback(IridiumSBD * device, char c)
-{
 #if DEBUG_IRIDIUM
+// Callback to sniff the conversation with the Iridium modem
+void ISBDConsoleCallback(IridiumSBD *device, char c)
+{
   DEBUG_WRITE(c);
-#endif
 }
 
 // Callback to to monitor Iridium modem library's run state
-void ISBDDiagsCallback(IridiumSBD * device, char c)
+void ISBDDiagsCallback(IridiumSBD *device, char c)
 {
-#if DEBUG_IRIDIUM
   DEBUG_WRITE(c);
-#endif
 }
+#endif
