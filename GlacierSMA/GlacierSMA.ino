@@ -336,13 +336,13 @@ typedef union
     int16_t   roll;               // Roll (°)                       (2 bytes)   * 100
     uint32_t  solar;              // Solar illuminance (lx)         (4 bytes)   * 10000
     uint16_t  windSpeed;          // Mean wind speed (m/s)          (2 bytes)   * 100
-    uint16_t  windDirection;      // Mean wind direction (°)        (2 bytes)	* 10
+    uint16_t  windDirection;      // Mean wind direction (°)        (2 bytes)	  * 10
     uint16_t  windGustSpeed;      // Wind gust speed (m/s)          (2 bytes)   * 100
-    uint16_t  windGustDirection;  // Wind gust direction (°)        (2 bytes)	* 10
+    uint16_t  windGustDirection;  // Wind gust direction (°)        (2 bytes)	  * 10
     int32_t   latitude;           // Latitude (DD)                  (4 bytes)   * 1000000
     int32_t   longitude;          // Longitude (DD)                 (4 bytes)   * 1000000
     uint8_t   satellites;         // # of satellites                (1 byte)
-    uint16_t  hdop;               // HDOP                           (2 bytes)
+    uint16_t  hauteurNeige;       // Hauteur de neige (mm)          (2 bytes)   * 1
     uint16_t  voltage;            // Battery voltage (V)            (2 bytes)   * 100
     uint16_t  transmitDuration;   // Previous transmission duration (2 bytes)
     uint8_t   transmitStatus;     // Iridium return code            (1 byte)

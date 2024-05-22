@@ -12,7 +12,7 @@ void calculateStats() //FIXME What an awful name for a function that DELETES all
   moSbdMessage.temperatureExt = nan2zero(temperatureExtStats.average()   * 100);          // Mean external temperature (°C)
   moSbdMessage.humidityExt    = nan2zero(humidityExtStats.average()      * 100);          // Mean external humidity (%)
   moSbdMessage.solar          = nan2zero(solarStats.average()            * 10000);        // Mean solar irradiance (lx)
-  //moSbdMessage.hauteurNeige   = nan2zero(hauteurNeigeStats.average()     * 1);
+  moSbdMessage.hauteurNeige   = nan2zero(hauteurNeigeStats.average()     * 1);            // Hauteur de neige (mm)
   moSbdMessage.voltage        = nan2zero(batteryStats.average()          * 100);          // Mean battery voltage (V)
 
   // Calculate mean wind speed and direction vectors
@@ -30,7 +30,7 @@ void calculateStats() //FIXME What an awful name for a function that DELETES all
   moSbdMessage.latitude = latitude * 1000000;
   moSbdMessage.longitude = longitude * 1000000;
   moSbdMessage.satellites = satellites;
-  moSbdMessage.hdop = hdop;
+  //moSbdMessage.hdop = hdop;
 }
 
 // Clear statistics objects
@@ -106,7 +106,7 @@ void printStats()
   DEBUG_PRINT(F("Max: "));        DEBUG_PRINT(solarStats.maximum());            printTab(1);
   DEBUG_PRINT(F("Mean: "));       DEBUG_PRINTLN(solarStats.average());
 
-  DEBUG_PRINT(F("HauteurNeige"));                                               printTab(1);
+  DEBUG_PRINT(F("Hauteur neige"));                                              printTab(1);
   DEBUG_PRINT(F("Samples: "));    DEBUG_PRINT(hauteurNeigeStats.count());       printTab(1);
   DEBUG_PRINT(F("Min: "));        DEBUG_PRINT(hauteurNeigeStats.minimum());     printTab(1);
   DEBUG_PRINT(F("Max: "));        DEBUG_PRINT(hauteurNeigeStats.maximum());     printTab(1);

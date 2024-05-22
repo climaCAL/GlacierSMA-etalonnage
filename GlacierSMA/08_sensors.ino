@@ -798,21 +798,21 @@ void readDFRWindSensor()
 
     { // LUMINOSITE (VEML7700)
       //Traitement data Stevenson - luminosité (VEML7700):
-      // Lumino: en cas d'erreur, la valeur recue sera 0
+      // Lumino: en cas d'erreur, la valeur recue sera 0 //FIXME This could use an error value for extra clarity.
 
       //Application du décodage:
       if (bridgeDataRaw.luminoReg > 0) {
         float tempLum = bridgeDataRaw.luminoReg / facteurMultLumino;
-        bridgeData.luminoAmbExt = pow(10,tempLum);
+        bridgeData.luminoAmbExt = pow(10, tempLum); //TODO This means the smallest possible value is 10 lux; why not support negatives?
       } else bridgeData.luminoAmbExt = 0.0;
 
       //Application de la correction selon étalonnage
       solar = veml_CF * bridgeData.luminoAmbExt + veml_Offset;
 
       // Protection en cas de mauvaise valeur après étalonnage
-      if (solar > 0 && solar < 188000) {  
+      if (solar > 0 && solar < 188000) {
         solarStats.add(solar);   // Add acquisition        
-      } else solar = 0.0; 
+      } else solar = 0.0;
 
       // Ex en date du 2 mai 2024: 
       #if CALIBRATE
