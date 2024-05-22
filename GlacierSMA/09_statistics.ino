@@ -37,6 +37,7 @@ void calculateStats() //FIXME What an awful name for a function that DELETES all
 void clearStats()
 {
   batteryStats.clear();
+  pressureIntStats.clear();
   temperatureIntStats.clear();
   humidityIntStats.clear();
   pressureExtStats.clear();
@@ -63,7 +64,13 @@ void printStats()
   DEBUG_PRINT(F("Max: "));        DEBUG_PRINT(batteryStats.maximum());          printTab(1);
   DEBUG_PRINT(F("Mean: "));       DEBUG_PRINTLN(batteryStats.average());
 
-  DEBUG_PRINT(F("Temp Int"));                                                   printTab(1);
+  DEBUG_PRINT(F("Pressure Int"));                                               printTab(1);
+  DEBUG_PRINT(F("Samples: "));    DEBUG_PRINT(pressureIntStats.count());        printTab(1);
+  DEBUG_PRINT(F("Min: "));        DEBUG_PRINT(pressureIntStats.minimum());      printTab(1);
+  DEBUG_PRINT(F("Max: "));        DEBUG_PRINT(pressureIntStats.maximum());      printTab(1);
+  DEBUG_PRINT(F("Mean: "));       DEBUG_PRINTLN(pressureIntStats.average());
+
+  DEBUG_PRINT(F("Temperature Int"));                                            printTab(1);
   DEBUG_PRINT(F("Samples: "));    DEBUG_PRINT(temperatureIntStats.count());     printTab(1);
   DEBUG_PRINT(F("Min: "));        DEBUG_PRINT(temperatureIntStats.minimum());   printTab(1);
   DEBUG_PRINT(F("Max: "));        DEBUG_PRINT(temperatureIntStats.maximum());   printTab(1);
@@ -81,7 +88,7 @@ void printStats()
   DEBUG_PRINT(F("Max: "));        DEBUG_PRINT(pressureExtStats.maximum());      printTab(1);
   DEBUG_PRINT(F("Mean: "));       DEBUG_PRINTLN(pressureExtStats.average());
 
-  DEBUG_PRINT(F("Temp Ext"));                                                   printTab(1);
+  DEBUG_PRINT(F("Temperature Ext"));                                            printTab(1);
   DEBUG_PRINT(F("Samples: "));    DEBUG_PRINT(temperatureExtStats.count());     printTab(1);
   DEBUG_PRINT(F("Min: "));        DEBUG_PRINT(temperatureExtStats.minimum());   printTab(1);
   DEBUG_PRINT(F("Max: "));        DEBUG_PRINT(temperatureExtStats.maximum());   printTab(1);

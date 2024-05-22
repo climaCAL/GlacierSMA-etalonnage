@@ -162,6 +162,7 @@ TinyGPSCustom gnssValidity(gnss, "GPRMC", 2); // Validity
 // ----------------------------------------------------------------------------
 typedef statistic::Statistic<float,uint32_t,false> StatisticCAL;
 StatisticCAL batteryStats;         // Battery voltage
+StatisticCAL pressureIntStats;     // Internal pressure
 StatisticCAL temperatureIntStats;  // Internal temperature
 StatisticCAL humidityIntStats;     // Internal humidity
 StatisticCAL pressureExtStats;     // External pressure
@@ -262,6 +263,7 @@ unsigned int  sampleCounter     = 0;      // Sensor measurement counter
 unsigned int  cutoffCounter     = 0;      // Battery voltage cutoff sleep cycle counter
 unsigned long samplesSaved      = 0;      // Log file sample counter
 long          rtcDrift          = 0;      // RTC drift calculated during sync
+float         pressureInt       = 0.0;    // Internal pressure (hPa)
 float         temperatureInt    = 0.0;    // Internal temperature (°C)
 float         humidityInt       = 0.0;    // Internal hunidity (%)
 float         pressureExt       = 0.0;    // External pressure (hPa)

@@ -76,7 +76,7 @@ void createLogFile()
 
   // Write header to file
   //FIXME Maybe we should skip this if the file already exists?
-  logFile.println(F("sample,datetime,voltage,temperature_int,humidity_int,pressure_ext,temperature_ext,"
+  logFile.println(F("sample,datetime,voltage,pressure_int,temperature_int,humidity_int,pressure_ext,temperature_ext,"
                     "humidity_ext,pitch,roll,wind_speed,wind_direction,solar,hauteur_neige,temperature_HN,latitude,longitude,"
                     "satellites,hdop,online_bme280_ext,online_bme280_int,online_lsm303,online_veml7700,online_dfrws,online_gnss,"
                     "online_microSd,online_iridium,timer_readRtc,timer_readBattery,timer_bme280_ext,timer_bme280_int,"
@@ -140,6 +140,7 @@ void logData()
       LOG_PRINT(samplesSaved);
       LOG_PRINT(dateTime);
       LOG_PRINT(voltage);
+      LOG_PRINT(pressureInt);
       LOG_PRINT(temperatureInt);
       LOG_PRINT(humidityInt);
       LOG_PRINT(pressureExt);

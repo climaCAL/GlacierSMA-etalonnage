@@ -126,7 +126,7 @@ void readBme280Int()
     // Read sensor data
     temperatureInt = tempImeINT_CF * bme280Int.readTemperature() + tempBmeINT_Offset ;
     humidityInt = min(humImeINT_CF * bme280Int.readHumidity() + humBmeINT_Offset, 100);
-    //pressureInt = bme280Int.readPressure() / 100.0F;
+    pressureInt = bme280Int.readPressure() / 100.0F;
 
     // Add to statistics object
     temperatureIntStats.add(temperatureInt);
@@ -136,7 +136,7 @@ void readBme280Int()
     #if CALIBRATE
       DEBUG_PRINT("\tTemperatureInt: "); DEBUG_PRINT(temperatureInt); DEBUG_PRINTLN(" C");
       DEBUG_PRINT("\tHumidityInt: "); DEBUG_PRINT(humidityInt); DEBUG_PRINTLN("%");
-      //DEBUG_PRINT("\tPressureInt: "); DEBUG_PRINT(pressureInt); DEBUG_PRINTLN(" hPa");
+      DEBUG_PRINT("\tPressureInt: "); DEBUG_PRINT(pressureInt); DEBUG_PRINTLN(" hPa");
     #endif
 
     DEBUG_PRINTLN("done.");
