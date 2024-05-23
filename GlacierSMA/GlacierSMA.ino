@@ -321,6 +321,7 @@ struct sensorsData {
   float humiditeExt = 0.0;               //V0.7
   float presAtmospExt = 0.0;             //V0.7
   float luminoAmbExt = 0.0;              //V0.7
+  uint16_t stvsnErrCode = 0;             //V0.8
 };
 
 // Union to store Iridium Short Burst Data (SBD) Mobile Originated (MO) messages
