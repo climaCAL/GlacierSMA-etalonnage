@@ -79,7 +79,9 @@
 #define DEBUG_WRITE(x)            SERIAL_PORT.write(x)
 #else
 #define DEBUG_PRINT(x)
+#define DEBUG_PRINTF(x)
 #define DEBUG_PRINTLN(x)
+#define DEBUG_PRINTFLN(x)
 #define DEBUG_PRINT_HEX(x)
 #define DEBUG_PRINTLN_HEX(x)
 #define DEBUG_PRINT_DEC(x, y)
