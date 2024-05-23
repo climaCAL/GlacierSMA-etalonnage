@@ -699,6 +699,12 @@ void readDFRWindSensor()
         // Update wind direction only if wind was detected.
         windDirection = bridgeData.angleVentFloat;
         windDirectionSector = bridgeData.directionVentInt;
+
+        // Check and update wind gust speed and direction.
+        if (windSpeed > windGustSpeed) {
+          windGustSpeed = windSpeed;
+          windGustDirection = windDirection;
+        }
       }
     }
 
@@ -836,12 +842,6 @@ void readDFRWindSensor()
     //--- Fin de la grande section de la récupération des valeurs et validation des codes d'erreurs --------------------------
   }
 
-  // Check and update wind gust speed and direction
-  if (windSpeed > windGustSpeed) {
-    windGustSpeed = windSpeed;
-    windGustDirection = windDirection;
-  }
-
   // Calculate wind speed and direction vectors
   // http://tornado.sfsu.edu/geosciences/classes/m430/Wind/WindDirection.html
   float windDirectionRadians = windDirection * DEG_TO_RAD;  // Convert wind direction from degrees to radians
@@ -903,7 +903,7 @@ void windVectors()
   // Zero wind direction if wind speed is zero
   // Note: atan2 can be undefined if u and v vectors are zero
   if (rvWindSpeed == 0)
-    rvWindDirection = 0;
+    rvWindDirection = 0; //FIXME: This resets the wind direction to 0 instead of keeping the previous value
   else if (rvWindDirection < 0) // Todo: Check if necessary
     rvWindDirection += 360;
 
