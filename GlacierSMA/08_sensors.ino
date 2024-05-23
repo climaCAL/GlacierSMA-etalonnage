@@ -601,36 +601,39 @@ void read7911()
 // DFRobot WindSensor comprises the following 2:
 //    RS485 Wind Speed Transmitter (SEN0483) : https://wiki.dfrobot.com/RS485_Wind_Speed_Transmitter_SKU_SEN0483
 //    RS485 Wind Direction Transmitter (SEN0482) : https://wiki.dfrobot.com/RS485_Wind_Direction_Transmitter_SKU_SEN0482
-//Slave ragisters map (read-only):
-  /*
-  0x00  MSB Angle Vent
-  0x01  LSB Angle Vent
-  0x02  MSB Direction Vent
-  0x03  LSB Direction Vent
-  0x04  MSB Vitesse Vent
-  0x05  MSB Vitesse Vent
+/* Slave registers mapping (read-only):
+  0x00 (16 bits) Angle Vent
+  0x01 (16 bits) Direction Vent
+  0x02 (16 bits) Vitesse Vent
+  0x03 (16 bits) Hauteur de neige (mm)
+  0x04 (16 bits) Temperature HN (C)
+  0x05 (16 bits) Temperature BME280
+  0x06 (16 bits) Humidite BME280
+  0x07 (16 bits) Pression atmosph BME280
+  0x08 (16 bits) Luminosite VEML7700
+  0x09 (16 bits) Code d'erreur (only the lower 8 bits are used)
+  NB: all words are sent in little-endian
   
-  * DFRobot wind direction sensor informations :
-  *
-  * Direction	      16 Directions Value   Angle(360°)
-  * North	                0	              0° - 11.2°
-  * North-northeast	      1	              11.3° - 33.7°
-  * Northeast	            2	              33.8° - 56.2°
-  * East-northeast	      3	              56.3° - 78.7°
-  * East	                4	              78.8° - 101.2°
-  * East-southeast	      5	              101.3° - 123.7°
-  * Southeast	            6	              123.8° - 146.2°
-  * South-southeast	      7	              146.3° - 168.7°
-  * South	                8	              168.8° - 191.2°
-  * South-southwest	      9	              191.3° - 213.7°
-  * Southwest	            10	            213.8° - 236.2°
-  * West-southwest	      11	            236.3° - 258.7°
-  * West	                12	            258.8° - 281.2°
-  * West-northwest	      13	            281.3° - 303.7°
-  * Northwest	            14	            303.8° - 326.2°
-  * North-northwest	      15	            326.3° - 348.7°
-  * North	                16	            348.8° - 360°
- */
+  * DFRobot wind direction sensor encoding table:
+  * Direction            Encoding        Angle(360°)
+  * North                0            0° - 11.2°
+  * North-northeast      1            11.3° - 33.7°
+  * Northeast            2            33.8° - 56.2°
+  * East-northeast       3            56.3° - 78.7°
+  * East                 4            78.8° - 101.2°
+  * East-southeast       5            101.3° - 123.7°
+  * Southeast            6            123.8° - 146.2°
+  * South-southeast      7            146.3° - 168.7°
+  * South                8            168.8° - 191.2°
+  * South-southwest      9            191.3° - 213.7°
+  * Southwest            10           213.8° - 236.2°
+  * West-southwest       11           236.3° - 258.7°
+  * West                 12           258.8° - 281.2°
+  * West-northwest       13           281.3° - 303.7°
+  * Northwest            14           303.8° - 326.2°
+  * North-northwest      15           326.3° - 348.7°
+  * North                16           348.8° - 360°       //FIXME Wait, why is north there twice?
+*/
 // ----------------------------------------------------------------------------
 const uint16_t bridgeSettleDelay = 15000; // 15 secondes! oui... pas encore optimisé - Yh - 26 avril 2024
 const uint16_t valeurLimiteHauteurNeige = 4000; // Max acceptable pour la valeur de mesure hauteur de neige

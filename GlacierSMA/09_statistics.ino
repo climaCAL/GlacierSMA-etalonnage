@@ -6,14 +6,15 @@ float nan2zero(float f) {
 void calculateStats() //FIXME What an awful name for a function that DELETES all stats afterwards...
 {
   // Write data to union
-  moSbdMessage.temperatureInt = nan2zero(temperatureIntStats.average()   * 100);          // Mean internal temperature (°C)
-  moSbdMessage.humidityInt    = nan2zero(humidityIntStats.average()      * 100);          // Mean internal humidity (%)
-  moSbdMessage.pressureExt    = nan2zero((pressureExtStats.average() - 400) * 100);       // Mean external pressure (hPa)
-  moSbdMessage.temperatureExt = nan2zero(temperatureExtStats.average()   * 100);          // Mean external temperature (°C)
-  moSbdMessage.humidityExt    = nan2zero(humidityExtStats.average()      * 100);          // Mean external humidity (%)
-  moSbdMessage.solar          = nan2zero(solarStats.average()            * 10000);        // Mean solar irradiance (lx)
-  moSbdMessage.hauteurNeige   = nan2zero(hauteurNeigeStats.average()     * 1);            // Hauteur de neige (mm)
-  moSbdMessage.voltage        = nan2zero(batteryStats.average()          * 100);          // Mean battery voltage (V)
+  moSbdMessage.temperatureInt = nan2zero(temperatureIntStats.average()      * 100);     // Mean internal temperature (°C)
+  moSbdMessage.humidityInt    = nan2zero(humidityIntStats.average()         * 100);     // Mean internal humidity (%)
+  moSbdMessage.pressureExt    = nan2zero((pressureExtStats.average() - 400) * 100);     // Mean external pressure (hPa)
+  moSbdMessage.temperatureExt = nan2zero(temperatureExtStats.average()      * 100);     // Mean external temperature (°C)
+  moSbdMessage.humidityExt    = nan2zero(humidityExtStats.average()         * 100);     // Mean external humidity (%)
+  moSbdMessage.solar          = nan2zero(solarStats.average()               * 10000);   // Mean solar irradiance (lx)
+  //moSbdMessage.solar          = nan2zero(log10(solarStats.average()) * facteurMultLumino); // Mean solar irradiance (W/m^2), 3800*log(lx)
+  moSbdMessage.hauteurNeige   = nan2zero(hauteurNeigeStats.average()        * 1);       // Hauteur de neige (mm)
+  moSbdMessage.voltage        = nan2zero(batteryStats.average()             * 100);     // Mean battery voltage (V)
 
   // Calculate mean wind speed and direction vectors
   windVectors();
@@ -30,7 +31,7 @@ void calculateStats() //FIXME What an awful name for a function that DELETES all
   moSbdMessage.latitude = latitude * 1000000;
   moSbdMessage.longitude = longitude * 1000000;
   moSbdMessage.satellites = satellites;
-  //moSbdMessage.hdop = hdop;
+  //moSbdMessage.hdop = hdop; // Message schema V0.2: This field is no longer included
 }
 
 // Clear statistics objects

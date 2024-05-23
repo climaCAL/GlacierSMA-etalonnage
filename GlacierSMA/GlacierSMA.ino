@@ -93,7 +93,7 @@
 // I2C address definitions
 // ----------------------------------------------------------------------------
 #define BME280_EXT_ADDR     BME280_ADDRESS            // Defined in Adafruit Library = 0x77 - Used for the outside sensor.
-#define BME280_INT_ADDR     BME280_ADDRESS_ALTERNATE  // defined in Adafruit Library = 0x76 - Used for the inside sensor.
+#define BME280_INT_ADDR     BME280_ADDRESS_ALTERNATE  // Defined in Adafruit Library = 0x76 - Used for the inside sensor.
 #define BRIDGE_SENSOR_SLAVE_ADDR 0x66                 // WindSensor module I2C address declaration
 #define VEML_ADDR           0x10 // According to datasheet page 6 (https://www.vishay.com/docs/84286/veml7700.pdf)
 
@@ -164,12 +164,12 @@ TinyGPSCustom gnssValidity(gnss, "GPRMC", 2); // Validity
 // ----------------------------------------------------------------------------
 typedef statistic::Statistic<float,uint32_t,false> StatisticCAL;
 StatisticCAL batteryStats;         // Battery voltage
-StatisticCAL pressureIntStats;     // Internal pressure
-StatisticCAL temperatureIntStats;  // Internal temperature
-StatisticCAL humidityIntStats;     // Internal humidity
-StatisticCAL pressureExtStats;     // External pressure
-StatisticCAL temperatureExtStats;  // External temperature
-StatisticCAL humidityExtStats;     // External humidity
+StatisticCAL pressureIntStats;     // Pressure from internal sensor
+StatisticCAL temperatureIntStats;  // Temperature from internal sensor
+StatisticCAL humidityIntStats;     // Humidity from internal sensor
+StatisticCAL pressureExtStats;     // Pressure from external sensor
+StatisticCAL temperatureExtStats;  // Temperature from external sensor
+StatisticCAL humidityExtStats;     // Humidity from external sensor
 StatisticCAL solarStats;           // Solar radiation
 StatisticCAL hauteurNeigeStats;    // Suivi hauteur de neige
 StatisticCAL windSpeedStats;       // Wind speed
@@ -481,7 +481,7 @@ void setup()
     readVeml7700();    // Read solar radiation
     DEBUG_PRINT(">  (VEML7700) Fram state: "); DEBUG_PRINTLN(freeRam());
 
-    readDFRWindSensor();
+    readDFRWindSensor(); //TODO Rename me
     DEBUG_PRINT(">  (DFRWS) Fram state: "); DEBUG_PRINTLN(freeRam());
 
     //readGnss(); // Sync RTC with the GNSS
@@ -632,9 +632,11 @@ void loop()
             readGnss(); // Sync RTC with the GNSS
             currentDate = newDate;
           }
+
           transmitData(); // Transmit data via Iridium transceiver
           printSettings(); // Print current settings (in case they changed)
         }
+        
         sampleCounter = 0; // Reset sample counter
       }
 
