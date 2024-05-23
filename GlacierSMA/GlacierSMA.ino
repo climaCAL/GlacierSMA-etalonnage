@@ -207,22 +207,22 @@ unsigned int  systemRstWDTCountLimit = 15;// Nombre d'alertes WDT autorisées av
 // Sensors correction factor and offsets -- to modify -- 
 // ----------------------------------------------------------------------------
 //BME280 -- Exterior sensor
-float tempBmeEXT_CF             = 1.00;    // Correction factor for exterior temperature acquisition.
-float tempBmeEXT_Offset         = 0.0;   // Offset for exterior temperature acquisition.
-float humBmeEXT_CF              = 1.00;     // Correction factor for exterior humidity acquisition.
+float tempBmeEXT_CF             = 1.0;      // Correction factor for exterior temperature acquisition.
+float tempBmeEXT_Offset         = 0.0;      // Offset for exterior temperature acquisition.
+float humBmeEXT_CF              = 1.0;      // Correction factor for exterior humidity acquisition.
 float humBmeEXT_Offset          = 0.0;      // Offset for exterior humidity acquisition.
-float presBmeEXT_CF             = 1.00;
-float presBmeEXT_Offset         = 0.0;
+float presBmeEXT_CF             = 1.0; //TODO: Never used, why?
+float presBmeEXT_Offset         = 0.0; //idem
 
 //BME280 -- Interior sensor
-float tempImeINT_CF             = 1.00;     // Correction factor for interior temperature acquisition.
-float tempBmeINT_Offset         = 0.0;    // Offset for interior temperature acquisition.
+float tempImeINT_CF             = 1.0;      // Correction factor for interior temperature acquisition.
+float tempBmeINT_Offset         = 0.0;      // Offset for interior temperature acquisition.
 float humImeINT_CF              = 1.0;      // Correction factor for interior humidity acquisition.
 float humBmeINT_Offset          = 0.0;      // Offset for interior humidity acquisition.
 
 //VEML7700
-float veml_CF                   = 15.172;   // Correction factor for light intensity acquisition.
-float veml_Offset               = -998;     // Offset for light intensity acquisition.
+float veml_CF                   = 22.045;   // Correction factor for light intensity acquisition. Ref: ÉtalonnageVEML7700_H24.xlsx
+float veml_Offset               = -372.06;  // Offset for light intensity acquisition.
 
 // ----------------------------------------------------------------------------
 // Error codes and values
@@ -636,7 +636,7 @@ void loop()
           transmitData(); // Transmit data via Iridium transceiver
           printSettings(); // Print current settings (in case they changed)
         }
-        
+
         sampleCounter = 0; // Reset sample counter
       }
 
