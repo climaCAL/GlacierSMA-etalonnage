@@ -1,18 +1,20 @@
 // ----------------------------------------------------------------------------
 // Utility function to detect I2C sensor lockup 
+// If `retry` is positive, on error try again after `delay` ms (up to `retry` times);
+// If `retry` is negative, on success check again after `delay` ms (up to `retry` times).
+// The second option exists because we sometimes get false positives with disconnected sensors.
 // ----------------------------------------------------------------------------
-bool scanI2CbusFor(uint8_t address, uint8_t recheck = 0) {
+bool scanI2CbusFor(uint8_t address, int retry = 0, int delay = 10) {
   Wire.beginTransmission(address);
-  uint8_t error = Wire.endTransmission();
+  uint8_t error = Wire.endTransmission(); // The I2C device replied normally if error == 0
 
-  while (error == 0 && recheck--) { // I2C device replied
-    //FIXME This sometimes returns false positives, so let's check again just in case...
-    myDelay(10);
+  while ((error != 0 && retry-- > 0) || (error == 0 && retry++ < 0)) { 
+    myDelay(delay);
     Wire.beginTransmission(address);
     error = Wire.endTransmission();
   }
 
-  if (error == 0) { // I2C device replied every time
+  if (error == 0) { // I2C device replied succesfully
     DEBUG_PRINT("Sensor found at address 0x");
     if (address < 16)
       DEBUG_PRINT(0);
