@@ -1,24 +1,28 @@
 // ----------------------------------------------------------------------------
-// Utility function to detect I2C sensor lockup 
-// If `retry` is positive, on error try again after `delay` ms (up to `retry` times);
-// If `retry` is negative, on success check again after `delay` ms (up to `retry` times).
-// The second option exists because we sometimes get false positives with disconnected sensors.
+// Utility function to detect I2C sensor lockup.
+// @param recheck Number of "double-checks" that the sensor is truly online (in case of false positives).
+// @param retry Number of "re-attempts" to communicate with the sensor (default is 3).
+// @param delay Initial delay (ms) before re-attempting to communicate; Doubles with every failure.
 // ----------------------------------------------------------------------------
-bool scanI2CbusFor(uint8_t address, int retry = 0, int delay = 10) {
+bool scanI2CbusFor(uint8_t address, unsigned int recheck = 0, unsigned int retry = 3, unsigned long delay = 10) {
   Wire.beginTransmission(address);
   uint8_t error = Wire.endTransmission(); // The I2C device replied normally if error == 0
 
-  while ((error != 0 && retry-- > 0) || (error == 0 && retry++ < 0)) { 
+  while ((error == 0 && recheck-- > 0) || (error != 0 && retry-- > 0)) { 
     myDelay(delay);
     Wire.beginTransmission(address);
-    error = Wire.endTransmission();
+    if (error = Wire.endTransmission()) {
+      DEBUG_PRINT("[Error "); DEBUG_PRINT(error); DEBUG_PRINT("] ");
+      delay *= 2; // Progressively increase the delay in case of failed transmissions.
+    }
   }
 
   if (error == 0) { // I2C device replied succesfully
-    DEBUG_PRINT("Sensor found at address 0x");
+    DEBUG_PRINT("[Sensor found at address 0x");
     if (address < 16)
       DEBUG_PRINT(0);
-    DEBUG_PRINTLN_HEX(address);
+    DEBUG_PRINT_HEX(address);
+    DEBUG_PRINT("] ");
     return true;
   }
 
@@ -26,7 +30,7 @@ bool scanI2CbusFor(uint8_t address, int retry = 0, int delay = 10) {
 }
 
 // ----------------------------------------------------------------------------
-// Adafruit BME280 Temperature Humidity Pressure Sensor -- Adressage par défaut pour le BME280 externe Adr = 0x77
+// Adafruit BME280 Temperature Humidity Pressure Sensor -- Adressage par défaut pour le BME280 externe (adr = 0x77)
 // Pression non-ajouté
 // https://www.adafruit.com/product/2652
 // ----------------------------------------------------------------------------
@@ -90,7 +94,7 @@ void readBme280Ext()
 }
 
 // ----------------------------------------------------------------------------
-// Adafruit BME280 Temperature Humidity Pressure Sensor -- Second adressage pour le BME280 interne adr = 0x76
+// Adafruit BME280 Temperature Humidity Pressure Sensor -- Second adressage pour le BME280 interne (adr = 0x76)
 // https://www.adafruit.com/product/2652
 // ----------------------------------------------------------------------------
 void configureBme280Int()
@@ -648,7 +652,7 @@ void readDFRWindSensor()
 
   DEBUG_PRINT("Info - Reading DFRWindSensor... ");
 
-  if (!scanI2CbusFor(BRIDGE_SENSOR_SLAVE_ADDR, 3)) {
+  if (!scanI2CbusFor(BRIDGE_SENSOR_SLAVE_ADDR, 1)) {
     DEBUG_PRINTLN("failed!");
     online.dfrws = false;
     timer.readDFRWS += millis() - loopStartTime; // Update the loop timer anyway
@@ -656,7 +660,7 @@ void readDFRWindSensor()
   }
 
   // Il faut laisser du temps au bridgeI2C de collecter les donnees sur le modbus RS485, tout en laissant les capteurs faire leur travail.
-  DEBUG_PRINT("(sensor settle time: "); DEBUG_PRINT(bridgeSettleDelay/1000); DEBUG_PRINT("s)");
+  DEBUG_PRINT("(sensor settle time: "); DEBUG_PRINT(bridgeSettleDelay/1000); DEBUG_PRINT("s) ");
   Wire.begin(); // Requires I2C bus
   myDelay(bridgeSettleDelay);
   
