@@ -137,18 +137,20 @@ void blinkLed(byte ledPin, byte ledFlashes, unsigned int ledDelay)
   digitalWrite(ledPin, LOW);
 }
 
-// Non-blocking delay (milliseconds)
+// Blocking delay (in milliseconds)
 // https://arduino.stackexchange.com/questions/12587/how-can-i-handle-the-millis-rollover
-void myDelay(unsigned long ms)
-{
-  unsigned long start = millis();        // Start: timestamp
-  for (;;)
-  {
-    petDog();                            // Reset watchdog timer
-    unsigned long now = millis();        // Now: timestamp
-    unsigned long elapsed = now - start; // Elapsed: duration
-    if (elapsed >= ms)                   // Comparing durations: OK
-      return;
+void myDelay(unsigned long ms) {
+  unsigned long now = millis();
+  unsigned long timerStart = now;
+
+  while (now - timerStart < ms) {
+    unsigned long loopStart = millis();
+    petDog(); // Reset watchdog timer (can take up to 10ms).
+
+    do { // Spin loop for up to 1 second to avoid calling petDog() constantly.
+        yield(); // Allow cooperative multitasking (if used).
+        now = millis();
+    } while (now - timerStart < ms && now - loopStart < 1000);
   }
 }
 
