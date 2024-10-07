@@ -28,6 +28,16 @@ void writeBuffer()
 // Attempt to transmit data via RockBLOCK 9603
 void transmitData()
 {
+  DEBUG_PRINT("#### MEM@mtSbdMessage: ");
+  DEBUG_PRINT_HEX(mtSbdMessage.bytes[0]); DEBUG_PRINT(' ');
+  DEBUG_PRINT_HEX(mtSbdMessage.bytes[1]); DEBUG_PRINT(' ');
+  DEBUG_PRINT_HEX(mtSbdMessage.bytes[2]); DEBUG_PRINT(' ');
+  DEBUG_PRINT_HEX(mtSbdMessage.bytes[3]); DEBUG_PRINT(' ');
+  DEBUG_PRINT_HEX(mtSbdMessage.bytes[4]); DEBUG_PRINT(' ');
+  DEBUG_PRINT_HEX(mtSbdMessage.bytes[5]); DEBUG_PRINT(' ');
+  DEBUG_PRINT_HEX(mtSbdMessage.bytes[6]); DEBUG_PRINT('\n');
+  printMtSbd();
+
   #if NO_TRANSMIT
     DEBUG_PRINTLN("Info - Satellite messages inhibited (#NO_TRANSMIT)");
     return;
@@ -98,7 +108,7 @@ void transmitData()
           DEBUG_PRINT(mtSbdBufferSize); DEBUG_PRINTLN(" bytes.");
 
           // Check if MT-SBD message is the correct size
-          if (mtSbdBufferSize == 7)
+          if (mtSbdBufferSize == 7)  //FIXME devrait être 6 (ou sizeof(mtSbdMessage) encore mieux)
           {
             DEBUG_PRINTLN("Info - MT-SBD message correct size.");
 
