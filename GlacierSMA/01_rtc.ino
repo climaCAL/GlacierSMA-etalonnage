@@ -54,16 +54,22 @@ void setRtcAlarm()
   alarmTime = unixtime + sampleInterval * 60;
   alarmTime -= second(alarmTime); // Discard the seconds
 
+  unsigned long currentTime = rtc.getEpoch();
+
   DEBUG_PRINT("unixtime: "); DEBUG_PRINTLN(unixtime);
+  DEBUG_PRINT("currentTime: "); DEBUG_PRINTLN(currentTime);
   DEBUG_PRINT("alarmTime: "); DEBUG_PRINTLN(alarmTime);
 
-  // Check if alarm is set in the past (or less than 5 seconds from now) or too far in the future
-  if (alarmTime <= rtc.getEpoch() + 5 || alarmTime > rtc.getEpoch() + sampleInterval * 60) {
+  // Check if alarm is set in the past (or less than 5 seconds from now) or too far in the future;
+  // This can happen if the sampling process takes longer than the sampleInterval (like when sending satellite data);
+  // It can also occur if the internal RTC clock drifted significantly before being resynced to the GNSS time.
+  if (alarmTime <= currentTime + 5 || alarmTime > currentTime + sampleInterval * 60) {
     DEBUG_PRINTLN(F("Warning - (setRtcAlarm) RTC alarm set in the past or too far in the future."));
 
-    // Update alarm time based on current time + sample interval so it is guaranteed to be in the future
-    // This is basically akin to "skipping" a sample (in the worst case)
-    alarmTime = rtc.getEpoch() + min(sampleInterval * 60, 3600); // Max 1 hour since we match MM:SS
+    // Update alarm time based on current time + sample interval so it is guaranteed to be in the future;
+    // This is basically akin to resetting the sample cycle so it starts "fresh" from the current time;
+    // In turn, this means samples could "drift" over time from the defined sampleInterval (FIXME?).
+    alarmTime = currentTime + min(sampleInterval * 60, 3600); // Max 1 hour since we match MM:SS
   }
 
   // Set next alarm at a "whole" minute
