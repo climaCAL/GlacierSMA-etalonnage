@@ -181,11 +181,11 @@ StatisticCAL vStats;               // Wind north-south wind vector component (v)
 // ----------------------------------------------------------------------------
 #if DEBUG
 unsigned int  sampleInterval    = 1;      // Sampling interval (minutes). Default: 5 min (300 seconds)
-unsigned int  averageInterval   = 15;     // Number of samples to be averaged in each message. Default: 12 (hourly)
+unsigned int  averageInterval   = 60;     // Number of samples to be averaged in each message. Default: 12 (hourly)
 unsigned int  transmitInterval  = 1;      // Number of messages in each Iridium transmission (340-byte limit)
 unsigned int  retransmitLimit   = 5;      // Failed data transmission reattempts (340-byte limit)
 unsigned int  iridiumTimeout    = 120;    // Timeout for Iridium transmission (seconds)
-unsigned int  gnssTimeout       = 30;     // Timeout for GNSS signal acquisition (seconds)
+unsigned int  gnssTimeout       = 60;     // Timeout for GNSS signal acquisition (seconds)
 float         batteryCutoff     = 3.0;    // Battery voltage cutoff threshold (V)
 byte          loggingMode       = 3;      // Flag for new log file creation. 1: daily, 2: monthly, 3: yearly
 unsigned int  systemRstWDTCountLimit = 5; // Nombre d'alertes WDT autorisées avant de faire un system Reset (8s par cycle)
