@@ -199,7 +199,7 @@ void logData()
       logFile.println(iridiumTimeout); DEBUG_PRINTLN(iridiumTimeout);
 
       { // TEMP Debogage seulement
-        logFile.print("#### MEM@mtSbdMessage: ");
+        logFile.print("#### MEM@mtSbdMessage:,");
         LOG_PRINT(mtSbdMessage.bytes[0]);
         LOG_PRINT(mtSbdMessage.bytes[1]);
         LOG_PRINT(mtSbdMessage.bytes[2]);

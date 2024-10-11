@@ -108,7 +108,7 @@ void transmitData()
           DEBUG_PRINT(mtSbdBufferSize); DEBUG_PRINTLN(" bytes.");
 
           // Check if MT-SBD message is the correct size
-          if (mtSbdBufferSize == 7)  //FIXME devrait être 6 (ou sizeof(mtSbdMessage) encore mieux)
+          if (mtSbdBufferSize == sizeof(mtSbdMessage))
           {
             DEBUG_PRINTLN("Info - MT-SBD message correct size.");
 
