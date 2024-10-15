@@ -28,16 +28,6 @@ void writeBuffer()
 // Attempt to transmit data via RockBLOCK 9603
 void transmitData()
 {
-  DEBUG_PRINT("#### MEM@mtSbdMessage: ");
-  DEBUG_PRINT_HEX(mtSbdMessage.bytes[0]); DEBUG_PRINT(' ');
-  DEBUG_PRINT_HEX(mtSbdMessage.bytes[1]); DEBUG_PRINT(' ');
-  DEBUG_PRINT_HEX(mtSbdMessage.bytes[2]); DEBUG_PRINT(' ');
-  DEBUG_PRINT_HEX(mtSbdMessage.bytes[3]); DEBUG_PRINT(' ');
-  DEBUG_PRINT_HEX(mtSbdMessage.bytes[4]); DEBUG_PRINT(' ');
-  DEBUG_PRINT_HEX(mtSbdMessage.bytes[5]); DEBUG_PRINT(' ');
-  DEBUG_PRINT_HEX(mtSbdMessage.bytes[6]); DEBUG_PRINT('\n');
-  printMtSbd();
-
   #if NO_TRANSMIT
     DEBUG_PRINTLN("Info - Satellite messages inhibited (#NO_TRANSMIT)");
     return;
@@ -106,20 +96,17 @@ void transmitData()
         {
           DEBUG_PRINT("Info - MT-SBD message received. Size: ");
           DEBUG_PRINT(mtSbdBufferSize); DEBUG_PRINTLN(" bytes.");
+          printMtSbdBuffer(); // Print MT-SBD message in hexadecimal
 
           // Check if MT-SBD message is the correct size
-          if (mtSbdBufferSize == sizeof(mtSbdMessage))
+          if (mtSbdBufferSize >= sizeof(mtSbdMessage))
           {
             DEBUG_PRINTLN("Info - MT-SBD message correct size.");
 
             // Write incoming MT-SBD message to union/structure
-            for (int i = 0; i < mtSbdBufferSize; ++i)
-            {
-              mtSbdMessage.bytes[i] = mtSbdBuffer[i];
-            }
+            memcpy(mtSbdMessage.bytes, mtSbdBuffer, sizeof(mtSbdMessage));
 
             // Print MT-SBD message
-            printMtSbdBuffer(); // Print MT-SBD message in hexadecimal
             printMtSbd(); // Print MT-SBD message stored in union/structure
 
             // Check if MT-SBD message data is valid and update variables

@@ -198,17 +198,6 @@ void logData()
       LOG_PRINT(gnssTimeout);
       logFile.println(iridiumTimeout); DEBUG_PRINTLN(iridiumTimeout);
 
-      { // TEMP Debogage seulement
-        logFile.print("#### MEM@mtSbdMessage:,");
-        LOG_PRINT(mtSbdMessage.bytes[0]);
-        LOG_PRINT(mtSbdMessage.bytes[1]);
-        LOG_PRINT(mtSbdMessage.bytes[2]);
-        LOG_PRINT(mtSbdMessage.bytes[3]);
-        LOG_PRINT(mtSbdMessage.bytes[4]);
-        LOG_PRINT(mtSbdMessage.bytes[5]);
-        logFile.println(mtSbdMessage.bytes[6]); DEBUG_PRINTLN(mtSbdMessage.bytes[6]);
-      }
-
       // Update file access timestamps
       updateFileAccess(&logFile);
 
