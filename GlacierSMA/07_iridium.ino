@@ -199,11 +199,9 @@ void transmitData()
     moSbdMessage.transmitDuration = timer.iridium / 1000;
 
     // Check if reset flag was transmitted
-    if (resetFlag) //TODO Use forceReset() instead
+    if (resetFlag)
     {
-      DEBUG_PRINTLN("Info - Forced system reset...");
-      digitalWrite(PIN_LED_RED, HIGH); // Turn on LED
-      while (true); // Wait for Watchdog Timer to reset system
+      forceReset();
     }
   }
 }

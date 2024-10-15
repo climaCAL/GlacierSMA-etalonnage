@@ -137,29 +137,35 @@ void blinkLed(byte ledPin, byte ledFlashes, unsigned int ledDelay)
   digitalWrite(ledPin, LOW);
 }
 
-// Blocking delay (in milliseconds)
+// Blocking delay (in milliseconds) -- will yield and call petDog automatically
 // https://arduino.stackexchange.com/questions/12587/how-can-i-handle-the-millis-rollover
-void myDelay(unsigned long ms) {
-    unsigned long start, pet, now;
-    start = pet = now = millis();
-    while (now - start < ms) {
-        if (now - pet >= 100) { // Call petDog() every 100ms or so.
-            pet = now;
-            if (now - start + 10 <= ms) {
-                petDog(); // Reset watchdog timer (can take up to 10ms).
-            }
-        }
-        else {
-            yield(); // Allow cooperative multitasking (if used).
-        }
-        now = millis();
+void myDelay(unsigned long ms)
+{
+  unsigned long start, pet, now;
+  start = pet = now = millis();
+  while (now - start < ms)
+  {
+    if (now - pet >= 100) // Call petDog() every 100ms or so.
+    {
+      pet = now;
+      if (now - start + 10 <= ms)
+      {
+        petDog(); // Reset watchdog timer (can take up to 10ms).
+      }
     }
+    else
+    {
+      yield(); // Allow cooperative multitasking (if used).
+    }
+    now = millis();
+  }
 }
 
 // Force WDT to reset system (assuming WDT is configured, else it's an infinite loop)
-void forceReset() {
-  while (true) {
-    blinkLed(PIN_LED_RED, 2, 250);
-    delay(1000); // We can't use myDelay since it would call petDog(), thus preventing the reset.
-  }
+void forceReset()
+{
+  DEBUG_PRINTLN("Info - Forced system reset started");
+  blinkLed(PIN_LED_RED, 4, 500);
+  digitalWrite(PIN_LED_RED, HIGH); // Turn on red LED
+  while (true); // Wait for Watchdog Timer to reset system
 }
