@@ -96,27 +96,24 @@ void transmitData()
         {
           DEBUG_PRINT("Info - MT-SBD message received. Size: ");
           DEBUG_PRINT(mtSbdBufferSize); DEBUG_PRINTLN(" bytes.");
+          printMtSbdBuffer(); // Print MT-SBD message in hexadecimal
 
           // Check if MT-SBD message is the correct size
-          if (mtSbdBufferSize == 7)
+          if (mtSbdBufferSize >= sizeof(mtSbdMessage))
           {
             DEBUG_PRINTLN("Info - MT-SBD message correct size.");
 
             // Write incoming MT-SBD message to union/structure
-            for (int i = 0; i < mtSbdBufferSize; ++i)
-            {
-              mtSbdMessage.bytes[i] = mtSbdBuffer[i];
-            }
+            memcpy(mtSbdMessage.bytes, mtSbdBuffer, sizeof(mtSbdMessage));
 
             // Print MT-SBD message
-            printMtSbdBuffer(); // Print MT-SBD message in hexadecimal
             printMtSbd(); // Print MT-SBD message stored in union/structure
 
             // Check if MT-SBD message data is valid and update variables
             if ((mtSbdMessage.sampleInterval    >= 1  &&  mtSbdMessage.sampleInterval   <= 60)  &&
-                (mtSbdMessage.averageInterval   >= 1  &&  mtSbdMessage.averageInterval  <= 24)  &&
+                (mtSbdMessage.averageInterval   >= 1  &&  mtSbdMessage.averageInterval  <= 144)  &&
                 (mtSbdMessage.transmitInterval  >= 1  &&  mtSbdMessage.transmitInterval <= 24)  &&
-                (mtSbdMessage.retransmitLimit   >= 0  &&  mtSbdMessage.retransmitLimit  <= 24)  &&
+                (mtSbdMessage.retransmitLimit   >= 0  &&  mtSbdMessage.retransmitLimit  <= 5)  &&
                 (mtSbdMessage.batteryCutoff     >= 0  &&  mtSbdMessage.batteryCutoff    <= 12)  &&
                 (mtSbdMessage.resetFlag         == 0  ||  mtSbdMessage.resetFlag        == 255))
             {
@@ -202,7 +199,7 @@ void transmitData()
     moSbdMessage.transmitDuration = timer.iridium / 1000;
 
     // Check if reset flag was transmitted
-    if (resetFlag)
+    if (resetFlag) //TODO Use forceReset() instead
     {
       DEBUG_PRINTLN("Info - Forced system reset...");
       digitalWrite(PIN_LED_RED, HIGH); // Turn on LED
