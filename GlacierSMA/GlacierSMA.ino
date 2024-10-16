@@ -180,7 +180,7 @@ StatisticCAL vStats;               // Wind north-south wind vector component (v)
 // User defined configuration variables
 // ----------------------------------------------------------------------------
 #if DEBUG
-unsigned int  sampleInterval    = 1;      // Sampling interval (minutes). Default: 5 min (300 seconds)
+unsigned int  sampleInterval    = 1;      // Sampling interval (minutes). Values must be in range [1, 60]
 unsigned int  averageInterval   = 60;     // Number of samples to be averaged in each message. Default: 12 (hourly)
 unsigned int  transmitInterval  = 1;      // Number of messages in each Iridium transmission (340-byte limit)
 unsigned int  retransmitLimit   = 5;      // Failed data transmission reattempts (340-byte limit)
@@ -667,7 +667,7 @@ void loop()
     if (checkAlarm())
     {
       // Blink LED to indicate WDT interrupt and nominal system operation
-      blinkLed(PIN_LED_GREEN, 1, 25);
+      blinkLed(PIN_LED_GREEN, 1, 50);
 
       // Reset the WDT
       petDog();
@@ -678,7 +678,7 @@ void loop()
       blinkLed(PIN_LED_RED, 1, 250);
 
       // Reset the RTC alarm based on current time
-      setCutoffAlarm();
+      setCutoffAlarm(); //TODO Clarify what cutOffAlarm should really do
     }
   }
 

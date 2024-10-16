@@ -55,21 +55,28 @@ void setRtcAlarm()
   alarmTime -= second(alarmTime); // Discard the seconds
 
   unsigned long currentTime = rtc.getEpoch();
+  unsigned long timeDiff = alarmTime > currentTime ? alarmTime - currentTime : currentTime - alarmTime;
 
   DEBUG_PRINT("unixtime: "); DEBUG_PRINTLN(unixtime);
   DEBUG_PRINT("currentTime: "); DEBUG_PRINTLN(currentTime);
   DEBUG_PRINT("alarmTime: "); DEBUG_PRINTLN(alarmTime);
 
-  // Check if alarm is set in the past (or less than 5 seconds from now) or too far in the future;
-  // This can happen if the sampling process takes longer than the sampleInterval (like when sending satellite data);
+  // Check if alarm is set way too far in the past or the future;
+  // This can happen when the internal clock was first set during the current cycle;
   // It can also occur if the internal RTC clock drifted significantly before being resynced to the GNSS time.
-  if (alarmTime <= currentTime + 5 || alarmTime > currentTime + sampleInterval * 60) {
-    DEBUG_PRINTLN(F("Warning - (setRtcAlarm) RTC alarm set in the past or too far in the future."));
+  if (timeDiff > sampleInterval * 60) {
+    DEBUG_PRINTLN(F("Warning - (setRtcAlarm) RTC alarm set way too far in the past or future."));
 
     // Update alarm time based on current time + sample interval so it is guaranteed to be in the future;
-    // This is basically akin to resetting the sample cycle so it starts "fresh" from the current time;
-    // In turn, this means samples could "drift" over time from the defined sampleInterval (FIXME?).
+    // This is basically akin to resetting the sample cycle so it starts "fresh" from the current time.
     alarmTime = currentTime + min(sampleInterval * 60, 3600); // Max 1 hour since we match MM:SS
+  }
+
+  // Check if alarm is set a little in the past or less than 5 seconds from now;
+  // This can happen if the sampling process takes longer than the sampleInterval (especially when sending satellite data).
+  else if (alarmTime <= currentTime + 5) {
+    DEBUG_PRINTLN(F("Info - (setRtcAlarm) RTC alarm set in the near past or future."));
+    alarmTime = currentTime + 65; // Wake up as soon as possible to try and "catch up" the late sample.
   }
 
   // Set next alarm at a "whole" minute
