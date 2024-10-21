@@ -180,8 +180,8 @@ StatisticCAL vStats;               // Wind north-south wind vector component (v)
 // User defined configuration variables
 // ----------------------------------------------------------------------------
 #if DEBUG
-unsigned int  sampleInterval    = 1;      // Sampling interval (minutes). Values must be in range [1, 60]
-unsigned int  averageInterval   = 60;     // Number of samples to be averaged in each message. Default: 12 (hourly)
+unsigned int  sampleInterval    = 5;      // Sampling interval (minutes). Values must be in range [1, 60]
+unsigned int  averageInterval   = 144;    // Number of samples to be averaged in each message. Range: [1, 240]
 unsigned int  transmitInterval  = 1;      // Number of messages in each Iridium transmission (340-byte limit)
 unsigned int  retransmitLimit   = 5;      // Failed data transmission reattempts (340-byte limit)
 unsigned int  iridiumTimeout    = 120;    // Timeout for Iridium transmission (seconds)
@@ -200,8 +200,7 @@ float         batteryCutoff     = 11.0;   // Battery voltage cutoff threshold (V
 byte          loggingMode       = 2;      // Flag for new log file creation. 1: daily, 2: monthly, 3: yearly
 unsigned int  systemRstWDTCountLimit = 15;// Nombre d'alertes WDT autorisées avant de faire un system Reset (8s par cycle)
 #endif
-//TODO If the values above were constants, we could include compile-time checks to make sure they are within range;
-//     However, we'd then lose the ability to modify them remotely, so it's probably not worth it.
+//TODO Verify that these values are within range -- see iridium.ino for acceptable ranges.
 
 // ----------------------------------------------------------------------------
 // Sensors correction factor and offsets -- to modify -- 
@@ -559,8 +558,7 @@ void loop()
       // system after 1 week
       if (cutoffCounter > 7 * 24 * (60/sampleInterval))
       {
-        // Force WDT reset
-        while (1);
+        forceReset(); // Force WDT reset
       }
 
       DEBUG_PRINTLN("Warning - Battery voltage cutoff exceeded. Entering deep sleep...");

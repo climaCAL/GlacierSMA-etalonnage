@@ -111,7 +111,7 @@ void transmitData()
 
             // Check if MT-SBD message data is valid and update variables
             if ((mtSbdMessage.sampleInterval    >= 1  &&  mtSbdMessage.sampleInterval   <= 60)  &&
-                (mtSbdMessage.averageInterval   >= 1  &&  mtSbdMessage.averageInterval  <= 144)  &&
+                (mtSbdMessage.averageInterval   >= 1  &&  mtSbdMessage.averageInterval  <= 240)  &&
                 (mtSbdMessage.transmitInterval  >= 1  &&  mtSbdMessage.transmitInterval <= 24)  &&
                 (mtSbdMessage.retransmitLimit   >= 0  &&  mtSbdMessage.retransmitLimit  <= 5)  &&
                 (mtSbdMessage.batteryCutoff     >= 0  &&  mtSbdMessage.batteryCutoff    <= 12)  &&
