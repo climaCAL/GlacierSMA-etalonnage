@@ -134,7 +134,7 @@ void printDateTime()
 //TODO Create a utility function that can print any datetime parameter, and rename this function "printCurrentTime"
 void printDateTime(char* printBuffer)
 {
-  sprintf(printBuffer, "20%02d-%02d-%02d %02d:%02d:%02d",
+  sprintf(printBuffer, "20%02d-%02d-%02dT%02d:%02d:%02d",
           rtc.getYear(), rtc.getMonth(), rtc.getDay(),
           rtc.getHours(), rtc.getMinutes(), rtc.getSeconds());
 }
@@ -143,7 +143,7 @@ void printDateTime(char* printBuffer)
 void printAlarm()
 {
   char alarmBuffer[20];
-  sprintf(alarmBuffer, "20%02d-%02d-%02d %02d:%02d:%02d",
+  sprintf(alarmBuffer, "20%02d-%02d-%02dT%02d:%02d:%02d",
           rtc.getAlarmYear(), rtc.getAlarmMonth(), rtc.getAlarmDay(),
           rtc.getAlarmHours(), rtc.getAlarmMinutes(), rtc.getAlarmSeconds());
   DEBUG_PRINTLN(alarmBuffer);
