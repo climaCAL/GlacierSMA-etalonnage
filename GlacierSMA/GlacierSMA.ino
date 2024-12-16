@@ -101,14 +101,15 @@
 // Pin definitions
 // ----------------------------------------------------------------------------
 #define PIN_VBAT            A0
-#define PIN_WIND_SPEED      A1
-#define PIN_WIND_DIR        A2
-#define PIN_HUMID           A3
-#define PIN_TEMP            A4
+#define PIN_WIND_SPEED      A1  // Used by Young 5103L and Davis 7911
+#define PIN_WIND_DIR        A2  // Used by Young 5103L and Davis 7911
+#define PIN_HUMID           A3  // Used by HMP60 module
+#define PIN_TEMP            A4  // Used by HMP60 module
 #define PIN_GNSS_EN         A5
 #define PIN_MICROSD_CS      4
 #define PIN_12V_EN          5   // 12 V step-up/down regulator
 #define PIN_5V_EN           6   // 5V step-down regulator
+#define PIN_MICROSD_CD      7   // Detects if the microSD card is present (currently unused)
 #define PIN_LED_GREEN       8   // Green LED
 #define PIN_IRIDIUM_RX      10  // Pin 1 RXD (Yellow)
 #define PIN_IRIDIUM_TX      11  // Pin 6 TXD (Orange)
@@ -116,8 +117,8 @@
 #define PIN_LED_RED         13
 
 // Unused
-#define PIN_SOLAR           7
-#define PIN_SENSOR_PWR      7
+#define PIN_SOLAR           7   // Used by SP212
+#define PIN_SENSOR_PWR      7   // Used by Davis 7911
 #define PIN_RFM95_CS        7   // LoRa "B"
 #define PIN_RFM95_RST       7   // LoRa "A"
 #define PIN_RFM95_INT       7   // LoRa "D"
