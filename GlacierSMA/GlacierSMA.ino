@@ -46,7 +46,7 @@
 #include <TinyGPS++.h>              // https://github.com/mikalhart/TinyGPSPlus (v1.0.3)
 #include <Wire.h>                   // https://www.arduino.cc/en/Reference/Wire
 #include <wiring_private.h>         // Required for creating new Serial instance
-#include "Adafruit_VEML7700.h"      // Add docs
+#include "src/Adafruit_VEML7700.h"  // Customized version of Adafruit VEML7700 library
 
 // ----------------------------------------------------------------------------
 // Define unique identifier
