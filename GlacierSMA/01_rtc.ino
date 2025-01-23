@@ -31,9 +31,9 @@ void readRtc()
   // Start the loop timer
   uint32_t loopStartTime = millis();
 
-  DEBUG_PRINT("Info - (readRtc) Current datetime: ");
+  //DEBUG_PRINT("Info - (readRtc) Current datetime: ");
   printDateTime(datetime); // This writes the date to a persistent string (used for logging)
-  DEBUG_PRINTLN(datetime);
+  //DEBUG_PRINTLN(datetime);
 
   // Get Unix Epoch time
   unixtime = rtc.getEpoch();

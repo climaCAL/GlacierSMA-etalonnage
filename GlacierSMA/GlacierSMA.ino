@@ -285,7 +285,7 @@ float         latitude          = 0.0;    // GNSS latitude (DD)
 float         longitude         = 0.0;    // GNSS longitude (DD)
 byte          satellites        = 0;      // GNSS satellites
 float         hdop              = 0.0;    // GNSS HDOP
-uint16_t      lastStvsnErrCode  = 0;      // last status of Stevenson Error Code
+uint16_t      lastStvsnErrCode  = 0;      // Last value of Stevenson Error Code
 
 // ----------------------------------------------------------------------------
 // Unions/structures

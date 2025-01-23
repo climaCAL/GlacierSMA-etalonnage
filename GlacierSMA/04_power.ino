@@ -160,7 +160,7 @@ void myDelay(unsigned long ms)
   start = pet = now = millis();
   while (now - start < ms)
   {
-    if (now - pet >= 1000) // Call petDog() every 1000ms or so.
+    if (now - pet >= 1000) // Call petDog() every second.
     {
       pet = now;
       if (now - start + 10 <= ms)
