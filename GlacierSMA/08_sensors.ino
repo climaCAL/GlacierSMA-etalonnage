@@ -6,11 +6,13 @@
 // ----------------------------------------------------------------------------
 bool scanI2CbusFor(uint8_t address, unsigned int recheck = 0, unsigned int retry = 3, unsigned long delay = 10) {
   Wire.beginTransmission(address);
+  Wire.write(0); // Sending a message without any data led to frequent false positives.
   uint8_t error = Wire.endTransmission(); // The I2C device replied normally if error == 0
 
   while ((error == 0 && recheck-- > 0) || (error != 0 && retry-- > 0)) { 
     myDelay(delay);
     Wire.beginTransmission(address);
+    Wire.write(0);
     if (error = Wire.endTransmission()) {
       DEBUG_PRINT("[Error "); DEBUG_PRINT(error); DEBUG_PRINT("] ");
       delay *= 2; // Progressively increase the delay in case of failed transmissions.
@@ -137,7 +139,7 @@ void readBme280Int()
     // Add to statistics object
     temperatureIntStats.add(temperatureInt);
     humidityIntStats.add(humidityInt);
-    //pressureIntStats.add(pressureInt);
+    pressureIntStats.add(pressureInt);
 
     #if CALIBRATE
       DEBUG_PRINT("\tTemperatureInt: "); DEBUG_PRINT(temperatureInt); DEBUG_PRINTLN(" C");
@@ -331,10 +333,11 @@ void readLsm303()
 
     DEBUG_PRINTLN("done.");
 
-    // Print debug info
-    //DEBUG_PRINT(F("pitch: ")); DEBUG_PRINT_DEC(pitch, 2);
-    //DEBUG_PRINT(F(" roll: ")); DEBUG_PRINTLN_DEC(roll, 2);
-
+    #if CALIBRATE
+      // Print debug info
+      DEBUG_PRINT(F("pitch: ")); DEBUG_PRINT_DEC(pitch, 2);
+      DEBUG_PRINT(F(" roll: ")); DEBUG_PRINTLN_DEC(roll, 2);
+    #endif
   }
   else
   {

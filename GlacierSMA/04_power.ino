@@ -87,8 +87,13 @@ void disable12V()
 // Prepare system for sleep
 void prepareForSleep()
 {
+#if !INSOMNIAC
+  DEBUG_PRINTLN("Info - Entering deep sleep...");
+  DEBUG_PRINTLN();
+
   // Disable serial
   disableSerial();
+#endif
 
   // Clear online union
   memset(&online, 0, sizeof(online));
@@ -100,14 +105,10 @@ void prepareForSleep()
 // Enter deep sleep
 void goToSleep()
 {
-  // Clear first-time flag after initial power-down
-  if (firstTimeFlag)
-  {
-    firstTimeFlag = false;
-  }
-
+#if !INSOMNIAC
   // Enter deep sleep
   LowPower.deepSleep();
+#endif
 
   /* Code sleeps here and awaits RTC or WDT interrupt */
 }
@@ -115,8 +116,10 @@ void goToSleep()
 // Wake from deep sleep
 void wakeUp()
 {
+#if !INSOMNIAC
   // Enable serial port
   enableSerial();
+#endif
 }
 
 // Non-blocking blink LED (https://forum.arduino.cc/index.php?topic=503368.0)

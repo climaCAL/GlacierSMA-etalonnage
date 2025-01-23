@@ -51,12 +51,12 @@
 // ----------------------------------------------------------------------------
 // Define unique identifier
 // ----------------------------------------------------------------------------
-#define CRYOLOGGER_ID "P05_Cegep"
+#define CRYOLOGGER_ID   "PART-IT-01"
 
 // ----------------------------------------------------------------------------
 // Data logging
 // ----------------------------------------------------------------------------
-#define LOGGING         true  // Log data to microSD
+#define LOGGING         false  // Log data to microSD
 
 // ----------------------------------------------------------------------------
 // Debugging macros
@@ -64,7 +64,8 @@
 #define DEBUG           true  // Output debug messages to Serial Monitor
 #define DEBUG_GNSS      false // Output GNSS debug information
 #define DEBUG_IRIDIUM   false // Output Iridium debug messages to Serial Monitor
-#define NO_TRANSMIT     false // Prevent sending satellite messages
+#define NO_TRANSMIT     true  // Prevent sending satellite messages
+#define INSOMNIAC       true  // Prevent sleeping
 #define CALIBRATE       false // Enable sensor calibration code
 
 #if DEBUG
@@ -181,12 +182,12 @@ StatisticCAL vStats;               // Wind north-south wind vector component (v)
 // User defined configuration variables
 // ----------------------------------------------------------------------------
 #if DEBUG
-unsigned int  sampleInterval    = 5;      // Sampling interval (minutes). Values must be in range [1, 60]
-unsigned int  averageInterval   = 144;    // Number of samples to be averaged in each message. Range: [1, 240]
+unsigned int  sampleInterval    = 1;      // Sampling interval (minutes). Values must be in range [1, 60]
+unsigned int  averageInterval   = 15;     // Number of samples to be averaged in each message. Range: [1, 240]
 unsigned int  transmitInterval  = 1;      // Number of messages in each Iridium transmission (340-byte limit)
 unsigned int  retransmitLimit   = 5;      // Failed data transmission reattempts (340-byte limit)
 unsigned int  iridiumTimeout    = 120;    // Timeout for Iridium transmission (seconds)
-unsigned int  gnssTimeout       = 60;     // Timeout for GNSS signal acquisition (seconds)
+unsigned int  gnssTimeout       = 30;     // Timeout for GNSS signal acquisition (seconds)
 float         batteryCutoff     = 3.0;    // Battery voltage cutoff threshold (V)
 byte          loggingMode       = 3;      // Flag for new log file creation. 1: daily, 2: monthly, 3: yearly
 unsigned int  systemRstWDTCountLimit = 5; // Nombre d'alertes WDT autorisées avant de faire un system Reset (8s par cycle)
@@ -443,7 +444,7 @@ void setup()
 
 #if DEBUG
   SERIAL_PORT.begin(115200); // Open serial port at 115200 baud
-  blinkLed(PIN_LED_GREEN, 4, 500); // Non-blocking delay to allow user to open Serial Monitor
+  blinkLed(PIN_LED_GREEN, 10, 500); // Non-blocking delay to allow user to open Serial Monitor
 #endif
 
   DEBUG_PRINTLN();
@@ -524,8 +525,10 @@ void setup()
 // ----------------------------------------------------------------------------
 void loop()
 {
+  myDelay(5000);
+
   // Check if RTC alarm triggered or if program is running for first time
-  if (alarmFlag || firstTimeFlag)
+  if (INSOMNIAC || alarmFlag || firstTimeFlag)
   {
     // Read the RTC
     readRtc();
@@ -646,14 +649,12 @@ void loop()
       printTimers();
 
       // Set the RTC alarm
-      setRtcAlarm();
+      if (!INSOMNIAC)
+        setRtcAlarm();
 
       //Ok, we're done, let's shutdown things
       disable12V();      // Disable 12V power
       disable5V();       // Disable 5V power
-
-      DEBUG_PRINTLN("Info - Entering deep sleep...");
-      DEBUG_PRINTLN();
 
       // Prepare for sleep
       prepareForSleep();
@@ -663,7 +664,7 @@ void loop()
   // Check for WDT interrupts
   if (wdtFlag)
   {
-    if (checkAlarm())
+    if (INSOMNIAC || checkAlarm())
     {
       // Blink LED to indicate WDT interrupt and nominal system operation
       blinkLed(PIN_LED_GREEN, 1, 50);
@@ -680,6 +681,9 @@ void loop()
       setCutoffAlarm(); //TODO Clarify what cutOffAlarm should really do
     }
   }
+
+  // Clear first-time flag after initial power-down
+  firstTimeFlag = false;
 
   // Enter deep sleep and wait for WDT or RTC alarm interrupt
   goToSleep();
