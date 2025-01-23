@@ -690,9 +690,14 @@ void receiveCommand() {
 
         command.trim();
         if (command.startsWith("READ")) {
-            int arg = command.indexOf(' ');
-            if (arg > 0) {
-                arg = command.substring(arg + 1).toInt();
+            int arg = 0, idx = command.indexOf(' ');
+            if (idx > 0) {
+                arg = command.substring(idx + 1).toInt();
+                if (!arg) {
+                    SERIAL_PORT.print("! INVALID ARGUMENT: ");
+                    SERIAL_PORT.println(command.substring(idx + 1));
+                    return;
+                }
             }
             if ((int)sampleCounter < arg) {
                 SERIAL_PORT.println("! SAMPLES NOT READY");
@@ -709,7 +714,10 @@ void receiveCommand() {
             SERIAL_PORT.flush();
         }
         else {
-            SERIAL_PORT.println("! COMMAND NOT RECOGNIZED");
+            if (command.length() > 0)
+                SERIAL_PORT.println("! COMMAND NOT RECOGNIZED");
+            else
+                SERIAL_PORT.println("! COMMAND MISSING");
         }
     }
 }
