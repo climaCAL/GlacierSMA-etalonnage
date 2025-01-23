@@ -87,7 +87,10 @@ void disable12V()
 // Prepare system for sleep
 void prepareForSleep()
 {
-#if !INSOMNIAC
+#if INSOMNIAC
+  myDelay(5000);
+  DEBUG_PRINTLN();
+#else
   DEBUG_PRINTLN("Info - Entering deep sleep...");
   DEBUG_PRINTLN();
 
