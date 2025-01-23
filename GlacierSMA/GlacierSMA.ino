@@ -581,6 +581,8 @@ void loop()
       enable5V();         // Enable 5V power
       enable12V();        // Enable 12V power
 
+      receiveCommand();
+
       // Perform measurements
       if (disabled.bme280Ext)
         DEBUG_PRINTLN("Info - BME280 Ext disabled");
@@ -644,10 +646,6 @@ void loop()
       if (!INSOMNIAC)
         setRtcAlarm();
 
-      //Ok, we're done, let's shutdown things
-      disable12V();      // Disable 12V power
-      disable5V();       // Disable 5V power
-
       // Prepare for sleep
       prepareForSleep();
     }
@@ -679,4 +677,16 @@ void loop()
 
   // Enter deep sleep and wait for WDT or RTC alarm interrupt
   goToSleep();
+}
+
+void receiveCommand() {
+    if (SERIAL_PORT.available() > 0) {
+        String command = SERIAL_PORT.readString();
+        SERIAL_PORT.print("\n< ");
+        SERIAL_PORT.print(command);
+
+        command.trim();
+        if (command == "READ")
+            SERIAL_PORT.println("> READING THE DATA");
+    }
 }

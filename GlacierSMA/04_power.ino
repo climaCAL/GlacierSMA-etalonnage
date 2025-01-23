@@ -91,6 +91,10 @@ void prepareForSleep()
   DEBUG_PRINTLN("Info - Entering deep sleep...");
   DEBUG_PRINTLN();
 
+  //Ok, we're done, let's shutdown things
+  disable12V();      // Disable 12V power
+  disable5V();       // Disable 5V power
+
   // Disable serial
   disableSerial();
 #else
@@ -163,6 +167,7 @@ void myDelay(unsigned long ms)
     else
     {
       yield(); // Allow cooperative multitasking (if used).
+      receiveCommand();
     }
     now = millis();
   }
