@@ -1,9 +1,12 @@
 // Configure RockBLOCK 9603
 void configureIridium()
 {
-  modem.setPowerProfile(IridiumSBD::DEFAULT_POWER_PROFILE); // Assume battery power (USB power: IridiumSBD::USB_POWER_PROFILE)
-  modem.adjustSendReceiveTimeout(iridiumTimeout);           // Timeout for Iridium send/receive commands (default = 300 s)
-  modem.adjustStartupTimeout(iridiumTimeout / 2);           // Timeout for Iridium startup (default = 240 s)
+  #if !NO_TRANSMIT
+    modem.setPowerProfile(IridiumSBD::DEFAULT_POWER_PROFILE); // Assume battery power (USB power: IridiumSBD::USB_POWER_PROFILE)
+    modem.adjustSendReceiveTimeout(iridiumTimeout);           // Timeout for Iridium send/receive commands (default = 300 s)
+    modem.adjustStartupTimeout(iridiumTimeout / 2);           // Timeout for Iridium startup (default = 240 s)
+    DEBUG_PRINTLN("Info - Iridium modem ready");
+  #endif
 }
 
 // Write data from structure to transmit buffer
@@ -214,6 +217,7 @@ bool ISBDCallback()
   {
     previousMillis = currentMillis;
     petDog(); // Reset the Watchdog Timer
+    DEBUG_PRINT('.');
     digitalWrite(PIN_LED_GREEN, !digitalRead(PIN_LED_GREEN)); // Blink LED
   }
   return true;

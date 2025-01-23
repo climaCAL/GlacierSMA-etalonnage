@@ -93,6 +93,9 @@ void prepareForSleep()
 
   // Disable serial
   disableSerial();
+#else
+  myDelay(5000);
+  DEBUG_PRINTLN();
 #endif
 
   // Clear online union
@@ -148,12 +151,13 @@ void myDelay(unsigned long ms)
   start = pet = now = millis();
   while (now - start < ms)
   {
-    if (now - pet >= 100) // Call petDog() every 100ms or so.
+    if (now - pet >= 1000) // Call petDog() every 1000ms or so.
     {
       pet = now;
       if (now - start + 10 <= ms)
       {
         petDog(); // Reset watchdog timer (can take up to 10ms).
+        DEBUG_PRINT('.');
       }
     }
     else

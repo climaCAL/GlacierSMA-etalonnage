@@ -20,11 +20,13 @@ void configureRtc()
   // Read RTC initially and display time
   readRtc();
 
+#if !INSOMNIAC
   // Set initial RTC alarm time (FIXME This isn't needed unless loop() never gets called)
   setRtcAlarm();
 
   // Attach alarm interrupt service routine (ISR)
   rtc.attachInterrupt(alarmIsr);
+#endif
 }
 
 // Read RTC
@@ -33,9 +35,9 @@ void readRtc()
   // Start the loop timer
   uint32_t loopStartTime = millis();
 
-  //DEBUG_PRINT("Info - (readRtc) Current datetime: ");
+  DEBUG_PRINT("Info - (readRtc) Current datetime: ");
   printDateTime(dateTime); // This writes the date to a persistent string (used for logging)
-  //DEBUG_PRINTLN(dateTime);
+  DEBUG_PRINTLN(dateTime);
 
   // Get Unix Epoch time
   unixtime = rtc.getEpoch();
@@ -57,9 +59,9 @@ void setRtcAlarm()
   unsigned long currentTime = rtc.getEpoch();
   unsigned long timeDiff = alarmTime > currentTime ? alarmTime - currentTime : currentTime - alarmTime;
 
-  DEBUG_PRINT("unixtime: "); DEBUG_PRINTLN(unixtime);
-  DEBUG_PRINT("currentTime: "); DEBUG_PRINTLN(currentTime);
-  DEBUG_PRINT("alarmTime: "); DEBUG_PRINTLN(alarmTime);
+  //DEBUG_PRINT("unixtime: "); DEBUG_PRINTLN(unixtime);
+  //DEBUG_PRINT("currentTime: "); DEBUG_PRINTLN(currentTime);
+  //DEBUG_PRINT("alarmTime: "); DEBUG_PRINTLN(alarmTime);
 
   // Check if alarm is set way too far in the past or the future;
   // This can happen when the internal clock was first set during the current cycle;
@@ -105,9 +107,9 @@ void setCutoffAlarm() //FIXME Is this function really necessary? Why not reuse s
   // Clear flag
   alarmFlag = false;
 
-  DEBUG_PRINT("Info - (setCOAlrm) Current datetime: "); printDateTime();
-  DEBUG_PRINT("Info - (setCOAlrm) Next alarm: "); printAlarm();
-  DEBUG_PRINT("Info - (setCOAlrm) Alarm mode: "); DEBUG_PRINTLN("MMSS");
+  DEBUG_PRINT("Info - (setCOAlarm) Current datetime: "); printDateTime();
+  DEBUG_PRINT("Info - (setCOAlarm) Next alarm: "); printAlarm();
+  DEBUG_PRINT("Info - (setCOAlarm) Alarm mode: "); DEBUG_PRINTLN("MMSS");
 }
 
 // Check that the next alarm is set correctly;
@@ -157,6 +159,6 @@ void checkDate()
     currentDate = rtc.getDay();
   }
   newDate = rtc.getDay();
-  DEBUG_PRINT("currentDate: "); DEBUG_PRINTLN(currentDate);
-  DEBUG_PRINT("newDate: "); DEBUG_PRINTLN(newDate);
+  //DEBUG_PRINT("currentDate: "); DEBUG_PRINTLN(currentDate);
+  //DEBUG_PRINT("newDate: "); DEBUG_PRINTLN(newDate);
 }

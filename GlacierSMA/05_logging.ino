@@ -1,10 +1,9 @@
 // Configure microSD
 void configureSd()
 {
-#if LOGGING
   // Check if microSD is force disabled
-  if (disabled.microSd) {
-    DEBUG_PRINTLN("Info - microSD disabled.");
+  if (!LOGGING || disabled.microSd) {
+    DEBUG_PRINTLN("Info - microSD disabled");
     return;
   }
 
@@ -32,8 +31,7 @@ void configureSd()
   }
 
   online.microSd = true; // Set online flag
-  DEBUG_PRINTLN("Info - microSD initialized.");
-#endif
+  DEBUG_PRINTLN("Info - microSD initialized");
 }
 
 // Create timestamped log file

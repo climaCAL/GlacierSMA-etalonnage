@@ -20,7 +20,7 @@ void readGnss()
 
   // Open serial port at 9600 baud
   GNSS_PORT.begin(9600);
-  DEBUG_PRINT(F("Info - Beginning to listen for GNSS traffic..."));
+  DEBUG_PRINT(F("Info - Beginning to listen for GNSS traffic"));
  
   // Configure GNSS
   // Note: a delay of at least 1 s is required after powering on GNSS module

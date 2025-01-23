@@ -444,7 +444,7 @@ void setup()
 
 #if DEBUG
   SERIAL_PORT.begin(115200); // Open serial port at 115200 baud
-  blinkLed(PIN_LED_GREEN, 10, 500); // Non-blocking delay to allow user to open Serial Monitor
+  blinkLed(PIN_LED_GREEN, 10, 500); // Non-blocking delay to allow user to open and clear Serial Monitor
 #endif
 
   DEBUG_PRINTLN();
@@ -499,16 +499,10 @@ void setup()
   printSettings();      // Print configuration settings
   readBattery();        DEBUG_PRINT("Info - Battery voltage: "); DEBUG_PRINTLN(voltage);
   readGnss();           // Sync RTC with GNSS
+  checkDate();          // Record current date
   configureIridium();   // Configure Iridium 9603 transceiver
   configureSd();        // Configure microSD
   createLogFile();      // Create initial log file
-
-  // Close serial port if immediately entering deep sleep
-  //TODO This looks like "legacy" code to me... Do we still need this?
-  if (!firstTimeFlag)
-  {
-    disableSerial();
-  }
 
   // Blink LED to indicate completion of setup
   for (byte i = 0; i < 10; i++)
@@ -525,8 +519,6 @@ void setup()
 // ----------------------------------------------------------------------------
 void loop()
 {
-  myDelay(5000);
-
   // Check if RTC alarm triggered or if program is running for first time
   if (INSOMNIAC || alarmFlag || firstTimeFlag)
   {
@@ -629,7 +621,7 @@ void loop()
         {
           // Check for date change
           checkDate();
-          if (firstTimeFlag || (currentDate != newDate))
+          if (currentDate != newDate)
           {
             readGnss(); // Sync RTC with the GNSS
             currentDate = newDate;

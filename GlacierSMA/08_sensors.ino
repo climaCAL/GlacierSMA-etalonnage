@@ -64,7 +64,7 @@ void readBme280Ext()
   // Check if sensor initialized successfully
   if (online.bme280Ext)
   {
-    DEBUG_PRINT("Info - Reading BME280 Ext...");
+    DEBUG_PRINT("Info - Reading BME280 Ext... ");
 
     myDelay(250);
 
@@ -127,7 +127,7 @@ void readBme280Int()
   // Check if sensor initialized successfully
   if (online.bme280Int)
   {
-    DEBUG_PRINT("Info - Reading BME280 Int...");
+    DEBUG_PRINT("Info - Reading BME280 Int... ");
 
     myDelay(250);
 
@@ -197,7 +197,7 @@ void readVeml7700()
   
   // Check if sensor initialized successfully
   if (veml) {
-    DEBUG_PRINT("Info - Reading VEML7700...");
+    DEBUG_PRINT("Info - Reading VEML7700... ");
     myDelay(250);
 
     // Add acquisition (Default mode for readLux() = VEML_LUX_NORMAL)
@@ -235,7 +235,7 @@ void readSht31()
   // Start the loop timer
   unsigned long loopStartTime = millis();
 
-  DEBUG_PRINT("Info - Reading SHT31...");
+  DEBUG_PRINT("Info - Reading SHT31... ");
 
   // Disable I2C bus
   Wire.end();
@@ -294,7 +294,7 @@ void readLsm303()
   // Check if sensor initialized successfully
   if (online.lsm303)
   {
-    DEBUG_PRINT("Info - Reading LSM303...");
+    DEBUG_PRINT("Info - Reading LSM303... ");
 
     myDelay(500);
 
@@ -365,7 +365,7 @@ void readHmp60()
   // Start loop timer
   unsigned long loopStartTime = millis();
 
-  DEBUG_PRINT("Info - Reading HMP60...");
+  DEBUG_PRINT("Info - Reading HMP60... ");
 
   // Note: A startup delay of 4 s is recommended at 12 V and 2 s at 5 V
   myDelay(4000);
@@ -416,7 +416,7 @@ void readSp212()
   // Start loop timer
   unsigned long loopStartTime = millis();
 
-  DEBUG_PRINT("Info - Reading SP212...");
+  DEBUG_PRINT("Info - Reading SP212... ");
 
   // Perform analog readings
   (void)analogRead(PIN_SOLAR);
@@ -459,7 +459,7 @@ void read5103L()
 {
   unsigned int loopStartTime = millis();
 
-  DEBUG_PRINT("Info - Reading 5103L...");
+  DEBUG_PRINT("Info - Reading 5103L... ");
 
   // Measure wind speed and direction
   (void)analogRead(PIN_WIND_SPEED);
@@ -525,7 +525,7 @@ void read7911()
   // Start loop timer
   uint32_t loopStartTime = millis();
 
-  DEBUG_PRINTLN("Info - Reading 7911...");
+  DEBUG_PRINTLN("Info - Reading 7911... ");
 
   // Enable pull-ups
   pinMode(PIN_WIND_SPEED, INPUT_PULLUP);
