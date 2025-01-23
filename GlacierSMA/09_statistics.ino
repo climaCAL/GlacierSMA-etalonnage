@@ -20,7 +20,7 @@ void calculateStats() //FIXME What an awful name for a function that DELETES all
   windVectors();
 
   // Clear all statistics objects
-  clearStats();
+  //clearStats();
 
   // Clear wind gust speed and direction maximums
   windGustSpeed = 0;

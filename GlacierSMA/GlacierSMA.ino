@@ -633,6 +633,7 @@ void loop()
           printSettings(); // Print current settings (in case they changed)
         }
 
+        clearStats();
         sampleCounter = 0; // Reset sample counter
       }
 
@@ -686,7 +687,14 @@ void receiveCommand() {
         SERIAL_PORT.print(command);
 
         command.trim();
-        if (command == "READ")
-            SERIAL_PORT.println("> READING THE DATA");
+        if (command == "READ") {
+            DEBUG_PRINTLN("Sending existing data");
+            calculateStats();
+            SERIAL_PORT.write('>');
+            SERIAL_PORT.write(' ');
+            SERIAL_PORT.write(moSbdMessage.bytes, sizeof(moSbdMessage));
+            SERIAL_PORT.write('\n');
+            SERIAL_PORT.flush();
+        }
     }
 }

@@ -892,8 +892,8 @@ void windSpeedIsr()
 // http://tornado.sfsu.edu/geosciences/classes/m430/Wind/WindDirection.html
 void windVectors()
 {
-  DEBUG_PRINT("uStats.average(): "); printTab(1); DEBUG_PRINTLN(uStats.average());
-  DEBUG_PRINT("vStats.average(): "); printTab(1); DEBUG_PRINTLN(vStats.average());
+  //DEBUG_PRINT("uStats.average(): "); printTab(1); DEBUG_PRINTLN(uStats.average());
+  //DEBUG_PRINT("vStats.average(): "); printTab(1); DEBUG_PRINTLN(vStats.average());
 
   // Calculate resultant mean wind speed
   float rvWindSpeed = sqrt(sq(uStats.average()) + sq(vStats.average()));
@@ -902,8 +902,8 @@ void windVectors()
   float rvWindDirection = atan2(-1.0 * uStats.average(), -1.0 * vStats.average());
   rvWindDirection *= RAD_TO_DEG;  // Convert from radians to degrees
 
-  DEBUG_PRINT("rvWindSpeed: "); printTab(2); DEBUG_PRINTLN(rvWindSpeed);
-  DEBUG_PRINT("rvWindDirection: "); printTab(1); DEBUG_PRINTLN(rvWindDirection);
+  //DEBUG_PRINT("rvWindSpeed: "); printTab(2); DEBUG_PRINTLN(rvWindSpeed);
+  //DEBUG_PRINT("rvWindDirection: "); printTab(1); DEBUG_PRINTLN(rvWindDirection);
 
   // Zero wind speed if no samples were taken
   if (isnan(rvWindSpeed))
