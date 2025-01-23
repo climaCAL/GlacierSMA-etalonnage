@@ -61,7 +61,7 @@
 // ----------------------------------------------------------------------------
 // Debugging macros
 // ----------------------------------------------------------------------------
-#define DEBUG           true  // Output debug messages to Serial Monitor
+#define DEBUG           false // Output debug messages to Serial Monitor
 #define DEBUG_GNSS      false // Output GNSS debug information
 #define DEBUG_IRIDIUM   false // Output Iridium debug messages to Serial Monitor
 #define NO_TRANSMIT     true  // Prevent sending satellite messages
@@ -164,30 +164,30 @@ TinyGPSCustom gnssValidity(gnss, "GPRMC", 2); // Validity
 // ----------------------------------------------------------------------------
 // Statistics objects
 // ----------------------------------------------------------------------------
-typedef statistic::Statistic<float,uint32_t,false> StatisticCAL;
-StatisticCAL batteryStats;         // Battery voltage
-StatisticCAL pressureIntStats;     // Pressure from internal sensor
-StatisticCAL temperatureIntStats;  // Temperature from internal sensor
-StatisticCAL humidityIntStats;     // Humidity from internal sensor
-StatisticCAL pressureExtStats;     // Pressure from external sensor
-StatisticCAL temperatureExtStats;  // Temperature from external sensor
-StatisticCAL humidityExtStats;     // Humidity from external sensor
-StatisticCAL solarStats;           // Solar radiation
-StatisticCAL hauteurNeigeStats;    // Suivi hauteur de neige
-StatisticCAL windSpeedStats;       // Wind speed
-StatisticCAL uStats;               // Wind east-west wind vector component (u)
-StatisticCAL vStats;               // Wind north-south wind vector component (v)
+typedef statistic::Statistic<float,uint32_t,false> StatisticSMA;
+StatisticSMA batteryStats;         // Battery voltage
+StatisticSMA pressureIntStats;     // Pressure from internal sensor
+StatisticSMA temperatureIntStats;  // Temperature from internal sensor
+StatisticSMA humidityIntStats;     // Humidity from internal sensor
+StatisticSMA pressureExtStats;     // Pressure from external sensor
+StatisticSMA temperatureExtStats;  // Temperature from external sensor
+StatisticSMA humidityExtStats;     // Humidity from external sensor
+StatisticSMA solarStats;           // Solar radiation
+StatisticSMA hauteurNeigeStats;    // Suivi hauteur de neige
+StatisticSMA windSpeedStats;       // Wind speed
+StatisticSMA uStats;               // Wind east-west wind vector component (u)
+StatisticSMA vStats;               // Wind north-south wind vector component (v)
 
 // ----------------------------------------------------------------------------
 // User defined configuration variables
 // ----------------------------------------------------------------------------
 #if DEBUG
 unsigned int  sampleInterval    = 1;      // Sampling interval (minutes). Values must be in range [1, 60]
-unsigned int  averageInterval   = 15;     // Number of samples to be averaged in each message. Range: [1, 240]
+unsigned int  averageInterval   = 5;      // Number of samples to be averaged in each message. Range: [1, 240]
 unsigned int  transmitInterval  = 1;      // Number of messages in each Iridium transmission (340-byte limit)
 unsigned int  retransmitLimit   = 5;      // Failed data transmission reattempts (340-byte limit)
 unsigned int  iridiumTimeout    = 120;    // Timeout for Iridium transmission (seconds)
-unsigned int  gnssTimeout       = 30;     // Timeout for GNSS signal acquisition (seconds)
+unsigned int  gnssTimeout       = 60;     // Timeout for GNSS signal acquisition (seconds)
 float         batteryCutoff     = 3.0;    // Battery voltage cutoff threshold (V)
 byte          loggingMode       = 3;      // Flag for new log file creation. 1: daily, 2: monthly, 3: yearly
 unsigned int  systemRstWDTCountLimit = 5; // Nombre d'alertes WDT autorisées avant de faire un system Reset (8s par cycle)
@@ -442,7 +442,7 @@ void setup()
   Wire.begin();
   Wire.setClock(400000); // Set I2C clock speed to 400 kHz
 
-#if DEBUG
+#if DEBUG || INSOMNIAC
   SERIAL_PORT.begin(115200); // Open serial port at 115200 baud
   blinkLed(PIN_LED_GREEN, 10, 500); // Non-blocking delay to allow user to open and clear Serial Monitor
 #endif
@@ -512,6 +512,8 @@ void setup()
     digitalWrite(PIN_LED_GREEN, !digitalRead(PIN_LED_GREEN));
     myDelay(250);
   }
+
+  SERIAL_PORT.println("> READY");
 }
 
 // ----------------------------------------------------------------------------
@@ -687,8 +689,14 @@ void receiveCommand() {
         SERIAL_PORT.print(command);
 
         command.trim();
-        if (command == "READ") {
-            DEBUG_PRINTLN("Sending existing data");
+        if (command.startsWith("READ")) {
+            if (sampleCounter == 0) {
+                SERIAL_PORT.println("! NOT READY");
+                return;
+            }
+            DEBUG_PRINT("Sending collected data (");
+            DEBUG_PRINT(sampleCounter);
+            DEBUG_PRINTLN(" samples)");
             calculateStats();
             SERIAL_PORT.write('>');
             SERIAL_PORT.write(' ');

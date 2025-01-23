@@ -20,13 +20,8 @@ void configureRtc()
   // Read RTC initially and display time
   readRtc();
 
-#if !INSOMNIAC
-  // Set initial RTC alarm time (FIXME This isn't needed unless loop() never gets called)
-  setRtcAlarm();
-
   // Attach alarm interrupt service routine (ISR)
   rtc.attachInterrupt(alarmIsr);
-#endif
 }
 
 // Read RTC

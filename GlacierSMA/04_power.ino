@@ -87,7 +87,10 @@ void disable12V()
 // Prepare system for sleep
 void prepareForSleep()
 {
-#if !INSOMNIAC
+#if INSOMNIAC
+  myDelay(5000);
+  DEBUG_PRINTLN();
+#else
   DEBUG_PRINTLN("Info - Entering deep sleep...");
   DEBUG_PRINTLN();
 
@@ -97,13 +100,10 @@ void prepareForSleep()
 
   // Disable serial
   disableSerial();
-#else
-  myDelay(5000);
-  DEBUG_PRINTLN();
-#endif
 
   // Clear online union
   memset(&online, 0, sizeof(online));
+#endif
 
   // Clear timer union
   memset(&timer, 0, sizeof(timer));

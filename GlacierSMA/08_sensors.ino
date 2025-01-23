@@ -36,7 +36,7 @@ bool scanI2CbusFor(uint8_t address, unsigned int recheck = 0, unsigned int retry
 // Pression non-ajouté
 // https://www.adafruit.com/product/2652
 // ----------------------------------------------------------------------------
-void configureBme280Ext()
+bool configureBme280Ext()
 {
   DEBUG_PRINT("Info - Initializing BME280 Ext... ");
 
@@ -44,12 +44,14 @@ void configureBme280Ext()
   {
     online.bme280Ext = true;
     DEBUG_PRINTLN("success!");
+    myDelay(250);
   }
   else
   {
     online.bme280Ext = false;
     DEBUG_PRINTLN("failed!");
   }
+  return online.bme280Ext;
 }
 
 // Read BME280
@@ -58,15 +60,10 @@ void readBme280Ext()
   // Start the loop timer
   unsigned long loopStartTime = millis();
 
-  // Initialize sensor
-  configureBme280Ext();
-
   // Check if sensor initialized successfully
-  if (online.bme280Ext)
+  if (online.bme280Ext || configureBme280Ext())
   {
     DEBUG_PRINT("Info - Reading BME280 Ext... ");
-
-    myDelay(250);
 
     // Read sensor data
     temperatureExt = tempBmeEXT_CF * bme280Ext.readTemperature() + tempBmeEXT_Offset;
@@ -99,7 +96,7 @@ void readBme280Ext()
 // Adafruit BME280 Temperature Humidity Pressure Sensor -- Second adressage pour le BME280 interne (adr = 0x76)
 // https://www.adafruit.com/product/2652
 // ----------------------------------------------------------------------------
-void configureBme280Int()
+bool configureBme280Int()
 {
   DEBUG_PRINT("Info - Initializing BME280 Int... ");
 
@@ -107,12 +104,14 @@ void configureBme280Int()
   {
     online.bme280Int = true;
     DEBUG_PRINTLN("success!");
+    myDelay(250);
   }
   else
   {
     online.bme280Int = false;
     DEBUG_PRINTLN("failed!");
   }
+  return online.bme280Int;
 }
 
 // Read BME280
@@ -121,15 +120,10 @@ void readBme280Int()
   // Start the loop timer
   unsigned long loopStartTime = millis();
 
-  // Initialize sensor
-  configureBme280Int();
-
   // Check if sensor initialized successfully
-  if (online.bme280Int)
+  if (online.bme280Int || configureBme280Int())
   {
     DEBUG_PRINT("Info - Reading BME280 Int... ");
-
-    myDelay(250);
 
     // Read sensor data
     temperatureInt = tempImeINT_CF * bme280Int.readTemperature() + tempBmeINT_Offset ;
@@ -266,7 +260,7 @@ void readSht31()
 // Adafruit LSM303AGR Accelerometer/Magnetomter
 // https://www.adafruit.com/product/4413
 // ----------------------------------------------------------------------------
-void configureLsm303()
+bool configureLsm303()
 {
   DEBUG_PRINT("Info - Initializing LSM303... ");
 
@@ -275,12 +269,14 @@ void configureLsm303()
   {
     online.lsm303 = true;
     DEBUG_PRINTLN("success!");
+    myDelay(250);
   }
   else
   {
     online.lsm303 = false;
     DEBUG_PRINTLN("failed!");
   }
+  return online.lsm303;
 }
 
 void readLsm303()
@@ -288,15 +284,10 @@ void readLsm303()
   // Start loop timer
   unsigned long loopStartTime = millis();
 
-  // Initialize accelerometer
-  configureLsm303();
-
   // Check if sensor initialized successfully
-  if (online.lsm303)
+  if (online.lsm303 || configureLsm303())
   {
     DEBUG_PRINT("Info - Reading LSM303... ");
-
-    myDelay(500);
 
     float xAvg = 0, yAvg = 0, zAvg = 0;
    
@@ -662,10 +653,16 @@ void readDFRWindSensor()
     return;
   }
 
-  // Il faut laisser du temps au bridgeI2C de collecter les donnees sur le modbus RS485, tout en laissant les capteurs faire leur travail.
-  DEBUG_PRINT("(sensor settle time: "); DEBUG_PRINT(bridgeSettleDelay/1000); DEBUG_PRINT("s) ");
   Wire.begin(); // Requires I2C bus
-  myDelay(bridgeSettleDelay);
+  if (!INSOMNIAC || firstTimeFlag) {
+    // Il faut laisser du temps au bridgeI2C de collecter les donnees sur le modbus RS485, tout en laissant les capteurs faire leur travail.
+    DEBUG_PRINT("(sensor settle time: "); DEBUG_PRINT(bridgeSettleDelay/1000); DEBUG_PRINT("s) ");
+    myDelay(bridgeSettleDelay);
+  }
+  else {
+    // Si le bridge était déjà actif, un délai plus court devrait être suffisant.
+    myDelay(250);
+  }
   
   sensorsDataRaw bridgeDataRaw; // Struct for raw sensor data (read from i2c)
   sensorsData bridgeData; // Struct for parsed sensor data

@@ -77,11 +77,14 @@ void transmitData()
       mtSbdBufferSize = sizeof(mtSbdBuffer);
       memset(mtSbdBuffer, 0x00, sizeof(mtSbdBuffer)); // Clear MT-SBD buffer
 
-      DEBUG_PRINTLN("Info - Attempting to transmit message...");
+      DEBUG_PRINT("Info - Attempting to transmit message (");
+      DEBUG_PRINT(iridiumTimeout);
+      DEBUG_PRINT(" seconds) ");
       petDog(); // The following might take a while, so best reset the WDT here
 
       // Transmit and receieve SBD message data in binary format
       returnCode = modem.sendReceiveSBDBinary(moSbdBuffer, moSbdBufferSize, mtSbdBuffer, mtSbdBufferSize);
+      DEBUG_PRINTLN();
 
       // Check if transmission was successful
       if (returnCode == ISBD_SUCCESS)

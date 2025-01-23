@@ -20,10 +20,12 @@ void readGnss()
 
   // Open serial port at 9600 baud
   GNSS_PORT.begin(9600);
-  DEBUG_PRINT(F("Info - Beginning to listen for GNSS traffic"));
+  DEBUG_PRINT(F("Info - Beginning to listen for GNSS traffic ("));
+  DEBUG_PRINT(gnssTimeout);
+  DEBUG_PRINT(" seconds) ");
  
   // Configure GNSS
-  // Note: a delay of at least 1 s is required after powering on GNSS module
+  // Note: a delay of at least 1s is required after powering on GNSS module
   myDelay(1000);
   GNSS_PORT.println("$PMTK220,1000*1F"); // Set NMEA update rate to 1 Hz
   GNSS_PORT.println("$PMTK314,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*28"); // Set NMEA sentence output frequencies to GGA and RMC
