@@ -269,7 +269,7 @@ bool configureLsm303()
   {
     online.lsm303 = true;
     DEBUG_PRINTLN("success!");
-    myDelay(250);
+    myDelay(500);
   }
   else
   {
@@ -745,9 +745,9 @@ void readDFRWindSensor()
 
     { // TPH (BME280 EXT)
       //Traitement data Stevenson - température (BME280):
-      if (((int16_t)bridgeDataRaw.tempExtReg) != temp_ERRORVAL) {
+      if ((int16_t)bridgeDataRaw.tempExtReg != temp_ERRORVAL) {
         //Application du décodage:
-        bridgeData.temperatureExt = ((int16_t)bridgeDataRaw.tempExtReg) / 100.0;
+        bridgeData.temperatureExt = (int16_t)bridgeDataRaw.tempExtReg / 100.0;
 
         //Application de la correction selon étalonnage
         bridgeData.temperatureExt  = tempBmeEXT_CF * bridgeData.temperatureExt + tempBmeEXT_Offset;
@@ -767,7 +767,7 @@ void readDFRWindSensor()
       // Question: est-ce qu'il faut injecter 0 dans le cas contraire?
 
       //Traitement data Stevenson - humidité (BME280):
-      if (((int16_t)bridgeDataRaw.humExtReg) != hum_ERRORVAL) {
+      if ((int16_t)bridgeDataRaw.humExtReg != hum_ERRORVAL) {
         //Application du décodage:
         bridgeData.humiditeExt = bridgeDataRaw.humExtReg / 100.0;
 
@@ -793,7 +793,7 @@ void readDFRWindSensor()
       // Question: est-ce qu'il faut injecter 0 dans le cas contraire?
 
       //Traitement data Stevenson - pression atmoshpérique (BME280):
-      if (((int16_t)bridgeDataRaw.presExtReg) != pres_ERRORVAL) {
+      if ((int16_t)bridgeDataRaw.presExtReg != pres_ERRORVAL) {
 
         //Application du décodage:
         bridgeData.presAtmospExt = bridgeDataRaw.presExtReg / 10.0;  //On veut en hPa
@@ -836,14 +836,15 @@ void readDFRWindSensor()
         DEBUG_PRINTF(" luminoAmbExt="); DEBUG_PRINT(bridgeData.luminoAmbExt);
         DEBUG_PRINTF(" solar="); DEBUG_PRINT(solar);
         DEBUG_PRINTF(" solarStats="); DEBUG_PRINT(solarStats.average());
-        DEBUG_PRINTFLN(" ");
+        DEBUG_PRINTLN();
       #endif
     }
 
     //Recupération de l'information d'état de lecture par le périphérique:
-    bridgeData.stvsnErrCode = ((uint16_t)bridgeDataRaw.stvsnErrReg);
-    lastStvsnErrCode = lastStvsnErrCode | bridgeData.stvsnErrCode;   // Yh 14nov24: fait un OR pour conserver entre 2 collectes, jusqu'à ce que l'envoie soit fait. Pas parfait, mais on aura l'info que pendant le cycle on a rencontré une erreur.
+    bridgeData.stvsnErrCode = (uint16_t)bridgeDataRaw.stvsnErrReg;
+    lastStvsnErrCode = bridgeData.stvsnErrCode || lastStvsnErrCode; // Yh 14nov24: fait un OR pour conserver entre 2 collectes, jusqu'à ce que l'envoie soit fait.
     if (bridgeData.stvsnErrCode) { DEBUG_PRINTF("*ATTN* "); }
+    DEBUG_PRINTF("\tstvsnErrCode: ");
     DEBUG_PRINTLN(bridgeData.stvsnErrCode);
 
     //--- Fin de la grande section de la récupération des valeurs et validation des codes d'erreurs --------------------------

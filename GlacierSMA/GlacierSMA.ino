@@ -179,7 +179,7 @@ StatisticSMA vStats;               // Wind north-south wind vector component (v)
 // ----------------------------------------------------------------------------
 #if DEBUG
 unsigned int  sampleInterval    = 1;      // Sampling interval (minutes). Values must be in range [1, 60]
-unsigned int  averageInterval   = 5;      // Number of samples to be averaged in each message. Range: [1, 240]
+unsigned int  averageInterval   = 15;     // Number of samples to be averaged in each message. Range: [1, 240]
 unsigned int  transmitInterval  = 1;      // Number of messages in each Iridium transmission (340-byte limit)
 unsigned int  retransmitLimit   = 5;      // Failed data transmission reattempts (340-byte limit)
 unsigned int  iridiumTimeout    = 120;    // Timeout for Iridium transmission (seconds)
