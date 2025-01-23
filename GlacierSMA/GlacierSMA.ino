@@ -690,8 +690,12 @@ void receiveCommand() {
 
         command.trim();
         if (command.startsWith("READ")) {
-            if (sampleCounter == 0) {
-                SERIAL_PORT.println("! NOT READY");
+            int arg = command.indexOf(' ');
+            if (arg > 0) {
+                arg = command.substring(arg + 1).toInt();
+            }
+            if ((int)sampleCounter < arg) {
+                SERIAL_PORT.println("! SAMPLES NOT READY");
                 return;
             }
             DEBUG_PRINT("Sending collected data (");
@@ -703,6 +707,9 @@ void receiveCommand() {
             SERIAL_PORT.write(moSbdMessage.bytes, sizeof(moSbdMessage));
             SERIAL_PORT.write('\n');
             SERIAL_PORT.flush();
+        }
+        else {
+            SERIAL_PORT.println("! COMMAND NOT RECOGNIZED");
         }
     }
 }
