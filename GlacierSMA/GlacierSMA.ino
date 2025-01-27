@@ -680,8 +680,11 @@ void loop()
   goToSleep();
 }
 
-
+// ----------------------------------------------------------------------------
+// Gestion des commandes
+// ----------------------------------------------------------------------------
 #define reply(var) _reply(var, #var)
+#define INSPECT(var) if (command.equalsIgnoreCase(#var)) { reply(var); }
 
 template<typename T, typename S>
 void _reply(T value, S* name = nullptr) {
@@ -705,12 +708,14 @@ int receiveCommand() {
     SERIAL_PORT.print("\n< ");
     SERIAL_PORT.print(command);
     command.trim();
-    command.toUpperCase();
 
-    if (command.startsWith("READ")) {
+    String COMMAND = command;
+    COMMAND.toUpperCase();
+
+    if (COMMAND.startsWith("READ")) {
         command = command.substring(5);
         int arg = command.length() > 0 ? command.toInt() : 1;
-        if (!arg) switch (command[0]) {
+        if (!arg) switch (toupper(command[0])) {
             case 'T': reply(temperatureInt); break;
             case 'P': reply(pressureInt); break;
             case 'H': reply(humidityInt); break;
@@ -735,15 +740,15 @@ int receiveCommand() {
             SERIAL_PORT.flush();
         }
     }
-    else if (command.startsWith("GET") || command.startsWith("SET")) {
+    else if (COMMAND.startsWith("GET") || COMMAND.startsWith("SET")) {
         command = command.substring(4);
         if (command.length() == 0) {
             SERIAL_PORT.println("! MISSING ARGUMENT");
             return -3;
         }
-        else if (command == "SAMPLEINTERVAL") {
-            reply(sampleInterval);
-        }
+        else INSPECT(sampleInterval)
+        else INSPECT(averageInterval)
+        else INSPECT(transmitInterval)
         else {
             SERIAL_PORT.print("! INVALID ARGUMENT: ");
             SERIAL_PORT.println(command);
@@ -751,7 +756,8 @@ int receiveCommand() {
         }
     }
     else if (command.length() > 0) {
-        SERIAL_PORT.println("! COMMAND NOT RECOGNIZED");
+        SERIAL_PORT.print("! COMMAND NOT RECOGNIZED: ");
+        SERIAL_PORT.println(command);
         return -1;
     }
     else {
