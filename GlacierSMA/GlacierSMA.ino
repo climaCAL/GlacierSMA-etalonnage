@@ -692,12 +692,13 @@ int receiveCommand() {
     String command = SERIAL_PORT.readString();
     SERIAL_PORT.print("\n< ");
     SERIAL_PORT.print(command);
-
     command.trim();
-    if (command.startsWith("GET ")) {
+    command.toUpperCase();
+
+    if (command.startsWith("GET")) {
         command = command.substring(4);
         if (command.length() == 0) {
-            SERIAL_PORT.print("! MISSING ARGUMENT");
+            SERIAL_PORT.println("! MISSING ARGUMENT");
             return -3;
         }
         else if (command[0] == 'T') {
@@ -709,12 +710,18 @@ int receiveCommand() {
         else if (command[0] == 'H') {
             reply(humidityInt);
         }
+        else {
+            SERIAL_PORT.print("! INVALID ARGUMENT: ");
+            SERIAL_PORT.println(command);
+            return -2;
+        }
     }
     else if (command.startsWith("READ")) {
-        int arg = command.length() > 4 ? command.substring(4).toInt() : 1;
+        command = command.substring(5);
+        int arg = command.length() > 0 ? command.toInt() : 1;
         if (!arg) {
             SERIAL_PORT.print("! INVALID ARGUMENT: ");
-            SERIAL_PORT.println(command.substring(4));
+            SERIAL_PORT.println(command);
             return -2;
         }
         if ((int)sampleCounter < arg) {
