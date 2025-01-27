@@ -694,7 +694,23 @@ int receiveCommand() {
     SERIAL_PORT.print(command);
 
     command.trim();
-    if (command.startsWith("READ")) {
+    if (command.startsWith("GET ")) {
+        command = command.substring(4);
+        if (command.length() == 0) {
+            SERIAL_PORT.print("! MISSING ARGUMENT");
+            return -3;
+        }
+        else if (command[0] == 'T') {
+            reply(temperatureInt);
+        }
+        else if (command[0] == 'P') {
+            reply(pressureInt);
+        }
+        else if (command[0] == 'H') {
+            reply(humidityInt);
+        }
+    }
+    else if (command.startsWith("READ")) {
         int arg = command.length() > 4 ? command.substring(4).toInt() : 1;
         if (!arg) {
             SERIAL_PORT.print("! INVALID ARGUMENT: ");
@@ -723,4 +739,12 @@ int receiveCommand() {
         SERIAL_PORT.println("> READY");
     }
     return 1;
+}
+
+template<typename T>
+void reply(const T& value) {
+    SERIAL_PORT.write('>');
+    SERIAL_PORT.write(' ');
+    SERIAL_PORT.println(value);
+    SERIAL_PORT.flush();
 }
