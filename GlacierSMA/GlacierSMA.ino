@@ -690,48 +690,48 @@ int receiveCommand() {
     command.trim();
     command.toUpperCase();
 
-    if (command.startsWith("GET")) {
+    if (command.startsWith("READ")) {
+        command = command.substring(5);
+        int arg = command.length() > 0 ? command.toInt() : 1;
+        if (!arg) switch (command[0]) {
+            case 'T': reply(temperatureInt); break;
+            case 'P': reply(pressureInt); break;
+            case 'H': reply(humidityInt); break;
+            default: 
+                SERIAL_PORT.print("! INVALID ARGUMENT: ");
+                SERIAL_PORT.println(command);
+                return -2;
+        }
+        else if ((int)sampleCounter < arg) {
+            SERIAL_PORT.println("! NOT ENOUGH SAMPLES");
+            return -4;
+        }
+        else {
+            DEBUG_PRINT("Sending collected data (");
+            DEBUG_PRINT(sampleCounter);
+            DEBUG_PRINTLN(" samples)");
+            calculateStats();
+            SERIAL_PORT.write('>');
+            SERIAL_PORT.write(' ');
+            SERIAL_PORT.write(moSbdMessage.bytes, sizeof(moSbdMessage));
+            SERIAL_PORT.write('\n');
+            SERIAL_PORT.flush();
+        }
+    }
+    else if (command.startsWith("GET") || command.startsWith("SET")) {
         command = command.substring(4);
         if (command.length() == 0) {
             SERIAL_PORT.println("! MISSING ARGUMENT");
             return -3;
         }
-        else if (command[0] == 'T') {
-            reply(temperatureInt);
-        }
-        else if (command[0] == 'P') {
-            reply(pressureInt);
-        }
-        else if (command[0] == 'H') {
-            reply(humidityInt);
+        else if (command == "SAMPLEINTERVAL") {
+            reply(sampleInterval);
         }
         else {
             SERIAL_PORT.print("! INVALID ARGUMENT: ");
             SERIAL_PORT.println(command);
             return -2;
         }
-    }
-    else if (command.startsWith("READ")) {
-        command = command.substring(5);
-        int arg = command.length() > 0 ? command.toInt() : 1;
-        if (!arg) {
-            SERIAL_PORT.print("! INVALID ARGUMENT: ");
-            SERIAL_PORT.println(command);
-            return -2;
-        }
-        if ((int)sampleCounter < arg) {
-            SERIAL_PORT.println("! NOT ENOUGH SAMPLES");
-            return -4;
-        }
-        DEBUG_PRINT("Sending collected data (");
-        DEBUG_PRINT(sampleCounter);
-        DEBUG_PRINTLN(" samples)");
-        calculateStats();
-        SERIAL_PORT.write('>');
-        SERIAL_PORT.write(' ');
-        SERIAL_PORT.write(moSbdMessage.bytes, sizeof(moSbdMessage));
-        SERIAL_PORT.write('\n');
-        SERIAL_PORT.flush();
     }
     else if (command.length() > 0) {
         SERIAL_PORT.println("! COMMAND NOT RECOGNIZED");
