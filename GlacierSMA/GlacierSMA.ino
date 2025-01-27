@@ -680,6 +680,23 @@ void loop()
   goToSleep();
 }
 
+
+#define reply(var) _reply(var, #var)
+
+template<typename T, typename S>
+void _reply(T value, S* name = nullptr) {
+    SERIAL_PORT.write('>');
+    SERIAL_PORT.write(' ');
+    if (name) {
+        DEBUG_PRINT(name);
+        DEBUG_PRINT(' ');
+        DEBUG_PRINT('=');
+        DEBUG_PRINT(' ');
+    }
+    SERIAL_PORT.println(value);
+    SERIAL_PORT.flush();
+}
+
 int receiveCommand() {
     if (SERIAL_PORT.available() <= 0)
         return 0;
@@ -741,12 +758,4 @@ int receiveCommand() {
         SERIAL_PORT.println("> READY");
     }
     return 1;
-}
-
-template<typename T>
-void reply(T value) {
-    SERIAL_PORT.write('>');
-    SERIAL_PORT.write(' ');
-    SERIAL_PORT.println(value);
-    SERIAL_PORT.flush();
 }
