@@ -61,7 +61,7 @@
 // ----------------------------------------------------------------------------
 // Debugging macros
 // ----------------------------------------------------------------------------
-#define DEBUG           true  // Output debug messages to Serial Monitor
+#define DEBUG           false // Output debug messages to Serial Monitor
 #define DEBUG_GNSS      false // Output GNSS debug information
 #define DEBUG_IRIDIUM   false // Output Iridium debug messages to Serial Monitor
 #define INSOMNIAC       true  // Prevent sleeping
@@ -695,17 +695,14 @@ int receiveCommand() {
 
     command.trim();
     if (command.startsWith("READ")) {
-        int arg = 0, idx = command.indexOf(' ');
-        if (idx > 0) {
-            arg = command.substring(idx + 1).toInt();
-            if (!arg) {
-                SERIAL_PORT.print("! INVALID ARGUMENT: ");
-                SERIAL_PORT.println(command.substring(idx + 1));
-                return -2;
-            }
+        int arg = command.length() > 4 ? command.substring(4).toInt() : 1;
+        if (!arg) {
+            SERIAL_PORT.print("! INVALID ARGUMENT: ");
+            SERIAL_PORT.println(command.substring(4));
+            return -2;
         }
         if ((int)sampleCounter < arg) {
-            SERIAL_PORT.println("! SAMPLES NOT READY");
+            SERIAL_PORT.println("! NOT ENOUGH SAMPLES");
             return -4;
         }
         DEBUG_PRINT("Sending collected data (");
@@ -718,12 +715,12 @@ int receiveCommand() {
         SERIAL_PORT.write('\n');
         SERIAL_PORT.flush();
     }
-    else {
-        if (command.length() > 0)
-            SERIAL_PORT.println("! COMMAND NOT RECOGNIZED");
-        else
-            SERIAL_PORT.println("! COMMAND MISSING");
+    else if (command.length() > 0) {
+        SERIAL_PORT.println("! COMMAND NOT RECOGNIZED");
         return -1;
+    }
+    else {
+        SERIAL_PORT.println("> READY");
     }
     return 1;
 }
