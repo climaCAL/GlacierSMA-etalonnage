@@ -1,22 +1,22 @@
 // Read GNSS
 void readGnss()
 {
-  // Start loop timer
-  unsigned long loopStartTime = millis();
-
   if (disabled.gnss) {
     DEBUG_PRINTLN(F("Info - GNSS module disabled."));
     return;
   }
 
-  // Assume the GNSS module is present until proven otherwise
-  online.gnss = true;
-  
+  // Start loop timer
+  unsigned long loopStartTime = millis();
+
   // Reset GNSS fix counter
   byte fixCounter = 0;
 
   // Enable power to GNSS
   enableGnssPower();
+
+  // Assume the GNSS module is present until proven otherwise
+  online.gnss = true;
 
   // Open serial port at 9600 baud
   GNSS_PORT.begin(9600);

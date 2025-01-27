@@ -61,10 +61,9 @@
 // ----------------------------------------------------------------------------
 // Debugging macros
 // ----------------------------------------------------------------------------
-#define DEBUG           false // Output debug messages to Serial Monitor
+#define DEBUG           true  // Output debug messages to Serial Monitor
 #define DEBUG_GNSS      false // Output GNSS debug information
 #define DEBUG_IRIDIUM   false // Output Iridium debug messages to Serial Monitor
-#define NO_TRANSMIT     true  // Prevent sending satellite messages
 #define INSOMNIAC       true  // Prevent sleeping
 #define CALIBRATE       false // Enable sensor calibration code
 
@@ -390,10 +389,11 @@ struct struct_online
   bool di7911   = 1; //TODO Retirer
   bool sp212    = 1; //TODO Retirer
   bool dfrws    = 0; // Est le bridge RS-485 (TODO: Renommer)
-  bool gnss     = 0;
-  bool iridium  = 0;
+  bool gnss     = 1;
+  bool iridium  = 1;
   bool microSd  = 0;
-} disabled, online;
+} online;
+const struct_online disabled;
 
 // Structure to store function timers
 struct struct_timer
@@ -583,29 +583,32 @@ void loop()
       enable5V();         // Enable 5V power
       enable12V();        // Enable 12V power
 
-      receiveCommand();
-
       // Perform measurements
+      receiveCommand();
       if (disabled.bme280Ext)
         DEBUG_PRINTLN("Info - BME280 Ext disabled");
       else
         readBme280Ext();     // Read temperature and humidty sensor (external)
 
+      receiveCommand();
       if (disabled.bme280Int)
         DEBUG_PRINTLN("Info - BME280 Int disabled");
       else
         readBme280Int();  // Read temperature and humidty sensor (internal)
 
+      receiveCommand();
       if (disabled.lsm303)
         DEBUG_PRINTLN("Info - LS303 disabled");
       else
         readLsm303();     // Read accelerometer
 
+      receiveCommand();
       if (disabled.veml7700)
         DEBUG_PRINTLN("Info - VEMLM7700 disabled");
       else
         readVeml7700();
 
+      receiveCommand();
       if (disabled.dfrws)
         DEBUG_PRINTLN("Info - DFRWS disabled");
       else
@@ -631,8 +634,8 @@ void loop()
             currentDate = newDate;
           }
 
-          transmitData(); // Transmit data via Iridium transceiver
-          printSettings(); // Print current settings (in case they changed)
+          if (transmitData()) // Transmit data via Iridium transceiver
+            printSettings(); // Print current settings (in case they changed)
         }
 
         clearStats();
@@ -682,42 +685,45 @@ void loop()
   goToSleep();
 }
 
-void receiveCommand() {
-    if (SERIAL_PORT.available() > 0) {
-        String command = SERIAL_PORT.readString();
-        SERIAL_PORT.print("\n< ");
-        SERIAL_PORT.print(command);
+int receiveCommand() {
+    if (SERIAL_PORT.available() <= 0)
+        return 0;
 
-        command.trim();
-        if (command.startsWith("READ")) {
-            int arg = 0, idx = command.indexOf(' ');
-            if (idx > 0) {
-                arg = command.substring(idx + 1).toInt();
-                if (!arg) {
-                    SERIAL_PORT.print("! INVALID ARGUMENT: ");
-                    SERIAL_PORT.println(command.substring(idx + 1));
-                    return;
-                }
+    String command = SERIAL_PORT.readString();
+    SERIAL_PORT.print("\n< ");
+    SERIAL_PORT.print(command);
+
+    command.trim();
+    if (command.startsWith("READ")) {
+        int arg = 0, idx = command.indexOf(' ');
+        if (idx > 0) {
+            arg = command.substring(idx + 1).toInt();
+            if (!arg) {
+                SERIAL_PORT.print("! INVALID ARGUMENT: ");
+                SERIAL_PORT.println(command.substring(idx + 1));
+                return -2;
             }
-            if ((int)sampleCounter < arg) {
-                SERIAL_PORT.println("! SAMPLES NOT READY");
-                return;
-            }
-            DEBUG_PRINT("Sending collected data (");
-            DEBUG_PRINT(sampleCounter);
-            DEBUG_PRINTLN(" samples)");
-            calculateStats();
-            SERIAL_PORT.write('>');
-            SERIAL_PORT.write(' ');
-            SERIAL_PORT.write(moSbdMessage.bytes, sizeof(moSbdMessage));
-            SERIAL_PORT.write('\n');
-            SERIAL_PORT.flush();
         }
-        else {
-            if (command.length() > 0)
-                SERIAL_PORT.println("! COMMAND NOT RECOGNIZED");
-            else
-                SERIAL_PORT.println("! COMMAND MISSING");
+        if ((int)sampleCounter < arg) {
+            SERIAL_PORT.println("! SAMPLES NOT READY");
+            return -4;
         }
+        DEBUG_PRINT("Sending collected data (");
+        DEBUG_PRINT(sampleCounter);
+        DEBUG_PRINTLN(" samples)");
+        calculateStats();
+        SERIAL_PORT.write('>');
+        SERIAL_PORT.write(' ');
+        SERIAL_PORT.write(moSbdMessage.bytes, sizeof(moSbdMessage));
+        SERIAL_PORT.write('\n');
+        SERIAL_PORT.flush();
     }
+    else {
+        if (command.length() > 0)
+            SERIAL_PORT.println("! COMMAND NOT RECOGNIZED");
+        else
+            SERIAL_PORT.println("! COMMAND MISSING");
+        return -1;
+    }
+    return 1;
 }

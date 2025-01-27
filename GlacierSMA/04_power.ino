@@ -164,10 +164,9 @@ void myDelay(unsigned long ms)
         DEBUG_PRINT('.');
       }
     }
-    else
+    else if (!receiveCommand())
     {
       yield(); // Allow cooperative multitasking (if used).
-      receiveCommand();
     }
     now = millis();
   }
