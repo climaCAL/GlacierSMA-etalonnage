@@ -87,10 +87,7 @@ void disable12V()
 // Prepare system for sleep
 void prepareForSleep()
 {
-#if INSOMNIAC
-  myDelay(5000);
-  DEBUG_PRINTLN();
-#else
+#if !INSOMNIAC
   DEBUG_PRINTLN("Info - Entering deep sleep...");
   DEBUG_PRINTLN();
 
@@ -115,9 +112,15 @@ void goToSleep()
 #if !INSOMNIAC
   // Enter deep sleep
   LowPower.deepSleep();
-#endif
-
   /* Code sleeps here and awaits RTC or WDT interrupt */
+#else
+  Serial.print('*');
+  DEBUG_PRINT("Waiting for next sample");
+  unsigned long elapsed = rtc.getEpoch() - unixtime;
+  if (sampleInterval > elapsed)
+    myDelay((sampleInterval - elapsed) * 1000);
+  DEBUG_PRINTLN();
+#endif
 }
 
 // Wake from deep sleep
@@ -127,6 +130,8 @@ void wakeUp()
   // Enable serial port
   enableSerial();
 #endif
+
+  printWakeUp(sampleCounter);
 }
 
 // Non-blocking blink LED (https://forum.arduino.cc/index.php?topic=503368.0)

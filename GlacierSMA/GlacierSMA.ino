@@ -191,7 +191,7 @@ float         batteryCutoff     = 3.0;    // Battery voltage cutoff threshold (V
 byte          loggingMode       = 3;      // Flag for new log file creation. 1: daily, 2: monthly, 3: yearly
 unsigned int  systemRstWDTCountLimit = 5; // Nombre d'alertes WDT autorisées avant de faire un system Reset (8s par cycle)
 #else
-unsigned int  sampleInterval    = 5;      // Sampling interval (minutes). Default: 5 min (300 seconds)
+unsigned int  sampleInterval    = 1;      // Sampling interval (minutes). Default: 5 min (300 seconds)
 unsigned int  averageInterval   = 12;     // Number of samples to be averaged in each message. Default: 12 (hourly)
 unsigned int  transmitInterval  = 1;      // Number of messages in each Iridium transmission (340-byte limit)
 unsigned int  retransmitLimit   = 5;      // Failed data transmission reattempts (340-byte limit)
@@ -388,8 +388,8 @@ struct struct_online
   bool di7911   = 1; //TODO Retirer
   bool sp212    = 1; //TODO Retirer
   bool dfrws    = 0; // Est le bridge RS-485 (TODO: Renommer)
-  bool gnss     = 1;
-  bool iridium  = 1;
+  bool gnss     = INSOMNIAC;
+  bool iridium  = INSOMNIAC;
   bool microSd  = 0;
 } online;
 const struct_online disabled;
@@ -512,7 +512,7 @@ void setup()
     myDelay(250);
   }
 
-  SERIAL_PORT.println("> READY");
+  SERIAL_PORT.println("> STARTING");
 }
 
 // ----------------------------------------------------------------------------
@@ -537,7 +537,6 @@ void loop()
     {
       // Wake from deep sleep
       wakeUp();
-      printWakeUp(sampleCounter);
 
       // Print date and time
       DEBUG_PRINT("Info - Alarm triggered at "); printDateTime();
@@ -672,7 +671,10 @@ void loop()
   }
 
   // Clear first-time flag after initial power-down
-  firstTimeFlag = false;
+  if (firstTimeFlag) {
+    firstTimeFlag = false;
+    SERIAL_PORT.println("> READY");
+  }
 
   // Enter deep sleep and wait for WDT or RTC alarm interrupt
   goToSleep();
@@ -742,7 +744,7 @@ int receiveCommand() {
 }
 
 template<typename T>
-void reply(const T& value) {
+void reply(T value) {
     SERIAL_PORT.write('>');
     SERIAL_PORT.write(' ');
     SERIAL_PORT.println(value);
