@@ -253,16 +253,15 @@ char          dateTime[20]      = "";     // Datetime buffer
 byte          retransmitCounter = 0;      // Counter for Iridium 9603 transmission reattempts
 byte          transmitCounter   = 0;      // Counter for Iridium 9603 transmission intervals
 byte          currentLogFile    = 0;      // Variable for tracking when new microSD log files are created
-byte          currentDate       = 0;      // Variable for tracking when the date changes
-byte          newDate           = 0;      // Variable for tracking when the date changes
+byte          currentDay        = 0;      // Variable for tracking when the date changes
 int           transmitStatus    = 0;      // Iridium transmission status code
 unsigned int  iterationCounter  = 0;      // Counter for program iterations (zero indicates a reset)
 unsigned int  failureCounter    = 0;      // Counter of consecutive failed Iridium transmission attempts
 unsigned long previousMillis    = 0;      // Global millis() timer
 unsigned long alarmTime         = 0;      // Global epoch alarm time variable
 unsigned long unixtime          = 0;      // Global epoch time variable
-unsigned int  sampleCounter     = 0;      // Sensor measurement counter
 unsigned int  cutoffCounter     = 0;      // Battery voltage cutoff sleep cycle counter
+unsigned long sampleCounter     = 0;      // Sensor measurement counter
 unsigned long samplesSaved      = 0;      // Log file sample counter
 long          rtcDrift          = 0;      // RTC drift calculated during sync
 float         pressureInt       = 0.0;    // Internal pressure (hPa)
@@ -499,7 +498,7 @@ void setup()
   printSettings();      // Print configuration settings
   readBattery();        DEBUG_PRINT("Info - Battery voltage: "); DEBUG_PRINTLN(voltage);
   readGnss();           // Sync RTC with GNSS
-  checkDate();          // Record current date
+  newDay();             // Update current date
   configureIridium();   // Configure Iridium 9603 transceiver
   configureSd();        // Configure microSD
   createLogFile();      // Create initial log file
@@ -626,20 +625,14 @@ void loop()
         // Check if data transmission interval has been reached
         if ((transmitCounter == transmitInterval) || firstTimeFlag)
         {
-          // Check for date change
-          checkDate();
-          if (currentDate != newDate)
-          {
+          if (newDay()) // Check for date change
             readGnss(); // Sync RTC with the GNSS
-            currentDate = newDate;
-          }
 
           if (transmitData()) // Transmit data via Iridium transceiver
             printSettings(); // Print current settings (in case they changed)
         }
 
-        clearStats();
-        sampleCounter = 0; // Reset sample counter
+        clearStats(); // This also resets the sample counter
       }
 
       // Log data to microSD card

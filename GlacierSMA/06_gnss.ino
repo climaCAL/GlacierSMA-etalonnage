@@ -25,8 +25,6 @@ void readGnss()
   DEBUG_PRINT(" seconds) ");
  
   // Configure GNSS
-  // Note: a delay of at least 1s is required after powering on GNSS module
-  myDelay(1000);
   GNSS_PORT.println("$PMTK220,1000*1F"); // Set NMEA update rate to 1 Hz
   GNSS_PORT.println("$PMTK314,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*28"); // Set NMEA sentence output frequencies to GGA and RMC
   //GNSS_PORT.println("$PGCMD,33,1*6C"); // Enable antenna updates

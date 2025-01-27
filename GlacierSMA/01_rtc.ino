@@ -146,14 +146,14 @@ void printAlarm()
   DEBUG_PRINTLN(alarmBuffer);
 }
 
-void checkDate()
+bool newDay()
 {
-  // Record log file tracker the first time program runs
-  if (firstTimeFlag)
-  {
-    currentDate = rtc.getDay();
+  byte today = rtc.getDay();
+  if (currentDay != today) {
+    //DEBUG_PRINT("currentDay: "); DEBUG_PRINTLN(currentDay);
+    //DEBUG_PRINT("newDay: "); DEBUG_PRINTLN(newDay);
+    currentDay = today;
+    return true;
   }
-  newDate = rtc.getDay();
-  //DEBUG_PRINT("currentDate: "); DEBUG_PRINTLN(currentDate);
-  //DEBUG_PRINT("newDate: "); DEBUG_PRINTLN(newDate);
+  return false;
 }

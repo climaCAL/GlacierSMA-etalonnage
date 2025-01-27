@@ -49,7 +49,7 @@ void enableSerial()
 void enableGnssPower()
 {
   digitalWrite(PIN_GNSS_EN, LOW);
-  myDelay(1000);
+  myDelay(1000); // Note: a delay of at least 1s is required after powering on GNSS module
 }
 
 // Disable power to GNSS

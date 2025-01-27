@@ -49,6 +49,8 @@ void clearStats()
   windSpeedStats.clear();
   uStats.clear();
   vStats.clear();
+
+  sampleCounter = 0; // Reset sample counter
 }
 
 // Print statistics
