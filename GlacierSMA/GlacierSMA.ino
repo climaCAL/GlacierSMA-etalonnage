@@ -512,7 +512,7 @@ void setup()
     myDelay(250);
   }
 
-  SERIAL_PORT.println("> STARTING");
+  //SERIAL_PORT.println("> STARTING");
 }
 
 // ----------------------------------------------------------------------------
@@ -673,7 +673,7 @@ void loop()
   // Clear first-time flag after initial power-down
   if (firstTimeFlag) {
     firstTimeFlag = false;
-    SERIAL_PORT.println("> READY");
+    //SERIAL_PORT.println("> READY");
   }
 
   // Enter deep sleep and wait for WDT or RTC alarm interrupt
@@ -705,14 +705,14 @@ int receiveCommand() {
         return 0;
 
     String command = SERIAL_PORT.readString();
-    SERIAL_PORT.print("\n< ");
-    SERIAL_PORT.print(command);
+    SERIAL_PORT.print("< ");
+    SERIAL_PORT.print(command + "\n");
     command.trim();
 
     String COMMAND = command;
     COMMAND.toUpperCase();
-
-    if (COMMAND.startsWith("READ")) {
+    if (COMMAND.startsWith("STATUS")) {}
+    else if (COMMAND.startsWith("READ")) {
         command = command.substring(5);
         int arg = command.length() > 0 ? command.toInt() : 1;
         if (!arg) switch (toupper(command[0])) {
