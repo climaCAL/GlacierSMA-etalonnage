@@ -6,6 +6,7 @@ float nan2zero(float f) {
 void calculateStats() //FIXME What an awful name for a function that DELETES all stats afterwards...
 {
   // Write data to union
+  //Yh 21-janv-2025: en appliquant de cette manière, se fie-t-on à une conversion implicite, par le compilateur?
   moSbdMessage.temperatureInt = nan2zero(temperatureIntStats.average()      * 100);     // Mean internal temperature (°C)
   moSbdMessage.humidityInt    = nan2zero(humidityIntStats.average()         * 100);     // Mean internal humidity (%)
   moSbdMessage.pressureExt    = nan2zero((pressureExtStats.average() - 400) * 100);     // Mean external pressure (hPa)
