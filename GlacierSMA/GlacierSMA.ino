@@ -711,8 +711,7 @@ int receiveCommand() {
 
     String COMMAND = command;
     COMMAND.toUpperCase();
-    if (COMMAND.startsWith("STATUS")) {}
-    else if (COMMAND.startsWith("READ")) {
+    if (COMMAND.startsWith("READ")) {
         command = command.substring(5);
         int arg = command.length() > 0 ? command.toInt() : 1;
         if (!arg) switch (toupper(command[0])) {
@@ -755,13 +754,16 @@ int receiveCommand() {
             return -2;
         }
     }
-    else if (command.length() > 0) {
+    else if (COMMAND.startsWith("STATUS") || COMMAND.length() == 0) {
+        if (firstTimeFlag)
+            SERIAL_PORT.println("> INITIALIZING");
+        else
+            SERIAL_PORT.println("> READY");
+    }
+    else {
         SERIAL_PORT.print("! COMMAND NOT RECOGNIZED: ");
         SERIAL_PORT.println(command);
         return -1;
-    }
-    else {
-        SERIAL_PORT.println("> READY");
     }
     return 1;
 }
