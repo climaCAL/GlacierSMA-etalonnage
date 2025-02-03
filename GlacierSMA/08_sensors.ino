@@ -126,8 +126,8 @@ void readBme280Int()
     DEBUG_PRINT("Info - Reading BME280 Int... ");
 
     // Read sensor data
-    temperatureInt = tempImeINT_CF * bme280Int.readTemperature() + tempBmeINT_Offset ;
-    humidityInt = min(humImeINT_CF * bme280Int.readHumidity() + humBmeINT_Offset, 100);
+    temperatureInt = tempBmeINT_CF * bme280Int.readTemperature() + tempBmeINT_Offset ;
+    humidityInt = min(humBmeINT_CF * bme280Int.readHumidity() + humBmeINT_Offset, 100);
     pressureInt = bme280Int.readPressure() / 100.0F;
 
     // Add to statistics object

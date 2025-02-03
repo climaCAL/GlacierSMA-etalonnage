@@ -215,9 +215,9 @@ float presBmeEXT_CF             = 1.0; //TODO: Never used, why?
 float presBmeEXT_Offset         = 0.0; //idem
 
 //BME280 -- Interior sensor
-float tempImeINT_CF             = 1.0;      // Correction factor for interior temperature acquisition.
+float tempBmeINT_CF             = 1.0;      // Correction factor for interior temperature acquisition.
 float tempBmeINT_Offset         = 0.0;      // Offset for interior temperature acquisition.
-float humImeINT_CF              = 1.0;      // Correction factor for interior humidity acquisition.
+float humBmeINT_CF              = 1.0;      // Correction factor for interior humidity acquisition.
 float humBmeINT_Offset          = 0.0;      // Offset for interior humidity acquisition.
 
 //VEML7700
@@ -749,6 +749,10 @@ int receiveCommand() {
         else _GET(sampleInterval)
         else _GET(averageInterval)
         else _GET(transmitInterval)
+        else _GET(tempBmeINT_Offset)
+        else _GET(tempBmeINT_CF)
+        else _GET(humBmeINT_Offset)
+        else _GET(humBmeINT_CF)
         else {
             SERIAL_PORT.print("! UNKNOWN PARAMETER: ");
             SERIAL_PORT.println(command);
@@ -766,7 +770,7 @@ int receiveCommand() {
             SERIAL_PORT.println("! MISSING ARGUMENT <value>");
             return -3;
         }
-        long arg = command.substring(idx + 1).toInt();
+        float arg = command.substring(idx + 1).toFloat();
         if (!arg) {
             SERIAL_PORT.print("! INVALID ARGUMENT: ");
             SERIAL_PORT.println(command.substring(idx + 1));
@@ -777,9 +781,13 @@ int receiveCommand() {
             SERIAL_PORT.println("! MISSING ARGUMENT <varname>");
             return -3;
         }
-        else _SET(sampleInterval, arg)
-        else _SET(averageInterval, arg)
-        else _SET(transmitInterval, arg)
+        else _SET(sampleInterval, (unsigned int)arg)
+        else _SET(averageInterval, (unsigned int)arg)
+        else _SET(transmitInterval, (unsigned int)arg)
+        else _SET(tempBmeINT_Offset, arg)
+        else _SET(tempBmeINT_CF, arg)
+        else _SET(humBmeINT_Offset, arg)
+        else _SET(humBmeINT_CF, arg)
         else {
             SERIAL_PORT.print("! UNKNOWN PARAMETER: ");
             SERIAL_PORT.println(command);
