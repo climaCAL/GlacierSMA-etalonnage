@@ -684,7 +684,8 @@ void loop()
 // Gestion des commandes
 // ----------------------------------------------------------------------------
 #define reply(var) _reply(var, #var)
-#define INSPECT(var) if (command.equalsIgnoreCase(#var)) { reply(var); }
+#define _GET(var) if (command.equalsIgnoreCase(#var)) { reply(var); }
+#define _SET(var, val) if (command.equalsIgnoreCase(#var)) { var = val; reply(var); }
 
 template<typename T, typename S>
 void _reply(T value, S* name = nullptr) {
@@ -706,14 +707,14 @@ int receiveCommand() {
 
     String command = SERIAL_PORT.readString();
     SERIAL_PORT.print("< ");
-    SERIAL_PORT.print(command + "\n");
+    SERIAL_PORT.print(command);
     command.trim();
 
     String COMMAND = command;
     COMMAND.toUpperCase();
     if (COMMAND.startsWith("READ")) {
         command = command.substring(5);
-        int arg = command.length() > 0 ? command.toInt() : 1;
+        long arg = command.length() > 0 ? command.toInt() : 1;
         if (!arg) switch (toupper(command[0])) {
             case 'T': reply(temperatureInt); break;
             case 'P': reply(pressureInt); break;
@@ -723,7 +724,7 @@ int receiveCommand() {
                 SERIAL_PORT.println(command);
                 return -2;
         }
-        else if ((int)sampleCounter < arg) {
+        else if ((long)sampleCounter < arg) {
             SERIAL_PORT.println("! NOT ENOUGH SAMPLES");
             return -4;
         }
@@ -739,19 +740,50 @@ int receiveCommand() {
             SERIAL_PORT.flush();
         }
     }
-    else if (COMMAND.startsWith("GET") || COMMAND.startsWith("SET")) {
+    else if (COMMAND.startsWith("GET")) {
         command = command.substring(4);
         if (command.length() == 0) {
-            SERIAL_PORT.println("! MISSING ARGUMENT");
+            SERIAL_PORT.println("! MISSING ARGUMENT <varname>");
             return -3;
         }
-        else INSPECT(sampleInterval)
-        else INSPECT(averageInterval)
-        else INSPECT(transmitInterval)
+        else _GET(sampleInterval)
+        else _GET(averageInterval)
+        else _GET(transmitInterval)
         else {
-            SERIAL_PORT.print("! INVALID ARGUMENT: ");
+            SERIAL_PORT.print("! UNKNOWN PARAMETER: ");
             SERIAL_PORT.println(command);
+            return -4;
+        }
+    }
+    else if (COMMAND.startsWith("SET")) {
+        command = command.substring(4);
+        if (command.length() == 0) {
+            SERIAL_PORT.println("! MISSING ARGUMENT <varname>");
+            return -3;
+        }
+        int idx = command.indexOf(' ');
+        if (idx < 0) {
+            SERIAL_PORT.println("! MISSING ARGUMENT <value>");
+            return -3;
+        }
+        long arg = command.substring(idx + 1).toInt();
+        if (!arg) {
+            SERIAL_PORT.print("! INVALID ARGUMENT: ");
+            SERIAL_PORT.println(command.substring(idx + 1));
             return -2;
+        }
+        command = command.substring(0, idx);
+        if (command.length() == 0) {
+            SERIAL_PORT.println("! MISSING ARGUMENT <varname>");
+            return -3;
+        }
+        else _SET(sampleInterval, arg)
+        else _SET(averageInterval, arg)
+        else _SET(transmitInterval, arg)
+        else {
+            SERIAL_PORT.print("! UNKNOWN PARAMETER: ");
+            SERIAL_PORT.println(command);
+            return -4;
         }
     }
     else if (COMMAND.startsWith("STATUS") || COMMAND.length() == 0) {
