@@ -717,11 +717,20 @@ int receiveCommand() {
         long arg = command.length() > 0 ? command.toInt() : 1;
         if (!arg) {
             int idx = COMMAND.indexOf('.');
-            COMMAND = idx < 0 ? "" : COMMAND.substring(idx + 1);
+            COMMAND = idx < 0 ? "INT" : COMMAND.substring(idx + 1);
+            if (COMMAND == "INT")
+                idx = 0;
+            else if (COMMAND == "EXT")
+                idx = 1;
+            else {
+                SERIAL_PORT.print("! INVALID ARGUMENT: ");
+                SERIAL_PORT.println(command);
+                return -2;
+            }
             switch (toupper(command[0])) {
-                case 'T': reply(COMMAND == "EXT" ? temperatureExt : temperatureInt); break;
-                case 'P': reply(COMMAND == "EXT" ? pressureExt : pressureInt); break;
-                case 'H': reply(COMMAND == "EXT" ? humidityExt : humidityInt); break;
+                case 'T': reply(idx ? temperatureExt : temperatureInt); break;
+                case 'P': reply(idx ? pressureExt : pressureInt); break;
+                case 'H': reply(idx ? humidityExt : humidityInt); break;
                 default:
                     SERIAL_PORT.print("! INVALID ARGUMENT: ");
                     SERIAL_PORT.println(command);
