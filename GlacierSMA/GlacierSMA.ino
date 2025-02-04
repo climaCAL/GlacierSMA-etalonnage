@@ -685,9 +685,16 @@ void loop()
 // ----------------------------------------------------------------------------
 // Gestion des commandes
 // ----------------------------------------------------------------------------
-#define reply(var) _reply(var, #var)
-#define _GET(var) if (command.equalsIgnoreCase(#var)) { reply(var); }
-#define _SET(var, val) if (command.equalsIgnoreCase(#var)) { var = val; reply(var); }
+#define reply(var) _reply(var, F(#var))
+
+#define FOREACH_SETTING(M) M(sampleInterval) M(averageInterval) M(transmitInterval)
+#define FOREACH_PARAM(M) \
+            M(tempBmeINT_Offset) M(tempBmeINT_CF) M(humBmeINT_Offset) M(humBmeINT_CF) M(presBmeINT_Offset) M(presBmeINT_CF) \
+            M(tempBmeEXT_Offset) M(tempBmeEXT_CF) M(humBmeEXT_Offset) M(humBmeEXT_CF) M(presBmeEXT_Offset) M(presBmeEXT_CF)
+
+#define _GET(var) else if (command.equalsIgnoreCase(F(#var))) { reply(var); }
+#define _SET(var, val) else if (command.equalsIgnoreCase(F(#var))) { var = val; reply(var); }
+#define _SET_ARG(var) _SET(var, arg)
 
 template<typename T, typename S>
 void _reply(T value, S* name = nullptr) {
@@ -761,13 +768,8 @@ int receiveCommand() {
             SERIAL_PORT.println("! MISSING ARGUMENT <param>");
             return -3;
         }
-        else _GET(sampleInterval)
-        else _GET(averageInterval)
-        else _GET(transmitInterval)
-        else _GET(tempBmeINT_Offset)
-        else _GET(tempBmeINT_CF)
-        else _GET(humBmeINT_Offset)
-        else _GET(humBmeINT_CF)
+        FOREACH_SETTING(_GET)
+        FOREACH_PARAM(_GET)
         else {
             SERIAL_PORT.print("! UNKNOWN PARAMETER: ");
             SERIAL_PORT.println(command);
@@ -798,13 +800,10 @@ int receiveCommand() {
             SERIAL_PORT.println("! MISSING ARGUMENT <param>");
             return -3;
         }
-        else _SET(sampleInterval, (unsigned int)arg)
-        else _SET(averageInterval, (unsigned int)arg)
-        else _SET(transmitInterval, (unsigned int)arg)
-        else _SET(tempBmeINT_Offset, arg)
-        else _SET(tempBmeINT_CF, arg)
-        else _SET(humBmeINT_Offset, arg)
-        else _SET(humBmeINT_CF, arg)
+        _SET(sampleInterval, (unsigned int)arg)
+        _SET(averageInterval, (unsigned int)arg)
+        _SET(transmitInterval, (unsigned int)arg)
+        FOREACH_PARAM(_SET_ARG)
         else {
             SERIAL_PORT.print("! UNKNOWN PARAMETER: ");
             SERIAL_PORT.println(command);
