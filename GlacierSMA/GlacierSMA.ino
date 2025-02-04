@@ -756,7 +756,7 @@ int receiveCommand() {
     else if (COMMAND.startsWith("GET")) {
         command = command.substring(4);
         if (command.length() == 0) {
-            SERIAL_PORT.println("! MISSING ARGUMENT <varname>");
+            SERIAL_PORT.println("! MISSING ARGUMENT <param>");
             return -3;
         }
         else _GET(sampleInterval)
@@ -775,23 +775,25 @@ int receiveCommand() {
     else if (COMMAND.startsWith("SET")) {
         command = command.substring(4);
         if (command.length() == 0) {
-            SERIAL_PORT.println("! MISSING ARGUMENT <varname>");
+            SERIAL_PORT.println("! MISSING ARGUMENTS <param> <value>");
             return -3;
         }
         int idx = command.indexOf(' ');
-        if (idx < 0) {
-            SERIAL_PORT.println("! MISSING ARGUMENT <value>");
-            return -3;
-        }
         float arg = command.substring(idx + 1).toFloat();
         if (!arg) {
-            SERIAL_PORT.print("! INVALID ARGUMENT: ");
-            SERIAL_PORT.println(command.substring(idx + 1));
-            return -2;
+            if (idx < 0) {
+                SERIAL_PORT.println("! MISSING ARGUMENT <value>");
+                return -3;
+            }
+            else {
+                SERIAL_PORT.print("! INVALID VALUE: ");
+                SERIAL_PORT.println(command.substring(idx + 1));
+                return -2;
+            }
         }
-        command = command.substring(0, idx);
+        command = command.substring(0, max(idx, 0));
         if (command.length() == 0) {
-            SERIAL_PORT.println("! MISSING ARGUMENT <varname>");
+            SERIAL_PORT.println("! MISSING ARGUMENT <param>");
             return -3;
         }
         else _SET(sampleInterval, (unsigned int)arg)
