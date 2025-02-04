@@ -723,7 +723,7 @@ void readDFRWindSensor()
       }
       else {
         bridgeData.hauteurNeige = (float)bridgeDataRaw.HNeigeReg;
-        bridgeData.temperatureHN = (float)bridgeDataRaw.tempHNReg;
+        bridgeData.temperatureHN = (float)bridgeDataRaw.tempHNReg;   //Yh 4-fev-2025: à revoir car ne sera pas bien interprété
         
         #if CALIBRATE
           DEBUG_PRINTF("\thauteurNeige Raw: "); DEBUG_PRINT(bridgeData.hauteurNeige); DEBUG_PRINTFLN(" mm");
@@ -842,8 +842,8 @@ void readDFRWindSensor()
     }
 
     //Recupération de l'information d'état de lecture par le périphérique:
-    bridgeData.stvsnErrCode = bridgeDataRaw.stvsnErrReg;
-    DEBUG_PRINTF("\tstvsnErrCode: ");
+    bridgeData.stvsnErrCode = ((uint16_t)bridgeDataRaw.stvsnErrReg);
+    lastStvsnErrCode = lastStvsnErrCode | bridgeData.stvsnErrCode;   // Yh 14nov24: fait un OR pour conserver entre 2 collectes, jusqu'à ce que l'envoie soit fait. Pas parfait, mais on aura l'info que pendant le cycle on a rencontré une erreur.
     if (bridgeData.stvsnErrCode) { DEBUG_PRINTF("*ATTN* "); }
     DEBUG_PRINTLN(bridgeData.stvsnErrCode);
 

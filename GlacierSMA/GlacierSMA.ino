@@ -182,17 +182,17 @@ StatisticCAL vStats;               // Wind north-south wind vector component (v)
 // ----------------------------------------------------------------------------
 #if DEBUG
 unsigned int  sampleInterval    = 5;      // Sampling interval (minutes). Values must be in range [1, 60]
-unsigned int  averageInterval   = 144;    // Number of samples to be averaged in each message. Range: [1, 240]
+unsigned int  averageInterval   = 12;    // Number of samples to be averaged in each message. Range: [1, 240]
 unsigned int  transmitInterval  = 1;      // Number of messages in each Iridium transmission (340-byte limit)
 unsigned int  retransmitLimit   = 5;      // Failed data transmission reattempts (340-byte limit)
 unsigned int  iridiumTimeout    = 120;    // Timeout for Iridium transmission (seconds)
 unsigned int  gnssTimeout       = 60;     // Timeout for GNSS signal acquisition (seconds)
-float         batteryCutoff     = 3.0;    // Battery voltage cutoff threshold (V)
-byte          loggingMode       = 3;      // Flag for new log file creation. 1: daily, 2: monthly, 3: yearly
+float         batteryCutoff     = 11.0;    // Battery voltage cutoff threshold (V)
+byte          loggingMode       = 1;      // Flag for new log file creation. 1: daily, 2: monthly, 3: yearly
 unsigned int  systemRstWDTCountLimit = 5; // Nombre d'alertes WDT autorisées avant de faire un system Reset (8s par cycle)
 #else
 unsigned int  sampleInterval    = 5;      // Sampling interval (minutes). Default: 5 min (300 seconds)
-unsigned int  averageInterval   = 12;     // Number of samples to be averaged in each message. Default: 12 (hourly)
+unsigned int  averageInterval   = 144;     // Number of samples to be averaged in each message. Default: 12 (hourly)
 unsigned int  transmitInterval  = 1;      // Number of messages in each Iridium transmission (340-byte limit)
 unsigned int  retransmitLimit   = 5;      // Failed data transmission reattempts (340-byte limit)
 unsigned int  iridiumTimeout    = 240;    // Timeout for Iridium transmission (seconds)
@@ -286,6 +286,7 @@ float         latitude          = 0.0;    // GNSS latitude (DD)
 float         longitude         = 0.0;    // GNSS longitude (DD)
 byte          satellites        = 0;      // GNSS satellites
 float         hdop              = 0.0;    // GNSS HDOP
+uint16_t      lastStvsnErrCode  = 0;      // last status of Stevenson Error Code
 tmElements_t  tm;                         // Variable for converting time elements to time_t
 
 // ----------------------------------------------------------------------------
