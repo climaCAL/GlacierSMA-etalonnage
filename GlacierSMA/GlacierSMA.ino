@@ -708,21 +708,25 @@ int receiveCommand() {
     String command = SERIAL_PORT.readString();
     command.trim();
     SERIAL_PORT.print("< ");
-    SERIAL_PORT.println(command);
+    SERIAL_PORT.println(command); // Les fins de ligne sont optionnels après les commandes (mais attention au baud rate)
 
     String COMMAND = command;
     COMMAND.toUpperCase();
     if (COMMAND.startsWith("READ")) {
         command = command.substring(5);
         long arg = command.length() > 0 ? command.toInt() : 1;
-        if (!arg) switch (toupper(command[0])) {
-            case 'T': reply(temperatureInt); break;
-            case 'P': reply(pressureInt); break;
-            case 'H': reply(humidityInt); break;
-            default: 
-                SERIAL_PORT.print("! INVALID ARGUMENT: ");
-                SERIAL_PORT.println(command);
-                return -2;
+        if (!arg) {
+            int idx = COMMAND.indexOf('.');
+            COMMAND = idx < 0 ? "" : COMMAND.substring(idx + 1);
+            switch (toupper(command[0])) {
+                case 'T': reply(COMMAND == "EXT" ? temperatureExt : temperatureInt); break;
+                case 'P': reply(COMMAND == "EXT" ? pressureExt : pressureInt); break;
+                case 'H': reply(COMMAND == "EXT" ? humidityExt : humidityInt); break;
+                default:
+                    SERIAL_PORT.print("! INVALID ARGUMENT: ");
+                    SERIAL_PORT.println(command);
+                    return -2;
+            }
         }
         else if ((long)sampleCounter < arg) {
             SERIAL_PORT.println("! NOT ENOUGH SAMPLES");
