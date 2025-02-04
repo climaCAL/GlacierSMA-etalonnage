@@ -706,9 +706,9 @@ int receiveCommand() {
         return 0;
 
     String command = SERIAL_PORT.readString();
-    SERIAL_PORT.print("< ");
-    SERIAL_PORT.print(command);
     command.trim();
+    SERIAL_PORT.print("< ");
+    SERIAL_PORT.println(command);
 
     String COMMAND = command;
     COMMAND.toUpperCase();
