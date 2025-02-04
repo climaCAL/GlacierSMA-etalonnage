@@ -266,6 +266,7 @@ unsigned int  cutoffCounter     = 0;      // Battery voltage cutoff sleep cycle 
 unsigned long sampleCounter     = 0;      // Sensor measurement counter
 unsigned long samplesSaved      = 0;      // Log file sample counter
 long          rtcDrift          = 0;      // RTC drift calculated during sync
+
 float         pressureInt       = 0.0;    // Internal pressure (hPa)
 float         temperatureInt    = 0.0;    // Internal temperature (°C)
 float         humidityInt       = 0.0;    // Internal hunidity (%)
@@ -687,7 +688,7 @@ void loop()
 // ----------------------------------------------------------------------------
 #define reply(var) _reply(var, F(#var))
 
-#define FOREACH_SETTING(M) M(sampleInterval) M(averageInterval) M(transmitInterval)
+#define FOREACH_SETTING(M) M(unixtime) M(sampleInterval) M(averageInterval) M(transmitInterval)
 #define FOREACH_PARAM(M) \
             M(tempBmeINT_Offset) M(tempBmeINT_CF) M(humBmeINT_Offset) M(humBmeINT_CF) M(presBmeINT_Offset) M(presBmeINT_CF) \
             M(tempBmeEXT_Offset) M(tempBmeEXT_CF) M(humBmeEXT_Offset) M(humBmeEXT_CF) M(presBmeEXT_Offset) M(presBmeEXT_CF)
@@ -737,6 +738,7 @@ int receiveCommand() {
                 return -2;
             }
             switch (toupper(command[0])) {
+                case 'V': reply(voltage); break;
                 case 'T': reply(idx ? temperatureExt : temperatureInt); break;
                 case 'P': reply(idx ? pressureExt : pressureInt); break;
                 case 'H': reply(idx ? humidityExt : humidityInt); break;
