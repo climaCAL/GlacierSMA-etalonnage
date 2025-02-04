@@ -68,7 +68,7 @@ void readBme280Ext()
     // Read sensor data
     temperatureExt = tempBmeEXT_CF * bme280Ext.readTemperature() + tempBmeEXT_Offset;
     humidityExt = min(humBmeEXT_CF * bme280Ext.readHumidity() + humBmeEXT_Offset, 100);
-    pressureExt = bme280Ext.readPressure() / 100.0F;
+    pressureExt = presBmeEXT_CF * (bme280Ext.readPressure() / 100.0F) + presBmeEXT_Offset;
 
     // Add to statistics object
     temperatureExtStats.add(temperatureExt);
@@ -126,9 +126,9 @@ void readBme280Int()
     DEBUG_PRINT("Info - Reading BME280 Int... ");
 
     // Read sensor data
-    temperatureInt = tempBmeINT_CF * bme280Int.readTemperature() + tempBmeINT_Offset ;
+    temperatureInt = tempBmeINT_CF * bme280Int.readTemperature() + tempBmeINT_Offset;
     humidityInt = min(humBmeINT_CF * bme280Int.readHumidity() + humBmeINT_Offset, 100);
-    pressureInt = bme280Int.readPressure() / 100.0F;
+    pressureInt = presBmeINT_CF * (bme280Int.readPressure() / 100.0F) + presBmeINT_Offset;
 
     // Add to statistics object
     temperatureIntStats.add(temperatureInt);

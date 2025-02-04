@@ -211,14 +211,16 @@ float tempBmeEXT_CF             = 1.0;      // Correction factor for exterior te
 float tempBmeEXT_Offset         = 0.0;      // Offset for exterior temperature acquisition.
 float humBmeEXT_CF              = 1.0;      // Correction factor for exterior humidity acquisition.
 float humBmeEXT_Offset          = 0.0;      // Offset for exterior humidity acquisition.
-float presBmeEXT_CF             = 1.0; //TODO: Never used, why?
-float presBmeEXT_Offset         = 0.0; //idem
+float presBmeEXT_CF             = 1.0;      // Correction factor for exterior pressure acquisition.
+float presBmeEXT_Offset         = 0.0;      // Offset for exterior pressure acquisition.
 
 //BME280 -- Interior sensor
 float tempBmeINT_CF             = 1.0;      // Correction factor for interior temperature acquisition.
 float tempBmeINT_Offset         = 0.0;      // Offset for interior temperature acquisition.
 float humBmeINT_CF              = 1.0;      // Correction factor for interior humidity acquisition.
 float humBmeINT_Offset          = 0.0;      // Offset for interior humidity acquisition.
+float presBmeINT_CF             = 1.0;      // Correction factor for interior pressure acquisition.
+float presBmeINT_Offset         = 0.0;      // Offset for interior pressure acquisition.
 
 //VEML7700
 float veml_CF                   = 22.045;   // Correction factor for light intensity acquisition. Ref: ÉtalonnageVEML7700_H24.xlsx
