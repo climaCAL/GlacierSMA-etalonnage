@@ -698,7 +698,7 @@ void loop()
 
 #define _GET(var) else if (command.equalsIgnoreCase(F(#var))) { reply(var); }
 #define _SET(var, val) else if (command.equalsIgnoreCase(F(#var))) { var = val; reply(var); }
-#define _SET_ARG(var) _SET(var, arg)
+#define _SET_ARG(var) _SET(var, static_cast<__typeof(var)>(arg))
 
 template<typename T, typename S>
 void _reply(T value, S* ident = nullptr) {
@@ -756,7 +756,7 @@ int receiveCommand() {
             return -4;
         }
         else {
-            DEBUG_PRINT("Sending all data (");
+            DEBUG_PRINT("Sending averaged data (");
             DEBUG_PRINT(sampleCounter);
             DEBUG_PRINTLN(" samples)");
             calculateStats();
@@ -791,7 +791,7 @@ int receiveCommand() {
             return -3;
         }
         int idx = command.indexOf(' ');
-        float arg = command.substring(idx + 1).toFloat();
+        double arg = command.substring(idx + 1).toDouble();
         if (!arg) {
             if (idx < 0) {
                 SERIAL_PORT.println("! MISSING ARGUMENT <value>");
@@ -812,9 +812,7 @@ int receiveCommand() {
             rtc.setEpoch((uint32_t)arg);
             _reply((uint32_t)arg, "time");
         }
-        _SET(sampleInterval, (unsigned int)arg)
-        _SET(averageInterval, (unsigned int)arg)
-        _SET(transmitInterval, (unsigned int)arg)
+        FOREACH_SETTING(_SET_ARG)
         FOREACH_PARAM(_SET_ARG)
         else {
             SERIAL_PORT.print("! UNKNOWN PARAMETER: ");
