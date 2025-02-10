@@ -68,26 +68,23 @@
 #define CALIBRATE       false // Enable sensor calibration code
 
 #if DEBUG
-#define DEBUG_PRINT(x)            SERIAL_PORT.print(x)
-#define DEBUG_PRINTF(x)           SERIAL_PORT.print(F(x))
-#define DEBUG_PRINTLN(x)          SERIAL_PORT.println(x)
-#define DEBUG_PRINTFLN(x)         SERIAL_PORT.println(F(x))
-#define DEBUG_PRINT_HEX(x)        SERIAL_PORT.print(x, HEX)
-#define DEBUG_PRINTLN_HEX(x)      SERIAL_PORT.println(x, HEX)
-#define DEBUG_PRINT_DEC(x, y)     SERIAL_PORT.print(x, y)
-#define DEBUG_PRINTLN_DEC(x, y)   SERIAL_PORT.println(x, y)
+#define DEBUG_PRINT(...)          SERIAL_PORT.print(__VA_ARGS__)
+#define DEBUG_PRINTF(x, ...)      SERIAL_PORT.print(F(x), ##__VA_ARGS__)
+#define DEBUG_PRINTLN(...)        SERIAL_PORT.println(__VA_ARGS__)
+#define DEBUG_PRINTFLN(x, ...)    SERIAL_PORT.println(F(x), ##__VA_ARGS__)
 #define DEBUG_WRITE(x)            SERIAL_PORT.write(x)
 #else
-#define DEBUG_PRINT(x)
-#define DEBUG_PRINTF(x)
-#define DEBUG_PRINTLN(x)
-#define DEBUG_PRINTFLN(x)
-#define DEBUG_PRINT_HEX(x)
-#define DEBUG_PRINTLN_HEX(x)
-#define DEBUG_PRINT_DEC(x, y)
-#define DEBUG_PRINTLN_DEC(x, y)
+#define DEBUG_PRINT(...)
+#define DEBUG_PRINTF(x, ...)
+#define DEBUG_PRINTLN(...)
+#define DEBUG_PRINTFLN(x, ...)
 #define DEBUG_WRITE(x)
 #endif
+
+#define DEBUG_PRINT_HEX(x)        DEBUG_PRINT(x, HEX)
+#define DEBUG_PRINTLN_HEX(x)      DEBUG_PRINTLN(x, HEX)
+#define DEBUG_PRINT_DEC(x, y)     DEBUG_PRINT(x, y)
+#define DEBUG_PRINTLN_DEC(x, y)   DEBUG_PRINTLN(x, y)
 
 // ----------------------------------------------------------------------------
 // I2C address definitions
