@@ -211,14 +211,16 @@ float tempBmeEXT_CF             = 1.0;      // Correction factor for exterior te
 float tempBmeEXT_Offset         = 0.0;      // Offset for exterior temperature acquisition.
 float humBmeEXT_CF              = 1.0;      // Correction factor for exterior humidity acquisition.
 float humBmeEXT_Offset          = 0.0;      // Offset for exterior humidity acquisition.
-float presBmeEXT_CF             = 1.0; //TODO: Never used, why?
-float presBmeEXT_Offset         = 0.0; //idem
+float presBmeEXT_CF             = 1.0;      // Correction factor for exterior pressure acquisition.
+float presBmeEXT_Offset         = 0.0;      // Offset for exterior pressure acquisition.
 
 //BME280 -- Interior sensor
-float tempImeINT_CF             = 1.0;      // Correction factor for interior temperature acquisition.
+float tempBmeINT_CF             = 1.0;      // Correction factor for interior temperature acquisition.
 float tempBmeINT_Offset         = 0.0;      // Offset for interior temperature acquisition.
-float humImeINT_CF              = 1.0;      // Correction factor for interior humidity acquisition.
+float humBmeINT_CF              = 1.0;      // Correction factor for interior humidity acquisition.
 float humBmeINT_Offset          = 0.0;      // Offset for interior humidity acquisition.
+float presBmeINT_CF             = 1.0;      // Correction factor for interior pressure acquisition.
+float presBmeINT_Offset         = 0.0;      // Offset for interior pressure acquisition.
 
 //VEML7700
 float veml_CF                   = 22.045;   // Correction factor for light intensity acquisition. Ref: ÉtalonnageVEML7700_H24.xlsx
@@ -264,6 +266,7 @@ unsigned int  cutoffCounter     = 0;      // Battery voltage cutoff sleep cycle 
 unsigned long sampleCounter     = 0;      // Sensor measurement counter
 unsigned long samplesSaved      = 0;      // Log file sample counter
 long          rtcDrift          = 0;      // RTC drift calculated during sync
+
 float         pressureInt       = 0.0;    // Internal pressure (hPa)
 float         temperatureInt    = 0.0;    // Internal temperature (°C)
 float         humidityInt       = 0.0;    // Internal hunidity (%)
@@ -370,6 +373,7 @@ typedef union
   };
   uint8_t bytes[6]; // Size of message to be received in bytes
 } SBD_MT_MESSAGE;
+
 SBD_MT_MESSAGE mtSbdMessage;
 
 // Structure to store device online/offline states and enabled/disabled flags
@@ -517,7 +521,7 @@ void setup()
     myDelay(250);
   }
 
-  SERIAL_PORT.println("> STARTING");
+  //SERIAL_PORT.println("> STARTING");
 }
 
 // ----------------------------------------------------------------------------
@@ -678,7 +682,7 @@ void loop()
   // Clear first-time flag after initial power-down
   if (firstTimeFlag) {
     firstTimeFlag = false;
-    SERIAL_PORT.println("> READY");
+    //SERIAL_PORT.println("> READY");
   }
 
   // Enter deep sleep and wait for WDT or RTC alarm interrupt
@@ -689,7 +693,15 @@ void loop()
 // Gestion des commandes
 // ----------------------------------------------------------------------------
 #define reply(var) _reply(var, F(#var))
-#define INSPECT(var) if (command.equalsIgnoreCase(#var)) { reply(var); }
+
+#define FOREACH_SETTING(M) M(unixtime) M(sampleInterval) M(averageInterval) M(transmitInterval)
+#define FOREACH_PARAM(M) \
+            M(tempBmeINT_Offset) M(tempBmeINT_CF) M(humBmeINT_Offset) M(humBmeINT_CF) M(presBmeINT_Offset) M(presBmeINT_CF) \
+            M(tempBmeEXT_Offset) M(tempBmeEXT_CF) M(humBmeEXT_Offset) M(humBmeEXT_CF) M(presBmeEXT_Offset) M(presBmeEXT_CF)
+
+#define _GET(var) else if (command.equalsIgnoreCase(F(#var))) { reply(var); }
+#define _SET(var, val) else if (command.equalsIgnoreCase(F(#var))) { var = val; reply(var); }
+#define _SET_ARG(var) _SET(var, arg)
 
 template<typename T, typename S>
 void _reply(T value, S* ident = nullptr) {
@@ -710,26 +722,39 @@ int receiveCommand() {
         return 0;
 
     String command = SERIAL_PORT.readString();
-    SERIAL_PORT.print("\n< ");
-    SERIAL_PORT.print(command);
     command.trim();
+    SERIAL_PORT.print("< ");
+    SERIAL_PORT.println(command); // Les fins de ligne sont optionnels après les commandes (mais attention au baud rate)
 
     String COMMAND = command;
     COMMAND.toUpperCase();
-
     if (COMMAND.startsWith("READ")) {
         command = command.substring(5);
-        int arg = command.length() > 0 ? command.toInt() : 1;
-        if (!arg) switch (toupper(command[0])) {
-            case 'T': reply(temperatureInt); break;
-            case 'P': reply(pressureInt); break;
-            case 'H': reply(humidityInt); break;
-            default: 
+        long arg = command.length() > 0 ? command.toInt() : 1;
+        if (!arg) {
+            int idx = COMMAND.indexOf('.');
+            COMMAND = idx < 0 ? "INT" : COMMAND.substring(idx + 1);
+            if (COMMAND == "INT")
+                idx = 0;
+            else if (COMMAND == "EXT")
+                idx = 1;
+            else {
                 SERIAL_PORT.print("! INVALID ARGUMENT: ");
                 SERIAL_PORT.println(command);
                 return -2;
+            }
+            switch (toupper(command[0])) {
+                case 'V': reply(voltage); break;
+                case 'T': reply(idx ? temperatureExt : temperatureInt); break;
+                case 'P': reply(idx ? pressureExt : pressureInt); break;
+                case 'H': reply(idx ? humidityExt : humidityInt); break;
+                default:
+                    SERIAL_PORT.print("! INVALID ARGUMENT: ");
+                    SERIAL_PORT.println(command);
+                    return -2;
+            }
         }
-        else if ((int)sampleCounter < arg) {
+        else if ((long)sampleCounter < arg) {
             SERIAL_PORT.println("! NOT ENOUGH SAMPLES");
             return -4;
         }
@@ -745,28 +770,64 @@ int receiveCommand() {
             SERIAL_PORT.flush();
         }
     }
-    else if (COMMAND.startsWith("GET") || COMMAND.startsWith("SET")) {
+    else if (COMMAND.startsWith("GET")) {
         command = command.substring(4);
         if (command.length() == 0) {
-            SERIAL_PORT.println("! MISSING ARGUMENT");
+            SERIAL_PORT.println("! MISSING ARGUMENT <param>");
             return -3;
         }
-        else INSPECT(sampleInterval)
-        else INSPECT(averageInterval)
-        else INSPECT(transmitInterval)
+        FOREACH_SETTING(_GET)
+        FOREACH_PARAM(_GET)
         else {
-            SERIAL_PORT.print("! INVALID ARGUMENT: ");
+            SERIAL_PORT.print("! UNKNOWN PARAMETER: ");
             SERIAL_PORT.println(command);
-            return -2;
+            return -4;
         }
     }
-    else if (command.length() > 0) {
+    else if (COMMAND.startsWith("SET")) {
+        command = command.substring(4);
+        if (command.length() == 0) {
+            SERIAL_PORT.println("! MISSING ARGUMENTS <param> <value>");
+            return -3;
+        }
+        int idx = command.indexOf(' ');
+        float arg = command.substring(idx + 1).toFloat();
+        if (!arg) {
+            if (idx < 0) {
+                SERIAL_PORT.println("! MISSING ARGUMENT <value>");
+                return -3;
+            }
+            else {
+                SERIAL_PORT.print("! INVALID VALUE: ");
+                SERIAL_PORT.println(command.substring(idx + 1));
+                return -2;
+            }
+        }
+        command = command.substring(0, max(idx, 0));
+        if (command.length() == 0) {
+            SERIAL_PORT.println("! MISSING ARGUMENT <param>");
+            return -3;
+        }
+        _SET(sampleInterval, (unsigned int)arg)
+        _SET(averageInterval, (unsigned int)arg)
+        _SET(transmitInterval, (unsigned int)arg)
+        FOREACH_PARAM(_SET_ARG)
+        else {
+            SERIAL_PORT.print("! UNKNOWN PARAMETER: ");
+            SERIAL_PORT.println(command);
+            return -4;
+        }
+    }
+    else if (COMMAND.startsWith("STATUS") || COMMAND.length() == 0) {
+        if (firstTimeFlag)
+            SERIAL_PORT.println("> INITIALIZING");
+        else
+            SERIAL_PORT.println("> READY");
+    }
+    else {
         SERIAL_PORT.print("! COMMAND NOT RECOGNIZED: ");
         SERIAL_PORT.println(command);
         return -1;
-    }
-    else {
-        SERIAL_PORT.println("> READY");
     }
     return 1;
 }

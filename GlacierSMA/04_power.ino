@@ -114,7 +114,7 @@ void goToSleep()
   LowPower.deepSleep();
   /* Code sleeps here and awaits RTC or WDT interrupt */
 #else
-  Serial.print('*');
+  //Serial.print('*');
   DEBUG_PRINT("Waiting for next sample");
   unsigned long elapsed = rtc.getEpoch() - unixtime;
   if (sampleInterval > elapsed)
