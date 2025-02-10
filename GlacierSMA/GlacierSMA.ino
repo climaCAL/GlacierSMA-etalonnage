@@ -822,7 +822,11 @@ int receiveCommand() {
             return -4;
         }
     }
-    else if (COMMAND.startsWith("STATUS") || COMMAND.length() == 0) {
+    else if (COMMAND.equals("RESET")) {
+        SERIAL_PORT.println("> RESETTING");
+        forceReset();
+    }
+    else if (COMMAND.equals("STATUS") || COMMAND.length() == 0) {
         if (firstTimeFlag)
             SERIAL_PORT.println("> INITIALIZING");
         else
