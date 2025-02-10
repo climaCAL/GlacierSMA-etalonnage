@@ -659,10 +659,6 @@ void readDFRWindSensor()
     DEBUG_PRINT("(sensor settle time: "); DEBUG_PRINT(bridgeSettleDelay/1000); DEBUG_PRINT("s) ");
     myDelay(bridgeSettleDelay);
   }
-  else {
-    // Si le bridge était déjà actif, un délai plus court devrait être suffisant.
-    myDelay(250);
-  }
   
   sensorsDataRaw bridgeDataRaw; // Struct for raw sensor data (read from i2c)
   sensorsData bridgeData; // Struct for parsed sensor data
@@ -872,7 +868,7 @@ void readDFRWindSensor()
   DEBUG_PRINTF("\tTemperatureExt: "); DEBUG_PRINTLN(temperatureExt);
   DEBUG_PRINTF("\tHumidityExt: "); DEBUG_PRINTLN(humidityExt);
   DEBUG_PRINTF("\tPressureExt: "); DEBUG_PRINTLN(pressureExt);
-  DEBUG_PRINTF("\tluminoAmbExt: "); DEBUG_PRINTLN(solar);
+  DEBUG_PRINTF("\tLuminoAmbExt: "); DEBUG_PRINTLN(solar);
 
   // Stop the loop timer
   timer.readDFRWS += millis() - loopStartTime;
