@@ -694,7 +694,7 @@ void loop()
 // ----------------------------------------------------------------------------
 #define reply(var) _reply(var, F(#var))
 
-#define FOREACH_SETTING(M) M(unixtime) M(sampleInterval) M(averageInterval) M(transmitInterval)
+#define FOREACH_SETTING(M) M(sampleInterval) M(averageInterval) M(transmitInterval)
 #define FOREACH_PARAM(M) \
             M(tempBmeINT_Offset) M(tempBmeINT_CF) M(humBmeINT_Offset) M(humBmeINT_CF) M(presBmeINT_Offset) M(presBmeINT_CF) \
             M(tempBmeEXT_Offset) M(tempBmeEXT_CF) M(humBmeEXT_Offset) M(humBmeEXT_CF) M(presBmeEXT_Offset) M(presBmeEXT_CF)
@@ -759,7 +759,7 @@ int receiveCommand() {
             return -4;
         }
         else {
-            DEBUG_PRINT("Sending collected data (");
+            DEBUG_PRINT("Sending all data (");
             DEBUG_PRINT(sampleCounter);
             DEBUG_PRINTLN(" samples)");
             calculateStats();
@@ -775,6 +775,9 @@ int receiveCommand() {
         if (command.length() == 0) {
             SERIAL_PORT.println("! MISSING ARGUMENT <param>");
             return -3;
+        }
+        else if (command.equalsIgnoreCase("time")) {
+            _reply(rtc.getEpoch(), "time");
         }
         FOREACH_SETTING(_GET)
         FOREACH_PARAM(_GET)
@@ -807,6 +810,10 @@ int receiveCommand() {
         if (command.length() == 0) {
             SERIAL_PORT.println("! MISSING ARGUMENT <param>");
             return -3;
+        }
+        else if (command.equalsIgnoreCase("time")) {
+            rtc.setEpoch((uint32_t)arg);
+            _reply((uint32_t)arg, "time");
         }
         _SET(sampleInterval, (unsigned int)arg)
         _SET(averageInterval, (unsigned int)arg)
