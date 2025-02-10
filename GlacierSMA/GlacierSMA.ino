@@ -370,7 +370,6 @@ typedef union
   };
   uint8_t bytes[6]; // Size of message to be received in bytes
 } SBD_MT_MESSAGE;
-
 SBD_MT_MESSAGE mtSbdMessage;
 
 // Structure to store device online/offline states and enabled/disabled flags
@@ -419,6 +418,12 @@ struct struct_timer
 // ----------------------------------------------------------------------------
 void setup()
 {
+  // Clear memory structures
+  memset(&moSbdMessage, 0, sizeof(moSbdMessage));
+  memset(&mtSbdMessage, 0, sizeof(mtSbdMessage));
+  memset(&online, 0, sizeof(online));
+  memset(&timer, 0, sizeof(timer));
+
   // Pin assignments
   pinMode(PIN_LED_GREEN, OUTPUT);
   pinMode(PIN_LED_RED, OUTPUT);
@@ -683,15 +688,15 @@ void loop()
 // ----------------------------------------------------------------------------
 // Gestion des commandes
 // ----------------------------------------------------------------------------
-#define reply(var) _reply(var, #var)
+#define reply(var) _reply(var, F(#var))
 #define INSPECT(var) if (command.equalsIgnoreCase(#var)) { reply(var); }
 
 template<typename T, typename S>
-void _reply(T value, S* name = nullptr) {
+void _reply(T value, S* ident = nullptr) {
     SERIAL_PORT.write('>');
     SERIAL_PORT.write(' ');
-    if (name) {
-        DEBUG_PRINT(name);
+    if (ident) {
+        DEBUG_PRINT(ident);
         DEBUG_PRINT(' ');
         DEBUG_PRINT('=');
         DEBUG_PRINT(' ');
