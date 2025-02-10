@@ -691,6 +691,7 @@ void loop()
 // ----------------------------------------------------------------------------
 #define reply(var) _reply(var, F(#var))
 
+#define FOREACH_STATUSVAR(M) M(sampleCounter) M(iterationCounter) M(transmitStatus)
 #define FOREACH_SETTING(M) M(sampleInterval) M(averageInterval) M(transmitInterval)
 #define FOREACH_PARAM(M) \
             M(tempBmeINT_Offset) M(tempBmeINT_CF) M(humBmeINT_Offset) M(humBmeINT_CF) M(presBmeINT_Offset) M(presBmeINT_CF) \
@@ -776,6 +777,7 @@ int receiveCommand() {
         else if (command.equalsIgnoreCase("time")) {
             _reply(rtc.getEpoch(), "time");
         }
+        FOREACH_STATUSVAR(_GET)
         FOREACH_SETTING(_GET)
         FOREACH_PARAM(_GET)
         else {
