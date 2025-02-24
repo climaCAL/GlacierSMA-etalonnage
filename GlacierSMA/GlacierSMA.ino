@@ -248,7 +248,7 @@ uint8_t       mtSbdBuffer[270];           // Buffer for Mobile Terminated SBD (M
 size_t        moSbdBufferSize;
 size_t        mtSbdBufferSize;
 char          logFileName[50]   = "";     // Log file name
-char          dateTime[20]      = "";     // Datetime buffer
+char          datetime[20]      = "";     // Datetime buffer
 byte          retransmitCounter = 0;      // Counter for Iridium 9603 transmission reattempts
 byte          transmitCounter   = 0;      // Counter for Iridium 9603 transmission intervals
 byte          currentLogFile    = 0;      // Variable for tracking when new microSD log files are created
@@ -545,7 +545,7 @@ void loop()
       wakeUp();
 
       // Print date and time
-      DEBUG_PRINT("Info - Alarm triggered at "); printDateTime();
+      DEBUG_PRINT("Info - Alarm triggered at "); DEBUG_PRINTLN(datetime);
     }
 
     // Read battery voltage

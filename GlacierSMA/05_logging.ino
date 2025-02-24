@@ -136,7 +136,7 @@ void logData()
 
       // Sensor information
       LOG_PRINT(samplesSaved);
-      LOG_PRINT(dateTime);
+      LOG_PRINT(datetime);
       LOG_PRINT(voltage);
       LOG_PRINT(pressureInt);
       LOG_PRINT(temperatureInt);
