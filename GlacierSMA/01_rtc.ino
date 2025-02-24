@@ -1,15 +1,16 @@
+// Alarm modes:
+// 0: MATCH_OFF          Never
+// 1: MATCH_SS           Every Minute
+// 2: MATCH_MMSS         Every Hour
+// 3: MATCH_HHMMSS       Every Day
+// 4: MATCH_DHHMMSS      Every Month
+// 5: MATCH_MMDDHHMMSS   Every Year
+// 6: MATCH_YYMMDDHHMMSS Once, on a specific date and a specific time
+#define ALARM_MODE rtc.MATCH_MMSS
+
 // Configure the real-time clock (RTC)
 void configureRtc()
 {
-  // Alarm modes:
-  // 0: MATCH_OFF          Never
-  // 1: MATCH_SS           Every Minute
-  // 2: MATCH_MMSS         Every Hour
-  // 3: MATCH_HHMMSS       Every Day
-  // 4: MATCH_DHHMMSS      Every Month
-  // 5: MATCH_MMDDHHMMSS   Every Year
-  // 6: MATCH_YYMMDDHHMMSS Once, on a specific date and a specific time
-
   // Initialize RTC
   rtc.begin(); // begin(bool resetTime = true) would reset time to 0 on startup
 
@@ -83,14 +84,14 @@ void setRtcAlarm()
   rtc.setAlarmTime(hour(alarmTime), minute(alarmTime), 0); // hours, minutes, seconds
   
   // Enable alarm for minute-and-second match
-  rtc.enableAlarm(rtc.MATCH_MMSS);
+  rtc.enableAlarm(ALARM_MODE);
 
   // Clear flag
   alarmFlag = false;
 
   DEBUG_PRINT("Info - (setRtcAlarm) Current datetime: "); printDateTime();
   DEBUG_PRINT("Info - (setRtcAlarm) Next alarm: "); printAlarm();
-  DEBUG_PRINT("Info - (setRtcAlarm) Alarm mode: "); DEBUG_PRINTLN("MMSS");
+  DEBUG_PRINT("Info - (setRtcAlarm) Alarm mode: "); DEBUG_PRINTLN(ALARM_MODE);
 }
 
 void setCutoffAlarm() //FIXME Is this function really necessary? Why not reuse setRtcAlarm() with a parameter?
@@ -100,14 +101,14 @@ void setCutoffAlarm() //FIXME Is this function really necessary? Why not reuse s
   rtc.setAlarmTime(hour(alarmTime), minute(alarmTime), 0); // hours, minutes, seconds
 
   // Enable alarm (matching hours, minutes and seconds)
-  rtc.enableAlarm(rtc.MATCH_MMSS);
+  rtc.enableAlarm(ALARM_MODE);
 
   // Clear flag
   alarmFlag = false;
 
   DEBUG_PRINT("Info - (setCOAlrm) Current datetime: "); printDateTime();
   DEBUG_PRINT("Info - (setCOAlrm) Next alarm: "); printAlarm();
-  DEBUG_PRINT("Info - (setCOAlrm) Alarm mode: "); DEBUG_PRINTLN("MMSS");
+  DEBUG_PRINT("Info - (setCOAlrm) Alarm mode: "); DEBUG_PRINTLN(ALARM_MODE);
 }
 
 // Check that the next alarm is set correctly;

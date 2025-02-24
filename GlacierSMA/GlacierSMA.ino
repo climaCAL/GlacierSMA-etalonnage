@@ -46,7 +46,7 @@
 #include <TinyGPS++.h>              // https://github.com/mikalhart/TinyGPSPlus (v1.0.3)
 #include <Wire.h>                   // https://www.arduino.cc/en/Reference/Wire
 #include <wiring_private.h>         // Required for creating new Serial instance
-#include "src/Adafruit_VEML7700.h"  // Customized version of Adafruit VEML7700 library
+#include "src/Adafruit_VEML7700.h"  // Patched version of Adafruit VEML7700 library
 
 // ----------------------------------------------------------------------------
 // Define unique identifier
@@ -286,7 +286,6 @@ float         latitude          = 0.0;    // GNSS latitude (DD)
 float         longitude         = 0.0;    // GNSS longitude (DD)
 byte          satellites        = 0;      // GNSS satellites
 float         hdop              = 0.0;    // GNSS HDOP
-tmElements_t  tm;                         // Variable for converting time elements to time_t
 
 // ----------------------------------------------------------------------------
 // Unions/structures

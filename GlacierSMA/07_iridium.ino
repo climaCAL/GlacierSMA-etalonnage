@@ -50,7 +50,7 @@ void transmitData()
     pinPeripheral(PIN_IRIDIUM_RX, PIO_SERCOM);
 
     // Wake up the RockBLOCK 9603 and begin communications
-    DEBUG_PRINTLN("Info - Starting iridium modem...");
+     DEBUG_PRINT("Info - Starting iridium modem ("); DEBUG_PRINT(iridiumTimeout/2); DEBUG_PRINTLN("s)...");
     petDog(); // The following might take a while, so best reset the WDT here
 
     int returnCode = modem.begin();
@@ -74,7 +74,7 @@ void transmitData()
       mtSbdBufferSize = sizeof(mtSbdBuffer);
       memset(mtSbdBuffer, 0x00, sizeof(mtSbdBuffer)); // Clear MT-SBD buffer
 
-      DEBUG_PRINTLN("Info - Attempting to transmit message...");
+      DEBUG_PRINT("Info - Attempting to transmit message ("); DEBUG_PRINT(iridiumTimeout); DEBUG_PRINTLN("s)...");
       petDog(); // The following might take a while, so best reset the WDT here
 
       // Transmit and receieve SBD message data in binary format
@@ -139,8 +139,7 @@ void transmitData()
       }
       else
       {
-        DEBUG_PRINT("Warning - Transmission failed with error code ");
-        DEBUG_PRINTLN(returnCode);
+        DEBUG_PRINT("Warning - Transmission failed with error code "); DEBUG_PRINTLN(returnCode);
         blinkLed(PIN_LED_RED, 10, 500);
       }
     }
