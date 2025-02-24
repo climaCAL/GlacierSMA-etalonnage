@@ -60,7 +60,7 @@ void printStats()
   printLine();
   DEBUG_PRINTLN(F("Statistics"));
   printLine();
-  DEBUG_PRINT("Datetime: ");  printTab(1);  DEBUG_PRINTLN(datetime);
+  DEBUG_PRINT("Datetime: ");      DEBUG_PRINTLN(datetime);
 
   DEBUG_PRINT(F("Voltage"));                                                    printTab(2);
   DEBUG_PRINT(F("Samples: "));    DEBUG_PRINT(batteryStats.count());            printTab(1);

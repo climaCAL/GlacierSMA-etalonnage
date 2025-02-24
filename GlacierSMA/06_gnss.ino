@@ -20,9 +20,7 @@ void readGnss()
 
   // Open serial port at 9600 baud
   GNSS_PORT.begin(9600);
-  DEBUG_PRINT(F("Info - Beginning to listen for GNSS traffic ("));
-  DEBUG_PRINT(gnssTimeout);
-  DEBUG_PRINT(" seconds) ");
+  DEBUG_PRINT(F("Info - Beginning to listen for GNSS traffic (")); DEBUG_PRINT(gnssTimeout); DEBUG_PRINT("s)");
  
   // Configure GNSS
   GNSS_PORT.println("$PMTK220,1000*1F"); // Set NMEA update rate to 1 Hz
@@ -73,6 +71,7 @@ void readGnss()
   }
   else {
     // Convert GNSS date and time to epoch time
+    tmElements_t tm;
     tm.Hour = gnss.time.hour();
     tm.Minute = gnss.time.minute();
     tm.Second = gnss.time.second();
