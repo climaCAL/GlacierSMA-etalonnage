@@ -723,7 +723,7 @@ void readDFRWindSensor()
       }
       else {
         bridgeData.hauteurNeige = (float)bridgeDataRaw.HNeigeReg;
-        bridgeData.temperatureHN = (float)bridgeDataRaw.tempHNReg;
+        bridgeData.temperatureHN = (float)bridgeDataRaw.tempHNReg;   //Yh 4-fev-2025: à revoir car ne sera pas bien interprété
         
         #if CALIBRATE
           DEBUG_PRINTF("\thauteurNeige Raw: "); DEBUG_PRINT(bridgeData.hauteurNeige); DEBUG_PRINTFLN(" mm");
@@ -751,20 +751,22 @@ void readDFRWindSensor()
       //Traitement data Stevenson - température (BME280):
       if ((int16_t)bridgeDataRaw.tempExtReg != temp_ERRORVAL) {
         //Application du décodage:
-        bridgeData.temperatureExt = bridgeDataRaw.tempExtReg / 100.0;
+        bridgeData.temperatureExt = (int16_t)bridgeDataRaw.tempExtReg / 100.0;
 
         //Application de la correction selon étalonnage
         bridgeData.temperatureExt  = tempBmeEXT_CF * bridgeData.temperatureExt + tempBmeEXT_Offset;
 
-        temperatureExt = bridgeData.temperatureExt;  // External temperature (°C)
+        if (bridgeData.temperatureExt > -40.0 && bridgeData.temperatureExt < 50.0) {
+          temperatureExt = bridgeData.temperatureExt;  // External temperature (°C)
 
-        // Protection en cas de mauvaise valeur après étalonnage?  n'a pas (encore) au 30 avril 2024 Yh
+          // Protection en cas de mauvaise valeur après étalonnage?  n'a pas (encore) au 30 avril 2024 Yh
 
-        temperatureExtStats.add(temperatureExt);
+          temperatureExtStats.add(temperatureExt);
 
-        #if CALIBRATE
-            DEBUG_PRINTF("\tTemperatureExt: "); DEBUG_PRINT(bridgeData.temperatureExt); DEBUG_PRINTFLN(" C");
-        #endif
+          #if CALIBRATE
+              DEBUG_PRINTF("\tTemperatureExt: "); DEBUG_PRINT(bridgeData.temperatureExt); DEBUG_PRINTFLN(" C");
+          #endif
+        } // else: la valeur est "rejetée"
       }
       // Question: est-ce qu'il faut injecter 0 dans le cas contraire?
 
@@ -835,14 +837,15 @@ void readDFRWindSensor()
           DEBUG_PRINTF(" luminoAmbExt="); DEBUG_PRINT(bridgeData.luminoAmbExt);
           DEBUG_PRINTF(" solar="); DEBUG_PRINT(solar);
           DEBUG_PRINTF(" solarStats="); DEBUG_PRINT(solarStats.average());
-          DEBUG_PRINTFLN(" ");
+          DEBUG_PRINTLN();
       #endif
     }
 
     //Recupération de l'information d'état de lecture par le périphérique:
-    bridgeData.stvsnErrCode = bridgeDataRaw.stvsnErrReg;
-    DEBUG_PRINTF("\tstvsnErrCode: ");
+    bridgeData.stvsnErrCode = (uint16_t)bridgeDataRaw.stvsnErrReg;
+    lastStvsnErrCode = bridgeData.stvsnErrCode || lastStvsnErrCode; // Yh 14nov24: fait un OR pour conserver entre 2 collectes, jusqu'à ce que l'envoie soit fait. Pas parfait, mais on aura l'info que pendant le cycle on a rencontré une erreur.
     if (bridgeData.stvsnErrCode) { DEBUG_PRINTF("*ATTN* "); }
+    DEBUG_PRINTF("\tstvsnErrCode: ");
     DEBUG_PRINTLN(bridgeData.stvsnErrCode);
 
     //--- Fin de la grande section de la récupération des valeurs et validation des codes d'erreurs --------------------------
