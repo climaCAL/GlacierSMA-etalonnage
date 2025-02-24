@@ -181,8 +181,8 @@ StatisticCAL vStats;               // Wind north-south wind vector component (v)
 // User defined configuration variables
 // ----------------------------------------------------------------------------
 #if DEBUG
-unsigned int  sampleInterval    = 5;      // Sampling interval (minutes). Values must be in range [1, 60]
-unsigned int  averageInterval   = 144;    // Number of samples to be averaged in each message. Range: [1, 240]
+unsigned int  sampleInterval    = 1;      // Sampling interval (minutes). Values must be in range [1, 60]
+unsigned int  averageInterval   = 15;     // Number of samples to be averaged in each message. Range: [1, 240]
 unsigned int  transmitInterval  = 1;      // Number of messages in each Iridium transmission (340-byte limit)
 unsigned int  retransmitLimit   = 5;      // Failed data transmission reattempts (340-byte limit)
 unsigned int  iridiumTimeout    = 120;    // Timeout for Iridium transmission (seconds)
@@ -249,7 +249,7 @@ uint8_t       mtSbdBuffer[270];           // Buffer for Mobile Terminated SBD (M
 size_t        moSbdBufferSize;
 size_t        mtSbdBufferSize;
 char          logFileName[50]   = "";     // Log file name
-char          dateTime[20]      = "";     // Datetime buffer
+char          datetime[20]      = "";     // Datetime buffer
 byte          retransmitCounter = 0;      // Counter for Iridium 9603 transmission reattempts
 byte          transmitCounter   = 0;      // Counter for Iridium 9603 transmission intervals
 byte          currentLogFile    = 0;      // Variable for tracking when new microSD log files are created
@@ -544,7 +544,7 @@ void loop()
       printWakeUp(sampleCounter);
 
       // Print date and time
-      DEBUG_PRINT("Info - Alarm triggered at "); printDateTime();
+      DEBUG_PRINT("Info - Alarm triggered at "); DEBUG_PRINTLN(datetime);
     }
 
     // Read battery voltage

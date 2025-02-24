@@ -57,9 +57,9 @@ void printStats()
   printLine();
   DEBUG_PRINTLN(F("Statistics"));
   printLine();
-  DEBUG_PRINT("Datetime: ");      printTab(1);  printDateTime();
+  DEBUG_PRINT("Datetime: ");  printTab(1);  DEBUG_PRINTLN(datetime);
 
-  DEBUG_PRINT(F("Voltage"));      printTab(2);
+  DEBUG_PRINT(F("Voltage"));                                                    printTab(2);
   DEBUG_PRINT(F("Samples: "));    DEBUG_PRINT(batteryStats.count());            printTab(1);
   DEBUG_PRINT(F("Min: "));        DEBUG_PRINT(batteryStats.minimum());          printTab(1);
   DEBUG_PRINT(F("Max: "));        DEBUG_PRINT(batteryStats.maximum());          printTab(1);
