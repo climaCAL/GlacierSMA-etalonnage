@@ -842,7 +842,7 @@ void readDFRWindSensor()
 
     //Recupération de l'information d'état de lecture par le périphérique:
     bridgeData.stvsnErrCode = (uint16_t)bridgeDataRaw.stvsnErrReg;
-    lastStvsnErrCode = bridgeData.stvsnErrCode || lastStvsnErrCode; // Yh 14nov24: fait un OR pour conserver entre 2 collectes, jusqu'à ce que l'envoie soit fait.
+    lastStvsnErrCode = bridgeData.stvsnErrCode ?: lastStvsnErrCode; // Yh 14nov24: fait un OR pour conserver entre 2 collectes, jusqu'à ce que l'envoie soit fait.
     if (bridgeData.stvsnErrCode) { DEBUG_PRINTF("*ATTN* "); }
     DEBUG_PRINTF("\tstvsnErrCode: ");
     DEBUG_PRINTLN(bridgeData.stvsnErrCode);
