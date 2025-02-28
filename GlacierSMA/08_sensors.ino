@@ -760,7 +760,7 @@ void readDFRWindSensor()
           temperatureExtStats.add(temperatureExt);
 
           #if CALIBRATE
-              DEBUG_PRINTF("\tTemperatureExt: "); DEBUG_PRINT(bridgeData.temperatureExt); DEBUG_PRINTFLN(" C");
+            DEBUG_PRINTF("\tTemperatureExt: "); DEBUG_PRINT(bridgeData.temperatureExt); DEBUG_PRINTFLN(" C");
           #endif
         } // else: la valeur est "rejetée"
       }
@@ -774,17 +774,20 @@ void readDFRWindSensor()
         //Application de la correction selon étalonnage
         float humExt = humBmeEXT_CF * bridgeData.humiditeExt + humBmeEXT_Offset;
 
-        // Protection en cas de mauvaise valeur après étalonnage
-        if (humExt >= 100) {
-          humidityExt = 100.0;
-        } else {
-          humidityExt = humExt;
-        }
+        #if CALIBRATE || INSOMNIAC 
+          // Protection en cas de mauvaise valeur après étalonnage
+          // Désactivé en mode calibration pour permettre d'avoir les valeurs réelles, même si elles sont au dessus de 100%
+          if (humExt >= 100) {
+            humidityExt = 100.0;
+          } else {
+            humidityExt = humExt;
+          }
+        #endif
 
         humidityExtStats.add(humidityExt);
 
         #if CALIBRATE
-            DEBUG_PRINTF("\tHumidityExt: "); DEBUG_PRINT(bridgeData.humiditeExt); DEBUG_PRINTFLN("%");
+          DEBUG_PRINTF("\tHumidityExt: "); DEBUG_PRINT(bridgeData.humiditeExt); DEBUG_PRINTFLN("%");
         #endif
       }
       // Question: est-ce qu'il faut injecter 0 dans le cas contraire?
@@ -803,7 +806,7 @@ void readDFRWindSensor()
         pressureExtStats.add(pressureExt);
 
         #if CALIBRATE
-            DEBUG_PRINTF("\tPressureExt: "); DEBUG_PRINT(bridgeData.presAtmospExt); DEBUG_PRINTFLN(" hPa");
+          DEBUG_PRINTF("\tPressureExt: "); DEBUG_PRINT(bridgeData.presAtmospExt); DEBUG_PRINTFLN(" hPa");
         #endif
       }  
       // Question: est-ce qu'il faut injecter 0 dans le cas contraire?
@@ -829,11 +832,11 @@ void readDFRWindSensor()
 
       // Ex en date du 2 mai 2024: 
       #if CALIBRATE
-          DEBUG_PRINTF(">\tluminosite: raw="); DEBUG_PRINT(bridgeDataRaw.luminoReg);
-          DEBUG_PRINTF(" luminoAmbExt="); DEBUG_PRINT(bridgeData.luminoAmbExt);
-          DEBUG_PRINTF(" solar="); DEBUG_PRINT(solar);
-          DEBUG_PRINTF(" solarStats="); DEBUG_PRINT(solarStats.average());
-          DEBUG_PRINTFLN(" ");
+        DEBUG_PRINTF(">\tluminosite: raw="); DEBUG_PRINT(bridgeDataRaw.luminoReg);
+        DEBUG_PRINTF(" luminoAmbExt="); DEBUG_PRINT(bridgeData.luminoAmbExt);
+        DEBUG_PRINTF(" solar="); DEBUG_PRINT(solar);
+        DEBUG_PRINTF(" solarStats="); DEBUG_PRINT(solarStats.average());
+        DEBUG_PRINTFLN(" ");
       #endif
     }
 
