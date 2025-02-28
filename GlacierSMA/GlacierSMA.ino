@@ -689,7 +689,7 @@ void loop()
 // ----------------------------------------------------------------------------
 // Gestion des commandes
 // ----------------------------------------------------------------------------
-#define reply(var) _reply(var, F(#var))
+#define reply(var, ...) __reply(var, F(#var), ##__VA_ARGS__)
 
 #define FOREACH_STATUSVAR(M) M(sampleCounter) M(iterationCounter) M(transmitStatus)
 #define FOREACH_SETTING(M) M(sampleInterval) M(averageInterval) M(transmitInterval)
@@ -697,12 +697,12 @@ void loop()
             M(tempBmeINT_Offset) M(tempBmeINT_CF) M(humBmeINT_Offset) M(humBmeINT_CF) M(presBmeINT_Offset) M(presBmeINT_CF) \
             M(tempBmeEXT_Offset) M(tempBmeEXT_CF) M(humBmeEXT_Offset) M(humBmeEXT_CF) M(presBmeEXT_Offset) M(presBmeEXT_CF)
 
-#define _GET(var) else if (command.equalsIgnoreCase(F(#var))) { reply(var); }
-#define _SET(var, val) else if (command.equalsIgnoreCase(F(#var))) { var = val; reply(var); }
+#define _GET(var) else if (command.equalsIgnoreCase(F(#var))) { _reply(var, F(#var)); }
+#define _SET(var, val) else if (command.equalsIgnoreCase(F(#var))) { var = val; _reply(var, F(#var)); }
 #define _SET_ARG(var) _SET(var, static_cast<__typeof(var)>(arg))
 
 template<typename T, typename S, typename... Args>
-void _reply(T value, S* ident = nullptr, Args... args) {
+void __reply(T value, S* ident = nullptr, Args... printArgs) {
     SERIAL_PORT.write('>');
     SERIAL_PORT.write(' ');
     if (ident) {
@@ -711,18 +711,23 @@ void _reply(T value, S* ident = nullptr, Args... args) {
         DEBUG_PRINT('=');
         DEBUG_PRINT(' ');
     }
-    SERIAL_PORT.println(value, args...);
+    SERIAL_PORT.println(value, printArgs...);
     SERIAL_PORT.flush();
+}
+
+template<typename T, typename S>
+void _reply(T value, S* ident = nullptr) {
+    __reply(value, ident);
 }
 
 template<typename S>
 void _reply(float value, S* ident = nullptr) {
-    _reply(value, ident, 5);
+    __reply(value, ident, 5);
 }
 
 template<typename S>
 void _reply(double value, S* ident = nullptr) {
-    _reply(value, ident, 5);
+    __reply(value, ident, 5);
 }
 
 int receiveCommand() {
