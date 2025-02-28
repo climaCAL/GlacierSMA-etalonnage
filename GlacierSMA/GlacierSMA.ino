@@ -56,7 +56,7 @@
 // ----------------------------------------------------------------------------
 // Data logging
 // ----------------------------------------------------------------------------
-#define LOGGING         false  // Log data to microSD
+#define LOGGING         true  // Log data to microSD
 
 // ----------------------------------------------------------------------------
 // Debugging macros
@@ -195,7 +195,7 @@ unsigned int  retransmitLimit   = 5;      // Failed data transmission reattempts
 unsigned int  iridiumTimeout    = 240;    // Timeout for Iridium transmission (seconds)
 unsigned int  gnssTimeout       = 120;    // Timeout for GNSS signal acquisition (seconds)
 float         batteryCutoff     = 11.0;   // Battery voltage cutoff threshold (V)
-byte          loggingMode       = 2;      // Flag for new log file creation. 1: daily, 2: monthly, 3: yearly
+byte          loggingMode       = 1;      // Flag for new log file creation. 1: daily, 2: monthly, 3: yearly
 unsigned int  systemRstWDTCountLimit = 15;// Nombre d'alertes WDT autorisées avant de faire un system Reset (8s par cycle)
 #endif
 //TODO Verify that these values are within range -- see iridium.ino for acceptable ranges.
@@ -387,7 +387,7 @@ struct struct_online
   bool wm5103L  = 1; //TODO Retirer
   bool di7911   = 1; //TODO Retirer
   bool sp212    = 1; //TODO Retirer
-  bool dfrws    = 0; // Est le bridge RS-485 (TODO: Renommer)
+  bool dfrws    = 0; //TODO Renommer (est le bridge RS-485)
   bool gnss     = INSOMNIAC;
   bool iridium  = INSOMNIAC;
   bool microSd  = 0;
@@ -701,8 +701,8 @@ void loop()
 #define _SET(var, val) else if (command.equalsIgnoreCase(F(#var))) { var = val; reply(var); }
 #define _SET_ARG(var) _SET(var, static_cast<__typeof(var)>(arg))
 
-template<typename T, typename S>
-void _reply(T value, S* ident = nullptr) {
+template<typename T, typename S, typename... Args>
+void _reply(T value, S* ident = nullptr, Args... args) {
     SERIAL_PORT.write('>');
     SERIAL_PORT.write(' ');
     if (ident) {
@@ -711,8 +711,18 @@ void _reply(T value, S* ident = nullptr) {
         DEBUG_PRINT('=');
         DEBUG_PRINT(' ');
     }
-    SERIAL_PORT.println(value);
+    SERIAL_PORT.println(value, args...);
     SERIAL_PORT.flush();
+}
+
+template<typename S>
+void _reply(float value, S* ident = nullptr) {
+    _reply(value, ident, 5);
+}
+
+template<typename S>
+void _reply(double value, S* ident = nullptr) {
+    _reply(value, ident, 5);
 }
 
 int receiveCommand() {
