@@ -691,7 +691,7 @@ void loop()
 // ----------------------------------------------------------------------------
 #define reply(var, ...) __reply(var, F(#var), ##__VA_ARGS__)
 
-#define FOREACH_STATUSVAR(M) M(sampleCounter) M(iterationCounter) M(transmitStatus)
+#define FOREACH_STATUSVAR(M) M(sampleCounter) M(iterationCounter) M(transmitStatus) M(lastStvsnErrCode)
 #define FOREACH_SETTING(M) M(sampleInterval) M(averageInterval) M(transmitInterval)
 #define FOREACH_PARAM(M) \
             M(tempBmeINT_Offset) M(tempBmeINT_CF) M(humBmeINT_Offset) M(humBmeINT_CF) M(presBmeINT_Offset) M(presBmeINT_CF) \
@@ -749,7 +749,7 @@ int receiveCommand() {
             COMMAND = idx < 0 ? "INT" : COMMAND.substring(idx + 1);
             if (COMMAND == "INT")
                 idx = 0;
-            else if (COMMAND == "EXT")
+            else if (COMMAND == "EXT" || COMMAND == "GUST")
                 idx = 1;
             else {
                 SERIAL_PORT.print("! INVALID ARGUMENT: ");
@@ -758,9 +758,12 @@ int receiveCommand() {
             }
             switch (toupper(command[0])) {
                 case 'V': reply(voltage); break;
+                case 'L': reply(solar); break;
                 case 'T': reply(idx ? temperatureExt : temperatureInt); break;
                 case 'P': reply(idx ? pressureExt : pressureInt); break;
                 case 'H': reply(idx ? humidityExt : humidityInt); break;
+                case 'W': if (toupper(command[1]) == 'S') { reply(idx ? windGustSpeed : windSpeed); break; }
+                     else if (toupper(command[1]) == 'D') { reply(idx ? windGustDirection : windDirection); break; }
                 default:
                     SERIAL_PORT.print("! INVALID ARGUMENT: ");
                     SERIAL_PORT.println(command);

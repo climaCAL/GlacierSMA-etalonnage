@@ -21,12 +21,15 @@ void calculateStats() //FIXME What an awful name for a function that DELETES all
   windVectors();
 
   // Clear all statistics objects
-  //clearStats();
+  clearStats();
 
   // Clear wind gust speed and direction maximums
   windGustSpeed = 0;
   windGustDirection = 0;
   windDirectionSector = 0;
+
+  // Clear last value of Stevenson error code
+  lastStvsnErrCode = 0;
 
   // Write location data to union (will reuse previously stored data if readGNSS did not occur during this cycle)
   moSbdMessage.latitude = latitude * 1000000;
