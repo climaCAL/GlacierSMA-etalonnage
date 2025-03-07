@@ -49,6 +49,11 @@
 #include "src/Adafruit_VEML7700.h"  // Patched version of Adafruit VEML7700 library
 
 // ----------------------------------------------------------------------------
+// Version id (should match shortened git commit hash: 8 hex chars - 32 bits)
+// ----------------------------------------------------------------------------
+#define VERSION         0x49ab24af /* TODO Idéalement serait mis à jour automatiquement */
+
+// ----------------------------------------------------------------------------
 // Define unique identifier
 // ----------------------------------------------------------------------------
 #define CRYOLOGGER_ID   "PART-IT-01"
@@ -793,7 +798,10 @@ int receiveCommand() {
             return -3;
         }
         else if (command.equalsIgnoreCase("time")) {
-            _reply(rtc.getEpoch(), "time");
+            __reply(rtc.getEpoch(), "time", DEC);
+        }
+        else if (command.equalsIgnoreCase("version")) {
+            __reply((uint32_t)VERSION, "version", HEX);
         }
         FOREACH_STATUSVAR(_GET)
         FOREACH_SETTING(_GET)
@@ -829,7 +837,7 @@ int receiveCommand() {
             return -3;
         }
         else if (command.equalsIgnoreCase("time")) {
-            rtc.setEpoch((uint32_t)arg);
+            rtc.setEpoch((uint32_t)arg); // TODO: Ajouter un argument "auto" pour sync avec le gps
             _reply((uint32_t)arg, "time");
         }
         FOREACH_SETTING(_SET_ARG)
