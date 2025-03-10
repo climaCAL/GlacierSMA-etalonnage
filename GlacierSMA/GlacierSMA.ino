@@ -185,28 +185,30 @@ StatisticSMA vStats;               // Wind north-south wind vector component (v)
 // ----------------------------------------------------------------------------
 // User defined configuration variables
 // ----------------------------------------------------------------------------
-#if DEBUG
-unsigned int  sampleInterval    = 1;      // Sampling interval (minutes). Values must be in range [1, 60]
-unsigned int  averageInterval   = 15;     // Number of samples to be averaged in each message. Range: [1, 240]
-unsigned int  transmitInterval  = 1;      // Number of messages in each Iridium transmission (340-byte limit)
-unsigned int  retransmitLimit   = 5;      // Failed data transmission reattempts (340-byte limit)
-unsigned int  iridiumTimeout    = 120;    // Timeout for Iridium transmission (seconds)
-unsigned int  gnssTimeout       = 60;     // Timeout for GNSS signal acquisition (seconds)
-float         batteryCutoff     = 3.0;    // Battery voltage cutoff threshold (V)
-byte          loggingMode       = 3;      // Flag for new log file creation. 1: daily, 2: monthly, 3: yearly
-unsigned int  systemRstWDTCountLimit = 5; // Nombre d'alertes WDT autorisées avant de faire un system Reset (8s par cycle)
-#else
-unsigned int  sampleInterval    = 1;      // Sampling interval (minutes). Default: 5 min (300 seconds)
-unsigned int  averageInterval   = 10;     // Number of samples to be averaged in each message. Default: 12 (hourly)
 unsigned int  transmitInterval  = 1;      // Number of messages in each Iridium transmission (340-byte limit)
 unsigned int  retransmitLimit   = 5;      // Failed data transmission reattempts (340-byte limit)
 unsigned int  iridiumTimeout    = 240;    // Timeout for Iridium transmission (seconds)
 unsigned int  gnssTimeout       = 120;    // Timeout for GNSS signal acquisition (seconds)
+
+#if DEBUG
+unsigned int  sampleInterval    = 1;
+unsigned int  averageInterval   = 15;
+float         batteryCutoff     = 3.0;
+byte          loggingMode       = 3;
+unsigned int  systemRstWDTCountLimit = 5;
+#elif CALIBRATE
+unsigned int  sampleInterval    = 1;      // Sampling interval (seconds). Default: 1 seconds
+unsigned int  averageInterval   = 15;     // Number of samples to be averaged in each message. Default: 15 (~15s)
 float         batteryCutoff     = 11.0;   // Battery voltage cutoff threshold (V)
 byte          loggingMode       = 1;      // Flag for new log file creation. 1: daily, 2: monthly, 3: yearly
+unsigned int  systemRstWDTCountLimit = 5; // Nombre d'alertes WDT autorisées avant de faire un system Reset (8s par cycle)
+#else
+unsigned int  sampleInterval    = 5;      // Sampling interval (minutes). Default: 5 min (300 seconds)
+unsigned int  averageInterval   = 12;     // Number of samples to be averaged in each message. Default: 12 (hourly)
+float         batteryCutoff     = 11.0;   // Battery voltage cutoff threshold (V)
+byte          loggingMode       = 2;      // Flag for new log file creation. 1: daily, 2: monthly, 3: yearly
 unsigned int  systemRstWDTCountLimit = 15;// Nombre d'alertes WDT autorisées avant de faire un system Reset (8s par cycle)
 #endif
-//TODO Verify that these values are within range -- see iridium.ino for acceptable ranges.
 
 // ----------------------------------------------------------------------------
 // Sensors correction factor and offsets -- to modify -- 
@@ -427,6 +429,12 @@ struct struct_timer
 // ----------------------------------------------------------------------------
 void setup()
 {
+  #if DEBUG
+    // Settings adjustement for DEBUG mode
+    iridiumTimeout /= 2;
+    gnssTimeout /= 2;
+  #endif
+
   // Clear memory structures
   memset(&moSbdMessage, 0, sizeof(moSbdMessage));
   memset(&mtSbdMessage, 0, sizeof(mtSbdMessage));

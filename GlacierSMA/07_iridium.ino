@@ -4,7 +4,7 @@ void configureIridium()
   if (!disabled.iridium) {
     modem.setPowerProfile(IridiumSBD::DEFAULT_POWER_PROFILE); // Assume battery power (USB power: IridiumSBD::USB_POWER_PROFILE)
     modem.adjustSendReceiveTimeout(iridiumTimeout);           // Timeout for Iridium send/receive commands (default = 300 s)
-    modem.adjustStartupTimeout(iridiumTimeout / 2);           // Timeout for Iridium startup (default = 240 s)
+    modem.adjustStartupTimeout(iridiumTimeout - 60);          // Timeout for Iridium startup (default = 240 s)
     DEBUG_PRINTLN("Info - Iridium modem ready");
   }
 }
@@ -55,7 +55,7 @@ bool transmitData()
   pinPeripheral(PIN_IRIDIUM_RX, PIO_SERCOM);
   
   // Wake up the RockBLOCK 9603 and begin communications
-  DEBUG_PRINT("Info - Starting iridium modem ("); DEBUG_PRINT(iridiumTimeout/2); DEBUG_PRINT("s)");
+  DEBUG_PRINT("Info - Starting iridium modem ("); DEBUG_PRINT(iridiumTimeout - 60); DEBUG_PRINT("s)");
   petDog(); // The following might take a while, so best reset the WDT here
   
   int returnCode = modem.begin();
