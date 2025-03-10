@@ -49,19 +49,24 @@
 #include "src/Adafruit_VEML7700.h"  // Patched version of Adafruit VEML7700 library
 
 // ----------------------------------------------------------------------------
-// Version id (should match shortened git commit hash: 8 hex chars - 32 bits)
-// ----------------------------------------------------------------------------
-#define VERSION         0x49ab24af /* TODO Idéalement serait mis à jour automatiquement */
-
-// ----------------------------------------------------------------------------
 // Define unique identifier
 // ----------------------------------------------------------------------------
 #define CRYOLOGGER_ID   "PART-IT-01"
 
 // ----------------------------------------------------------------------------
-// Data logging
+// Version id (should match shortened git commit hash: 8 hex chars - 32 bits)
+// ----------------------------------------------------------------------------
+#define VERSION         0x1a357c1d /* TODO Idéalement serait mis à jour automatiquement */
+
+// ----------------------------------------------------------------------------
+// Data logging to SD card
 // ----------------------------------------------------------------------------
 #define LOGGING         true  // Log data to microSD
+
+// ----------------------------------------------------------------------------
+// Station operation mode ("NORMAL" or "CALIBRATE")
+// ----------------------------------------------------------------------------
+#define CALIBRATE       true  // Enable sensor calibration mode (no sleeping)
 
 // ----------------------------------------------------------------------------
 // Debugging macros
@@ -69,8 +74,6 @@
 #define DEBUG           false // Output debug messages to Serial Monitor
 #define DEBUG_GNSS      false // Output GNSS debug information
 #define DEBUG_IRIDIUM   false // Output Iridium debug messages to Serial Monitor
-#define INSOMNIAC       true  // Prevent sleeping
-#define CALIBRATE       false // Enable sensor calibration code
 
 #if DEBUG
 #define DEBUG_PRINT(...)          SERIAL_PORT.print(__VA_ARGS__)
@@ -393,8 +396,8 @@ struct struct_online
   bool di7911   = 1; //TODO Retirer
   bool sp212    = 1; //TODO Retirer
   bool dfrws    = 0; //TODO Renommer (est le bridge RS-485)
-  bool gnss     = INSOMNIAC;
-  bool iridium  = INSOMNIAC;
+  bool gnss     = CALIBRATE;
+  bool iridium  = CALIBRATE;
   bool microSd  = 0;
 } online;
 const struct_online disabled;
@@ -452,7 +455,7 @@ void setup()
   Wire.begin();
   Wire.setClock(400000); // Set I2C clock speed to 400 kHz
 
-#if DEBUG || INSOMNIAC
+#if DEBUG || CALIBRATE
   SERIAL_PORT.begin(115200); // Open serial port at 115200 baud
   blinkLed(PIN_LED_GREEN, 10, 500); // Non-blocking delay to allow user to open and clear Serial Monitor
 #endif
@@ -463,45 +466,6 @@ void setup()
   printLine();
   DEBUG_PRINT("Cryologger - Automatic Weather Station #"); DEBUG_PRINTLN(CRYOLOGGER_ID);
   printLine();
-
-#if CALIBRATE
-  enable5V();   // Enable 5V power
-  enable12V();  // Enable 12V power
-
-  while (true)
-  {
-    petDog(); // Reset WDT
-    int fram = freeRam();
-    DEBUG_PRINT(">  Fram initial: "); DEBUG_PRINTLN(fram);
-
-    calibrateAdc();
-    DEBUG_PRINT(">  (ADC) Fram state: "); DEBUG_PRINTLN(freeRam());
-
-    readBattery();        // Read battery voltage
-    DEBUG_PRINT(">  (Bat) Fram state: "); DEBUG_PRINTLN(freeRam());
-
-    readBme280Int();  // Read temperature and humidty sensor (external)
-    DEBUG_PRINT(">  (BME280Int) Fram state: "); DEBUG_PRINTLN(freeRam());
-
-    readBme280Ext();     // Read temperature and humidty sensor (external)
-    DEBUG_PRINT(">  (BME280Ext) Fram state: "); DEBUG_PRINTLN(freeRam());
-
-    readLsm303();
-    DEBUG_PRINT(">  (LSM303) Fram state: "); DEBUG_PRINTLN(freeRam());
-
-    readVeml7700();    // Read solar radiation
-    DEBUG_PRINT(">  (VEML7700) Fram state: "); DEBUG_PRINTLN(freeRam());
-
-    readDFRWindSensor(); //TODO Rename me
-    DEBUG_PRINT(">  (DFRWS) Fram state: "); DEBUG_PRINTLN(freeRam());
-
-    //readGnss(); // Sync RTC with the GNSS
-
-    DEBUG_PRINT(">  Fram final change: "); DEBUG_PRINTLN(freeRam() - fram);
-    myDelay(5000);
-    printWakeUp(++sampleCounter);
-  }
-#endif
 
   // Configure devices
   configureRtc();       // Configure real-time clock (RTC)
@@ -532,7 +496,7 @@ void setup()
 void loop()
 {
   // Check if RTC alarm triggered or if program is running for first time
-  if (INSOMNIAC || alarmFlag || firstTimeFlag)
+  if (CALIBRATE || alarmFlag || firstTimeFlag)
   {
     // Read the RTC
     readRtc();
@@ -652,7 +616,7 @@ void loop()
       printTimers();
 
       // Set the RTC alarm
-      if (!INSOMNIAC)
+      if (!CALIBRATE)
         setRtcAlarm();
 
       // Prepare for sleep
@@ -663,7 +627,7 @@ void loop()
   // Check for WDT interrupts
   if (wdtFlag)
   {
-    if (INSOMNIAC || checkAlarm())
+    if (CALIBRATE || checkAlarm())
     {
       // Blink LED to indicate WDT interrupt and nominal system operation
       blinkLed(PIN_LED_GREEN, 1, 50);

@@ -654,7 +654,7 @@ void readDFRWindSensor()
   }
 
   Wire.begin(); // Requires I2C bus
-  if (!INSOMNIAC || firstTimeFlag) {
+  if (!CALIBRATE || firstTimeFlag) {
     // Il faut laisser du temps au bridgeI2C de collecter les donnees sur le modbus RS485, tout en laissant les capteurs faire leur travail.
     DEBUG_PRINT("(sensor settle time: "); DEBUG_PRINT(bridgeSettleDelay/1000); DEBUG_PRINT("s) ");
     myDelay(bridgeSettleDelay);
@@ -774,7 +774,7 @@ void readDFRWindSensor()
         //Application de la correction selon étalonnage
         float humExt = humBmeEXT_CF * bridgeData.humiditeExt + humBmeEXT_Offset;
 
-        #if CALIBRATE || INSOMNIAC 
+        #if !CALIBRATE
           // Protection en cas de mauvaise valeur après étalonnage
           // Désactivé en mode calibration pour permettre d'avoir les valeurs réelles, même si elles sont au dessus de 100%
           if (humExt >= 100) {

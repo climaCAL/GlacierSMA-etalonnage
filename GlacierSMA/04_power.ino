@@ -87,7 +87,7 @@ void disable12V()
 // Prepare system for sleep
 void prepareForSleep()
 {
-#if INSOMNIAC
+#if CALIBRATE
   myDelay(5000);
   DEBUG_PRINTLN();
 #else
@@ -112,7 +112,7 @@ void prepareForSleep()
 // Enter deep sleep
 void goToSleep()
 {
-#if !INSOMNIAC
+#if !CALIBRATE
   // Enter deep sleep
   LowPower.deepSleep();
   /* Code sleeps here and awaits RTC or WDT interrupt */
@@ -129,7 +129,7 @@ void goToSleep()
 // Wake from deep sleep
 void wakeUp()
 {
-#if !INSOMNIAC
+#if !CALIBRATE
   // Enable serial port
   enableSerial();
 #endif
