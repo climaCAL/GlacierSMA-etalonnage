@@ -25,10 +25,10 @@ bool scanI2CbusFor(uint8_t address, unsigned int recheck = 0, unsigned int retry
       DEBUG_PRINT(0);
     DEBUG_PRINT_HEX(address);
     DEBUG_PRINT("] ");
-    return true;
   }
 
-  return false;
+  myDelay(10); // Juste pour être sûr de laisser le bus i2c prêt à communiquer.
+  return error == 0;
 }
 
 // ----------------------------------------------------------------------------
